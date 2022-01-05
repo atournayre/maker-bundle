@@ -107,7 +107,7 @@ class MakeTrait extends AbstractMaker implements MakerInterface
                 break;
             }
 
-            $this->classTraitAdder->generate($entityNamespace, $objectNamespace);
+            $this->classTraitAdder->generate($objectNamespace, $classNameDetails->getFullName());
         }
 
         $this->writeSuccessMessage($io);
