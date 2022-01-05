@@ -36,8 +36,5 @@ class AtournayreMakerExtension extends Extension
 
         $configuration = $this->getConfiguration($configs, $container);
         $this->processConfiguration($configuration, $configs);
-
-        $container->registerForAutoconfiguration(MakerInterface::class)
-            ->addTag(MakeCommandRegistrationPass::MAKER_TAG);
     }
 }
