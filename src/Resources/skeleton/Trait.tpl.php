@@ -2,6 +2,6 @@
 
 namespace <?= $namespace; ?>;
 
-class <?= $class_name."\n" ?>
+trait <?= $class_name."\n" ?>
 {
 }

@@ -21,12 +21,12 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder('maker');
+        $treeBuilder = new TreeBuilder('atournayre_maker');
         if (method_exists($treeBuilder, 'getRootNode')) {
             $rootNode = $treeBuilder->getRootNode();
         } else {
             // BC layer for symfony/config 4.1 and older
-            $rootNode = $treeBuilder->root('maker');
+            $rootNode = $treeBuilder->root('atournayre_maker');
         }
 
         $rootNode

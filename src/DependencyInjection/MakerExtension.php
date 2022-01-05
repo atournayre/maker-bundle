@@ -11,8 +11,6 @@
 
 namespace Atournayre\Bundle\MakerBundle\DependencyInjection;
 
-use Symfony\Bundle\MakerBundle\DependencyInjection\CompilerPass\MakeCommandRegistrationPass;
-use Symfony\Bundle\MakerBundle\MakerInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
@@ -35,20 +33,6 @@ class MakerExtension extends Extension
         $loader->load('makers.xml');
 
         $configuration = $this->getConfiguration($configs, $container);
-        $config = $this->processConfiguration($configuration, $configs);
-
-        $rootNamespace = trim($config['root_namespace'], '\\');
-
-        $autoloaderFinderDefinition = $container->getDefinition('maker.autoloader_finder');
-        $autoloaderFinderDefinition->replaceArgument(0, $rootNamespace);
-
-        $makeCommandDefinition = $container->getDefinition('maker.generator');
-        $makeCommandDefinition->replaceArgument(1, $rootNamespace);
-
-        $doctrineHelperDefinition = $container->getDefinition('maker.doctrine_helper');
-        $doctrineHelperDefinition->replaceArgument(0, $rootNamespace.'\\Entity');
-
-        $container->registerForAutoconfiguration(MakerInterface::class)
-            ->addTag(MakeCommandRegistrationPass::MAKER_TAG);
+        $this->processConfiguration($configuration, $configs);
     }
 }

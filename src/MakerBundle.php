@@ -11,24 +11,20 @@
 
 namespace Atournayre\Bundle\MakerBundle;
 
-use Symfony\Bundle\MakerBundle\DependencyInjection\CompilerPass\MakeCommandRegistrationPass;
-use Symfony\Bundle\MakerBundle\DependencyInjection\CompilerPass\RemoveMissingParametersPass;
-use Symfony\Bundle\MakerBundle\DependencyInjection\CompilerPass\SetDoctrineManagerRegistryClassPass;
-use Symfony\Component\DependencyInjection\Compiler\PassConfig;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Atournayre\Bundle\MakerBundle\DependencyInjection\MakerExtension;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
- * @author Javier Eguiluz <javier.eguiluz@gmail.com>
- * @author Ryan Weaver <weaverryan@gmail.com>
+ * @author Aurélien Tournayre <aurelien.tournayre@gmail.com>
  */
 class MakerBundle extends Bundle
 {
-    public function build(ContainerBuilder $container)
+    public function getContainerExtension()
     {
-        // add a priority so we run before the core command pass
-        $container->addCompilerPass(new MakeCommandRegistrationPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 10);
-        $container->addCompilerPass(new RemoveMissingParametersPass());
-        $container->addCompilerPass(new SetDoctrineManagerRegistryClassPass());
+        if (null === $this->extension) {
+            $this->extension = new MakerExtension();
+        }
+
+        return $this->extension;
     }
 }
