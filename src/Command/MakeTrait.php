@@ -98,8 +98,17 @@ class MakeTrait extends AbstractMaker implements MakerInterface
             $classNameDetails = $this->traitGenerator->generate($entityNamespace, $regenerate);
         }
 
-        // TODO Adder
-       $this->classTraitAdder->generate($entityNamespace, $classNameDetails->getFullName());
+        $isFirstField = true;
+        while (true) {
+            $objectNamespace = $this->askForNamespacesOfClassesUsingTrait($io, $isFirstField);
+            $isFirstField = false;
+
+            if (null === $objectNamespace) {
+                break;
+            }
+
+            $this->classTraitAdder->generate($entityNamespace, $objectNamespace);
+        }
 
         $this->writeSuccessMessage($io);
     }
@@ -113,5 +122,24 @@ class MakeTrait extends AbstractMaker implements MakerInterface
     public function configureDependencies(DependencyBuilder $dependencies, InputInterface $input = null)
     {
         // TODO: Implement configureDependencies() method.
+    }
+
+    /**
+     * @param ConsoleStyle $io
+     * @param bool         $isFirstField
+     *
+     * @return string|null
+     */
+    private function askForNamespacesOfClassesUsingTrait(ConsoleStyle $io, bool $isFirstField): ?string
+    {
+        $io->writeln('');
+
+        if ($isFirstField) {
+            $questionText = 'New class namespace (press <return> to stop adding trait to classes)';
+        } else {
+            $questionText = 'Add another class namespace? Enter the class namespace (or press <return> to stop adding trait to classes)';
+        }
+
+        return $io->ask($questionText);
     }
 }
