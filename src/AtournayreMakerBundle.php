@@ -11,19 +11,19 @@
 
 namespace Atournayre\Bundle\MakerBundle;
 
-use Atournayre\Bundle\MakerBundle\DependencyInjection\MakerExtension;
+use Atournayre\Bundle\MakerBundle\DependencyInjection\AtournayreMakerExtension;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
  * @author Aurélien Tournayre <aurelien.tournayre@gmail.com>
  */
-class MakerBundle extends Bundle
+class AtournayreMakerBundle extends Bundle
 {
     public function getContainerExtension(): ?ExtensionInterface
     {
         if (null === $this->extension) {
-            $this->extension = new MakerExtension();
+            $this->extension = new AtournayreMakerExtension();
         }
 
         return $this->extension;

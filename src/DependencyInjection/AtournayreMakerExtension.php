@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
  *
  * @see http://symfony.com/doc/current/cookbook/bundles/extension.html
  */
-class MakerExtension extends Extension
+class AtournayreMakerExtension extends Extension
 {
     /**
      * {@inheritdoc}
