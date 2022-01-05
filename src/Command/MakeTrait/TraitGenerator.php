@@ -55,7 +55,7 @@ class TraitGenerator
 
         $manipulator->addProperty($property);
         $this->addGetter($manipulator, $property, $type);
-        $this->addSetter($manipulator, $property, $type);
+        $this->addSetter($manipulator, $property, $type, $name);
 
         $sourceCode = $this->adjustSourceCode($manipulator, $name, $property, $type);
         $this->saveFile($entityPath, $sourceCode);
@@ -108,16 +108,17 @@ class TraitGenerator
      * @param ClassSourceManipulator $manipulator
      * @param string                 $property
      * @param string                 $type
+     * @param string                 $name
      *
      * @return void
      */
-    protected function addSetter(ClassSourceManipulator $manipulator, string $property, string $type): void
+    protected function addSetter(ClassSourceManipulator $manipulator, string $property, string $type, string $name): void
     {
         $manipulator
             ->addSetter($property, $type, false, [
                 sprintf('@param %s $%s', $type, $property),
                 '',
-                '@return $this',
+                sprintf('@return %s|%s', $this->setName($name), $type),
             ]);
     }
 

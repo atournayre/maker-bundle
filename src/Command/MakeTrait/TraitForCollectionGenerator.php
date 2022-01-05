@@ -52,8 +52,8 @@ class TraitForCollectionGenerator extends TraitGenerator
 
         $manipulator->addProperty($propertyCollection);
         $this->addGetter($manipulator, $propertyCollection, $type);
-        $this->addSetter($manipulator, $propertyCollection, $type);
-        $this->addAdder($manipulator, $property, $propertyCollection, $type);
+        $this->addSetter($manipulator, $propertyCollection, $type, $name);
+        $this->addAdder($manipulator, $property, $propertyCollection, $type, $name);
         $this->addRemover($manipulator, $property, $propertyCollection, $type);
         $this->addAllRemover($manipulator, $propertyCollection, $type);
         $this->addHaser($manipulator, $propertyCollection, $type);
@@ -94,16 +94,17 @@ class TraitForCollectionGenerator extends TraitGenerator
      * @param ClassSourceManipulator $manipulator
      * @param string                 $property
      * @param string                 $type
+     * @param string                 $name
      *
      * @return void
      */
-    protected function addSetter(ClassSourceManipulator $manipulator, string $property, string $type): void
+    protected function addSetter(ClassSourceManipulator $manipulator, string $property, string $type, string $name): void
     {
         $manipulator
             ->addSetter($property, 'Collection', false, [
                 sprintf('@param %s $%s', 'Collection', $property),
                 '',
-                '@return $this',
+                sprintf('@return %s|%s', $this->setName($name), $type),
             ]);
     }
 
@@ -112,6 +113,7 @@ class TraitForCollectionGenerator extends TraitGenerator
      * @param string                 $property
      * @param string                 $propertyCollection
      * @param string                 $type
+     * @param string                 $name
      *
      * @return void
      */
@@ -119,7 +121,8 @@ class TraitForCollectionGenerator extends TraitGenerator
         ClassSourceManipulator $manipulator,
         string                 $property,
         string                 $propertyCollection,
-        string                 $type
+        string                 $type,
+        string                 $name
     ): void
     {
         $methodBuilder = $this->createPublicMethod('add' . $type, 'self');
@@ -128,7 +131,7 @@ class TraitForCollectionGenerator extends TraitGenerator
         $methodBuilder->setDocComment(
             $this->createDocBlock([
                                       sprintf('@param %s $%s', $type, $property),
-                                      '@return $this',
+                                      sprintf('@return %s|%s', $this->setName($name), $type),
                                   ])
         );
 
