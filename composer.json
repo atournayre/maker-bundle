@@ -13,10 +13,11 @@
     "minimum-stability": "dev",
     "require": {
         "php": ">=8.1.1",
+        "doctrine/common": "3.2.x-dev",
         "symfony/maker-bundle": "^1.36"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "^4.3|^5.0"
+        "symfony/phpunit-bridge": "6.1.x-dev"
     },
     "config": {
         "preferred-install": "dist",
