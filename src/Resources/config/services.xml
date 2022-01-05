@@ -7,5 +7,19 @@
         <services>
             <defaults public="false" />
 
+            <service id="atournayre.maker.trait_generator" class="App\Command\MakeTrait\TraitGenerator">
+                <argument type="service" id="maker.generator" />
+                <argument type="service" id="maker.file_manager" />
+            </service>
+
+            <service id="atournayre.maker.trait_for_collection_generator"
+                     class="App\Command\MakeTrait\TraitForCollectionGenerator"
+                     parent="atournayre.maker.trait_generator" />
+
+            <service id="atournayre.maker.class_trait_adder" class="App\Command\MakeTrait\ClassTraitAdder">
+                <argument type="service" id="maker.generator" />
+                <argument type="service" id="maker.file_manager" />
+            </service>
+
         </services>
 </container>

@@ -7,12 +7,10 @@
         <services>
             <defaults public="false" />
 
-            <service id="maker.maker.make_entity" class="Symfony\Bundle\MakerBundle\Maker\MakeEntity">
-                <argument type="service" id="maker.file_manager" />
-                <argument type="service" id="maker.doctrine_helper" />
-                <argument>%kernel.project_dir%</argument>
-                <argument type="service" id="maker.generator" />
-                <argument type="service" id="maker.entity_class_generator" />
+            <service id="atournayre.maker.make_trait" class="App\Command\MakeTrait">
+                <argument type="service" id="atournayre.maker.trait_generator" />
+                <argument type="service" id="atournayre.maker.trait_for_collection_generator" />
+                <argument type="service" id="atournayre.maker.class_trait_adder" />
                 <tag name="maker.command" />
             </service>
 
