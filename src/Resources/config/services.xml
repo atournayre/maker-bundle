@@ -7,16 +7,16 @@
         <services>
             <defaults public="false" />
 
-            <service id="atournayre.maker.trait_generator" class="App\Command\MakeTrait\TraitGenerator">
+            <service id="atournayre.maker.trait_generator" class="Atournayre\Bundle\MakerBundle\Command\TraitGenerator">
                 <argument type="service" id="maker.generator" />
                 <argument type="service" id="maker.file_manager" />
             </service>
 
             <service id="atournayre.maker.trait_for_collection_generator"
-                     class="App\Command\MakeTrait\TraitForCollectionGenerator"
+                     class="Atournayre\Bundle\MakerBundle\Command\TraitForCollectionGenerator"
                      parent="atournayre.maker.trait_generator" />
 
-            <service id="atournayre.maker.class_trait_adder" class="App\Command\MakeTrait\ClassTraitAdder">
+            <service id="atournayre.maker.class_trait_adder" class="Atournayre\Bundle\MakerBundle\Command\ClassTraitAdder">
                 <argument type="service" id="maker.generator" />
                 <argument type="service" id="maker.file_manager" />
             </service>

@@ -7,11 +7,11 @@
         <services>
             <defaults public="false" />
 
-            <service id="atournayre.maker.make_trait" class="App\Command\MakeTrait">
+            <service id="atournayre.maker.make_trait" class="Atournayre\Bundle\MakerBundle\Command">
                 <argument type="service" id="atournayre.maker.trait_generator" />
                 <argument type="service" id="atournayre.maker.trait_for_collection_generator" />
                 <argument type="service" id="atournayre.maker.class_trait_adder" />
-                <tag name="command" />
+                <tag name="maker.command" />
             </service>
 
         </services>
