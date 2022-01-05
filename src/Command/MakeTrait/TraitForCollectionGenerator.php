@@ -87,7 +87,7 @@ class TraitForCollectionGenerator extends TraitGenerator
         $manipulator
             ->addGetter(
                 $property,
-                sprintf('Collection|%s[]', $type),
+                sprintf('Collection|%s\[\]', $type),
                 false,
                 [
                     sprintf('@return %s', 'Collection'),
