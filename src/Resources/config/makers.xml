@@ -11,7 +11,7 @@
                 <argument type="service" id="atournayre.maker.trait_generator" />
                 <argument type="service" id="atournayre.maker.trait_for_collection_generator" />
                 <argument type="service" id="atournayre.maker.class_trait_adder" />
-                <tag name="maker.command" />
+                <tag name="command" />
             </service>
 
         </services>
