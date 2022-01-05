@@ -11,6 +11,8 @@
 
 namespace Atournayre\Bundle\MakerBundle\DependencyInjection;
 
+use Symfony\Bundle\MakerBundle\DependencyInjection\CompilerPass\MakeCommandRegistrationPass;
+use Symfony\Bundle\MakerBundle\MakerInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
@@ -34,5 +36,8 @@ class AtournayreMakerExtension extends Extension
 
         $configuration = $this->getConfiguration($configs, $container);
         $this->processConfiguration($configuration, $configs);
+
+        $container->registerForAutoconfiguration(MakerInterface::class)
+            ->addTag(MakeCommandRegistrationPass::MAKER_TAG);
     }
 }
