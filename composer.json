@@ -1,37 +1,48 @@
 {
-    "description": "Atournayre Maker.",
     "name": "atournayre/maker-bundle",
+    "description": "This bundle adds functionalities to Symfony Maker Bundle.",
     "type": "symfony-bundle",
     "license": "MIT",
     "keywords": ["generator", "code generator", "scaffolding", "scaffold"],
     "authors": [
         {
-            "name": "Aurélien Tournayre",
+            "name": "atournayre",
             "email": "aurelien.tournayre@gmail.com"
         }
     ],
-    "minimum-stability": "dev",
-    "require": {
-        "php": ">=8.1.1",
-        "doctrine/common": "3.2.1",
-        "symfony/maker-bundle": "^1.36"
-    },
-    "require-dev": {
-        "symfony/phpunit-bridge": "6.1.x-dev"
-    },
-    "config": {
-        "preferred-install": "dist",
-        "sort-packages": true
-    },
     "autoload": {
-        "psr-4": { "Atournayre\\Bundle\\MakerBundle\\": "src/" }
+        "psr-4": {
+            "Atournayre\\Bundle\\MakerBundle\\": "src/"
+        }
     },
-    "autoload-dev": {
-        "psr-4": { "Atournayre\\Bundle\\MakerBundle\\Tests\\": "tests/" }
+    "require": {
+        "php": ">=8.1",
+        "symfony/flex": "^2.2",
+        "symfony/console": "6.2.*",
+        "symfony/http-kernel": "6.2.*",
+        "symfony/dependency-injection": "6.2.*",
+        "symfony/maker-bundle": "^1.48",
+        "symfony/config": "6.2.*"
     },
     "extra": {
-        "branch-alias": {
-            "dev-master": "1.0-dev"
+        "symfony": {
+            "allow-contrib": true,
+            "require": "6.2.*",
+            "endpoint": [
+                "https://api.github.com/repos/atournayre/symfony-flex-recipes/contents/index.json",
+                "flex://defaults"
+            ]
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "symfony/flex": true
+        }
+    },
+    "scripts": {
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd"
         }
     }
 }

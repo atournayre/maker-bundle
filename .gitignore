@@ -1,7 +1,14 @@
-.idea/
-/composer.lock
-/phpunit.xml
+.env
+composer.lock
+symfony.lock.lock
 /vendor/
-/tests/tmp/*
-/.php_cs.cache
-/.phpunit.result.cache
+
+###> symfony/framework-bundle ###
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
