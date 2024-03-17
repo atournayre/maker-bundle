@@ -15,12 +15,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Atournayre\\Bundle\\AtournayreMakerBundle\\": "src/"
+            "Atournayre\\Bundle\\MakerBundle\\AtournayreMakerBundle\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Atournayre\\Bundle\\AtournayreMakerBundle\\Tests\\": "tests/"
+            "Atournayre\\Bundle\\MakerBundle\\AtournayreMakerBundle\\Tests\\": "tests/"
         }
     }
 }
