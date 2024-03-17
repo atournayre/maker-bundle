@@ -1,5 +1,6 @@
 <?php
 
+use Atournayre\Bundle\MakerBundle\Generator\InterfaceGenerator;
 use Atournayre\Bundle\MakerBundle\Maker\MakeInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\param;
@@ -28,6 +29,7 @@ return static function (ContainerConfigurator $container): void {
 
             ->load('Atournayre\\Bundle\\MakerBundle\\', '../src/*')
 
+            ->set(InterfaceGenerator::class, InterfaceGenerator::class)->public()
             ->set('atournayre_maker.make_interface', MakeInterface::class)->tag('maker.command')->public()
 
             ->alias(Generator::class, 'maker.generator')
