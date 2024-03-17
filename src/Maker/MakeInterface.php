@@ -23,7 +23,7 @@ class MakeInterface extends AbstractMaker
 
     public static function getCommandName(): string
     {
-        return 'make:interface';
+        return 'make:new:interface';
     }
 
     public function configureCommand(Command $command, InputConfiguration $inputConfig): void
