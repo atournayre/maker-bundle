@@ -21,14 +21,14 @@ return static function (ContainerConfigurator $container): void {
         ->defaults()->private();
 
     $services
-        ->set(InterfaceGenerator::class)
+        ->set(InterfaceGenerator::class)->public()
             ->arg('$projectDir', param('kernel.project_dir'))
             ->arg('$skeletonDir', param('atournayre_maker.skeleton_dir'))
             ->arg('$rootNamespace', param('atournayre_maker.root_namespace'))
             ->arg('$rootDir', param('kernel.project_dir').'/'.param('atournayre_maker.root_dir'));
 
     $services
-        ->set(MakeInterface::class)
+        ->set(MakeInterface::class)->public()
             ->arg('$interfaceGenerator', service(InterfaceGenerator::class))
             ->tag('console.command');
 
