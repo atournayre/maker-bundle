@@ -1,48 +1,26 @@
 {
     "name": "atournayre/maker-bundle",
-    "description": "This bundle adds functionalities to Symfony Maker Bundle.",
     "type": "symfony-bundle",
     "license": "MIT",
-    "keywords": ["generator", "code generator", "scaffolding", "scaffold"],
-    "authors": [
-        {
-            "name": "atournayre",
-            "email": "aurelien.tournayre@gmail.com"
-        }
-    ],
-    "autoload": {
-        "psr-4": {
-            "Atournayre\\Bundle\\MakerBundle\\": "src/"
-        }
-    },
+    "description": "This bundle Extend Symfony Maker Bundle.",
+    "minimum-stability": "dev",
     "require": {
         "php": ">=8.1",
-        "symfony/flex": "^2.2",
-        "symfony/console": "6.2.*",
-        "symfony/http-kernel": "6.2.*",
-        "symfony/dependency-injection": "6.2.*",
-        "symfony/maker-bundle": "^1.48",
-        "symfony/config": "6.2.*"
-    },
-    "extra": {
-        "symfony": {
-            "allow-contrib": true,
-            "require": "6.2.*",
-            "endpoint": [
-                "https://api.github.com/repos/atournayre/symfony-flex-recipes/contents/index.json",
-                "flex://defaults"
-            ]
-        }
+        "symfony/framework-bundle": "^6.4|^7.0",
+        "symfony/maker-bundle": "^1.56",
+        "symfony/twig-bundle": "^6.4"
     },
     "config": {
-        "allow-plugins": {
-            "symfony/flex": true
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "Atournayre\\MakerBundle\\": "src/"
         }
     },
-    "scripts": {
-        "auto-scripts": {
-            "cache:clear": "symfony-cmd",
-            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+    "autoload-dev": {
+        "psr-4": {
+            "Atournayre\\MakerBundle\\Tests\\": "tests/"
         }
     }
 }

@@ -1,34 +1,40 @@
-# Maker Bundle
+# MakerBundle
 
-This bundle Extend Symfony Maker Bundle.
+## Installation
 
-## Requirements
-Symfony ``6.2.*``
+Make sure Composer is installed globally, as explained in the
+[installation chapter](https://getcomposer.org/doc/00-intro.md)
+of the Composer documentation.
 
-PHP ``>=8.1``
+### Applications that use Symfony Flex
 
-## Install
-### Composer
-```shell
-composer require atournayre/maker-bundle
+Open a command console, enter your project directory and execute:
+
+```console
+$ composer require atournayre/maker-bundle
 ```
-### Register bundle
+
+### Applications that don't use Symfony Flex
+
+#### Step 1: Download the Bundle
+
+Open a command console, enter your project directory and execute the
+following command to download the latest stable version of this bundle:
+
+```console
+$ composer require atournayre/maker-bundle
+```
+
+#### Step 2: Enable the Bundle
+
+Then, enable the bundle by adding it to the list of registered bundles
+in the `config/bundles.php` file of your project:
 
 ```php
 // config/bundles.php
 
 return [
     // ...
-    new \Atournayre\Bundle\Maker\AtournayreMakerBundle(),
-    // ...
-]
+    Atournayre\MakerBundle\MakerBundle::class => ['all' => true],
+];
 ```
-
-## Contributing
-Of course, open source is fueled by everyone's ability to give just a little bit
-of their time for the greater good. If you'd like to see a feature or add some of
-your *own* happy words, awesome! Tou can request it - but creating a pull request
-is an even better way to get things done.
-
-Either way, please feel comfortable submitting issues or pull requests: all contributions
-and questions are warmly appreciated :).
