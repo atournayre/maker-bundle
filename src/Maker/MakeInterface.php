@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace Atournayre\Bundle\MakerBundle\Maker;
+namespace Atournayre\Maker;
 
-use Atournayre\Bundle\MakerBundle\Generator\InterfaceGenerator;
+use Atournayre\Generator\InterfaceGenerator;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\Generator;

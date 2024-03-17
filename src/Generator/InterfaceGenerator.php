@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Atournayre\Bundle\MakerBundle\Generator;
+namespace Atournayre\Generator;
 
 use Symfony\Bundle\MakerBundle\Generator;
 
