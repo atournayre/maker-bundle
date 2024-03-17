@@ -50,7 +50,7 @@ class MakeInterface extends AbstractMaker
         $this->writeSuccessMessage($io);
     }
 
-    public function getCommandDescription(): string
+    public static function getCommandDescription(): string
     {
         return 'Creates a new interface';
     }
