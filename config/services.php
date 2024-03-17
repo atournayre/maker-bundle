@@ -1,5 +1,6 @@
 <?php
 
+use Atournayre\Bundle\MakerBundle\Maker\MakeInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\param;
 
@@ -26,6 +27,8 @@ return static function (ContainerConfigurator $container): void {
                 ->bind('string $rootDir', param('kernel.project_dir').'/'.param('atournayre_maker.root_dir'))
 
             ->load('Atournayre\\Bundle\\MakerBundle\\', '../src/*')
+
+            ->set('atournayre_maker.make_interface', MakeInterface::class)->tag('maker.command')
 
             ->alias(Generator::class, 'maker.generator')
     ;
