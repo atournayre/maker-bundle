@@ -35,6 +35,6 @@ in the `config/bundles.php` file of your project:
 
 return [
     // ...
-    Atournayre\MakerBundle\MakerBundle::class => ['all' => true],
+    Atournayre\Bundle\MakerBundle\AtournayreMakerBundle::class => ['all' => true],
 ];
 ```
