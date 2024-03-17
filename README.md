@@ -11,7 +11,7 @@ of the Composer documentation.
 Open a command console, enter your project directory and execute:
 
 ```console
-$ composer require atournayre/maker-bundle
+$ composer require atournayre/maker-bundle --dev
 ```
 
 ### Applications that don't use Symfony Flex
@@ -22,7 +22,7 @@ Open a command console, enter your project directory and execute the
 following command to download the latest stable version of this bundle:
 
 ```console
-$ composer require atournayre/maker-bundle
+$ composer require atournayre/maker-bundle --dev
 ```
 
 #### Step 2: Enable the Bundle
@@ -36,5 +36,5 @@ in the `config/bundles.php` file of your project:
 return [
     // ...
 ];
-    Atournayre\AtournayreMakerBundle::class => ['all' => true],
+    Atournayre\AtournayreMakerBundle::class => ['dev' => true],
 ```
