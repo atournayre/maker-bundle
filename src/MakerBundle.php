@@ -16,9 +16,14 @@ class MakerBundle extends AbstractBundle
     {
         $definition->import('../config/definition.php');
     }
-    
+
     public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder) : void
     {
         $container->import('../config/services.php');
+    }
+
+    public function getPath(): string
+    {
+        return dirname(__DIR__);
     }
 }

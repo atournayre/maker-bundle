@@ -1,6 +1,7 @@
 <?php
 
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\param;
 
 /**
  * @link https://symfony.com/doc/current/bundles/best_practices.html#services
@@ -8,10 +9,23 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 return static function (ContainerConfigurator $container): void {
     $container
         ->parameters()
-            // ->set('atournayre_maker.param_name', 'param_value');
+            ->set('atournayre_maker.skeleton_dir', 'skeleton_dir')
+            ->set('atournayre_maker.root_dir', 'root_dir')
+            ->set('atournayre_maker.root_namespace', 'root_namespace')
     ;
+
     $container
         ->services()
-            // ->set('atournayre_maker.service_name', 'service_class')
+            ->defaults()
+                ->autowire()
+                ->autoconfigure()
+                ->bind('string $projectDir', param('kernel.project_dir'))
+                ->bind('string $skeletonDir', param('atournayre_maker.skeleton_dir'))
+                ->bind('string $rootNamespace', param('atournayre_maker.root_namespace'))
+                ->bind('string $rootDir', param('kernel.project_dir').'/'.param('atournayre_maker.root_dir'))
+
+            ->load('Atournayre\\MakerBundle\\', '../src/*')
+
+            ->alias(Generator::class, 'maker.generator')
     ;
 };
