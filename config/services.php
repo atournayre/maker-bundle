@@ -29,9 +29,6 @@ return static function (ContainerConfigurator $container): void {
 
             ->load('Atournayre\\Bundle\\MakerBundle\\', '../src/*')
 
-            ->set(InterfaceGenerator::class, InterfaceGenerator::class)->public()
-            ->set('atournayre_maker.make_interface', MakeInterface::class)->tag('maker.command')->public()
-
             ->alias(Generator::class, 'maker.generator')
     ;
 };
