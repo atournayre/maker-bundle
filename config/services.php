@@ -19,6 +19,7 @@ return static function (ContainerConfigurator $container): void {
             ->defaults()
                 ->autowire()
                 ->autoconfigure()
+                ->public()
                 ->bind('string $projectDir', param('kernel.project_dir'))
                 ->bind('string $skeletonDir', param('atournayre_maker.skeleton_dir'))
                 ->bind('string $rootNamespace', param('atournayre_maker.root_namespace'))
