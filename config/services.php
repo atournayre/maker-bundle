@@ -24,7 +24,7 @@ return static function (ContainerConfigurator $container): void {
                 ->bind('string $rootNamespace', param('atournayre_maker.root_namespace'))
                 ->bind('string $rootDir', param('kernel.project_dir').'/'.param('atournayre_maker.root_dir'))
 
-            ->load('Atournayre\\MakerBundle\\', '../src/*')
+            ->load('Atournayre\\Bundle\\MakerBundle\\', '../src/*')
 
             ->alias(Generator::class, 'maker.generator')
     ;
