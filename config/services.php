@@ -4,6 +4,7 @@ use Atournayre\Bundle\MakerBundle\Generator\InterfaceGenerator;
 use Atournayre\Bundle\MakerBundle\Maker\MakeInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\param;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 /**
  * @link https://symfony.com/doc/current/bundles/best_practices.html#services
@@ -16,19 +17,21 @@ return static function (ContainerConfigurator $container): void {
             ->set('atournayre_maker.root_namespace', 'root_namespace')
     ;
 
-    $container
-        ->services()
-            ->defaults()
-                ->autowire()
-                ->autoconfigure()
-                ->public()
-                ->bind('string $projectDir', param('kernel.project_dir'))
-                ->bind('string $skeletonDir', param('atournayre_maker.skeleton_dir'))
-                ->bind('string $rootNamespace', param('atournayre_maker.root_namespace'))
-                ->bind('string $rootDir', param('kernel.project_dir').'/'.param('atournayre_maker.root_dir'))
+    $services = $container->services()
+        ->defaults()->private();
 
-            ->load('Atournayre\\Bundle\\MakerBundle\\', '../src/*')
+    $services
+        ->set(InterfaceGenerator::class)
+            ->arg('$projectDir', param('kernel.project_dir'))
+            ->arg('$skeletonDir', param('atournayre_maker.skeleton_dir'))
+            ->arg('$rootNamespace', param('atournayre_maker.root_namespace'))
+            ->arg('$rootDir', param('kernel.project_dir').'/'.param('atournayre_maker.root_dir'));
 
-            ->alias(Generator::class, 'maker.generator')
-    ;
+    $services
+        ->set(MakeInterface::class)
+            ->arg('$interfaceGenerator', service(InterfaceGenerator::class))
+            ->tag('console.command');
+
+    $services
+        ->alias(Generator::class, 'maker.generator');
 };
