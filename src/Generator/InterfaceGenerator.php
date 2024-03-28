@@ -9,8 +9,6 @@ class InterfaceGenerator
 {
     public function __construct(
         private readonly Generator $generator,
-        private readonly string    $rootDir,
-        private readonly string    $skeletonDir,
         private readonly string    $rootNamespace,
     )
     {
@@ -21,22 +19,8 @@ class InterfaceGenerator
         $path = new NamespacePath($namespacePath, $this->rootNamespace);
         $name = NamespacePath::normalize($name);
 
-        $this->generateInterface($path, $name);
+        throw new \RuntimeException('Not implemented yet');
 
         $this->generator->writeChanges();
-    }
-
-    public function generateInterface(NamespacePath $path, string $name): void
-    {
-        $className = ucfirst($name).'Interface';
-        $targetPath = $this->rootDir . '/Contracts/' . $path->normalizedValue() . '/' . $className . '.php';
-        $templateName = $this->skeletonDir . '/src/Contracts/Interface.tpl.php';
-        $variables = [
-            'root_namespace' => $this->rootNamespace,
-            'namespace' => $path->toNamespace('\\Contracts' . $path->normalizedValue()),
-            'class_name' => $className,
-        ];
-
-        $this->generator->generateFile($targetPath, $templateName, $variables);
     }
 }

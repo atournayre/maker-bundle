@@ -18,8 +18,6 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->scalarNode('skeleton_dir')->defaultValue(dirname(__DIR__).'/config/skeleton')->end()
-                ->scalarNode('root_dir')->defaultValue('src')->end()
                 ->scalarNode('root_namespace')->defaultValue('App')->end()
             ->end()
         ;
