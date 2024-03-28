@@ -24,7 +24,7 @@ return static function (ContainerConfigurator $container): void {
             ->arg('$rootNamespace', param('atournayre_maker.root_namespace'));
 
     $services
-        ->set(MakeInterface::class)->public()
+        ->set('atournayre.maker.make_interface', MakeInterface::class)->public()
             ->arg('$interfaceGenerator', service(InterfaceGenerator::class));
 
     $services
