@@ -14,7 +14,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
-#[AutoconfigureTag('console.command')]
+#[AutoconfigureTag('maker.command')]
 class MakeInterface extends AbstractMaker
 {
     public function __construct(
