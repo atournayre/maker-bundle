@@ -34,4 +34,7 @@ return static function (ContainerConfigurator $container): void {
 
     $services
         ->alias(Generator::class, 'maker.generator');
+
+    $services
+        ->load('Atournayre\\Bundle\\MakerBundle\\', '../src/*');
 };
