@@ -6,7 +6,9 @@ namespace Atournayre\Bundle\MakerBundle\Generator;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Contracts\LoggerInterfaceBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Contracts\ResponseInterfaceBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Contracts\RoutingInterfaceBuilder;
+use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Contracts\SecurityInterfaceBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Contracts\TemplatingInterfaceBuilder;
+use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Contracts\UserInterfaceBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Exception\ExceptionBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Logger\AbstractLoggerBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Logger\LoggerBuilder;
@@ -27,6 +29,8 @@ class ProjectInstallGenerator extends AbstractGenerator
         $config = $this->addRootToConfig($config);
 
         $this->addFileDefinition(LoggerInterfaceBuilder::build($config));
+        $this->addFileDefinition(SecurityInterfaceBuilder::build($config));
+        $this->addFileDefinition(UserInterfaceBuilder::build($config));
         $this->addFileDefinition(AbstractLoggerBuilder::build($config));
         $this->addFileDefinition(LoggerBuilder::build($config));
         $this->addFileDefinition(NullLoggerBuilder::build($config));
