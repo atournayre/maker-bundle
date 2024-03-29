@@ -58,6 +58,6 @@ class MakeLogger extends AbstractMaker
 
     public static function getCommandDescription(): string
     {
-        return 'Creates a new logger';
+        return 'Create a new Logger';
     }
 }

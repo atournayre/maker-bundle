@@ -66,7 +66,7 @@ class MakeDto extends AbstractMaker
 
     public static function getCommandDescription(): string
     {
-        return 'Creates a new DTO';
+        return 'Create a new DTO';
     }
 
     private function askForNextField(ConsoleStyle $io, array $fields, bool $isFirstField): ?array

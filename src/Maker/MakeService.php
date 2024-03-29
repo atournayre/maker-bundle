@@ -93,7 +93,7 @@ class MakeService extends AbstractMaker
 
     public static function getCommandDescription(): string
     {
-        return 'Creates a new Service';
+        return 'Create a new Service';
     }
 
     public function interact(InputInterface $input, ConsoleStyle $io, Command $command): void

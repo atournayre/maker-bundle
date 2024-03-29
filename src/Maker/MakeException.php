@@ -65,7 +65,7 @@ class MakeException extends AbstractMaker
 
     public static function getCommandDescription(): string
     {
-        return 'Creates a new exception';
+        return 'Create a new Exception';
     }
 
     public function interact(InputInterface $input, ConsoleStyle $io, Command $command): void

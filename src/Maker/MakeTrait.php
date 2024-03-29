@@ -71,7 +71,7 @@ class MakeTrait extends AbstractMaker
 
     public static function getCommandDescription(): string
     {
-        return 'Creates a new trait';
+        return 'Create a new Trait';
     }
 
     private function askForNextField(ConsoleStyle $io, array $fields, bool $isFirstField): ?array

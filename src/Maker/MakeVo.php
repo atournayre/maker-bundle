@@ -71,7 +71,7 @@ class MakeVo extends AbstractMaker
 
     public static function getCommandDescription(): string
     {
-        return 'Creates a new VO';
+        return 'Create a new VO';
     }
 
     private function askForNextField(ConsoleStyle $io, array $fields, bool $isFirstField): ?array

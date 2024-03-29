@@ -43,7 +43,7 @@ class MakeInterface extends AbstractMaker
 
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
     {
-        $io->title('Creating new Interface');
+        $io->title('Create new Interface');
         $path = 'Contracts';
         $name = $input->getArgument('name');
 
@@ -58,6 +58,6 @@ class MakeInterface extends AbstractMaker
 
     public static function getCommandDescription(): string
     {
-        return 'Creates a new interface';
+        return 'Create a new Interface';
     }
 }
