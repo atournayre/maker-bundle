@@ -282,14 +282,14 @@ class VOBuilder implements FileDefinitionBuilderInterface
         $class->setFinal()->setReadOnly();
 
         $namespace1 = $class->getNamespace();
-        $namespace1->addUse(\Symfony\Component\Security\Core\User\UserInterface::class);
+        $namespace1->addUse(\App\Contracts\Security\UserInterface::class);
         $namespace1->addUse(\App\VO\DateTime::class);
 
         $class->addMethod('__construct')
             ->setPrivate()
             ->addPromotedParameter('user')
             ->setPrivate()
-            ->setType(\Symfony\Component\Security\Core\User\UserInterface::class);
+            ->setType(\App\Contracts\Security\UserInterface::class);
 
         $class->getMethod('__construct')
             ->addPromotedParameter('createdAt')
@@ -302,7 +302,7 @@ class VOBuilder implements FileDefinitionBuilderInterface
             ->addComment('@throws \Exception')
             ->setReturnType('self')
             ->addParameter('user')
-            ->setType(\Symfony\Component\Security\Core\User\UserInterface::class);
+            ->setType(\App\Contracts\Security\UserInterface::class);
 
         $class->getMethod('create')
             ->addParameter('createdAt')
@@ -314,7 +314,7 @@ class VOBuilder implements FileDefinitionBuilderInterface
         $properties = [
             [
                 'fieldName' => 'user',
-                'type' => \Symfony\Component\Security\Core\User\UserInterface::class,
+                'type' => \App\Contracts\Security\UserInterface::class,
             ],
             [
                 'fieldName' => 'createdAt',
