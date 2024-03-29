@@ -56,3 +56,18 @@ services:
                 
     App\Contracts\Logger\LoggerInterface: '@App\Logger\DefaultLogger'
 ```
+
+## Documentation
+
+### Commands
+
+| Command                   | Description                                                             |
+|---------------------------|-------------------------------------------------------------------------|
+| `make:new:dto`            | Create a new DTO                                                        |
+| `make:new:exception`      | Create a new Exception                                                  |
+| `make:new:interface`      | Create a new Interface                                                  |
+| `make:new:logger`         | Create a new Logger                                                     |
+| `make:new:service`        | [Create a new Service](docs/new-service.md)                             |
+| `make:new:trait`          | Create a new Trait                                                      |
+| `make:new:vo`             | Create a new VO                                                         |
+| `project:getting-started` | [Add minimal files to start a project](docs/project-getting-started.md) |
