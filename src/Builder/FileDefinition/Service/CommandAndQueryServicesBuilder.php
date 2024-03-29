@@ -404,6 +404,11 @@ PHP);
         $namespace->addUse(\App\VO\Context::class);
 
         $class->addMethod('__construct')
+            ->addPromotedParameter('logger')
+            ->setPrivate()
+            ->setType(LoggerInterface::class);
+
+        $class->getMethod('__construct')
             ->addPromotedParameter('services')
             ->setPrivate()
             ->setType('iterable')
@@ -411,11 +416,6 @@ PHP);
             ->addAttribute(TaggedIterator::class, [
                 new Literal('TagCommandServiceInterface::class')
             ]);
-
-        $class->getMethod('__construct')
-            ->addPromotedParameter('logger')
-            ->setPrivate()
-            ->setType(LoggerInterface::class);
 
         $class->addMethod('execute')
             ->setReturnType('void')
@@ -547,6 +547,11 @@ PHP);
         $namespace->addUse(\App\VO\Context::class);
 
         $class->addMethod('__construct')
+            ->addPromotedParameter('logger')
+            ->setPrivate()
+            ->setType(LoggerInterface::class);
+
+        $class->getMethod('__construct')
             ->addPromotedParameter('services')
             ->setPrivate()
             ->setType('iterable')
@@ -554,11 +559,6 @@ PHP);
             ->addAttribute(TaggedIterator::class, [
                 new Literal('TagQueryServiceInterface::class')
             ]);
-
-        $class->getMethod('__construct')
-            ->addPromotedParameter('logger')
-            ->setPrivate()
-            ->setType(LoggerInterface::class);
 
         $class->addMethod('fetch')
             ->addParameter('object');
