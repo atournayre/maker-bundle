@@ -405,7 +405,7 @@ PHP);
         $class->getMethod('doExecute')
             ->setBody(<<<'PHP'
 $serviceClass = $this->services[$service];
-Assert::methodExists($serviceClass, '__invoke');
+Assert::methodExists($serviceClass, 'execute');
 
 $serviceReflection = new \ReflectionClass($service);
 
@@ -549,7 +549,7 @@ PHP);
         $class->getMethod('doQuery')
             ->setBody(<<<'PHP'
 $serviceClass = $this->services[$service];
-Assert::methodExists($serviceClass, '__invoke');
+Assert::methodExists($serviceClass, 'fetch');
 
 $serviceReflection = new \ReflectionClass($service);
 
