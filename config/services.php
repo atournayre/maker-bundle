@@ -20,7 +20,7 @@ use function Symfony\Component\DependencyInjection\Loader\Configurator\param;
 return static function (ContainerConfigurator $container): void {
     $container
         ->parameters()
-            ->set('atournayre_maker.root_namespace', 'root_namespace')
+            ->set('atournayre_maker.root_namespace', 'App')
     ;
 
     $services = $container->services()
