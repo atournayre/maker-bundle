@@ -117,12 +117,17 @@ class CommandAndQueryServicesBuilder implements FileDefinitionBuilderInterface
         $class = $fileDefinition->getClass();
 
         $namespace = $class->getNamespace();
+        $namespace->addUse(\App\VO\Context::class);
         $namespace->addUse(FailFast::class);
 
         $class->addMethod('failFast')
             ->setPublic()
             ->setReturnType('void')
             ->addParameter('object');
+
+        $class->getMethod('failFast')
+            ->addParameter('context')
+            ->setType(\App\VO\Context::class);
 
         $class->getMethod('failFast')
             ->addComment('Implement logic here, or remove method and interface from the class if not needed.')
@@ -141,10 +146,17 @@ class CommandAndQueryServicesBuilder implements FileDefinitionBuilderInterface
 
         $class = $fileDefinition->getClass();
 
+        $namespace = $class->getNamespace();
+        $namespace->addUse(\App\VO\Context::class);
+
         $class->addMethod('postConditionsChecks')
             ->setPublic()
             ->setReturnType('void')
             ->addParameter('object');
+
+        $class->getMethod('postConditionsChecks')
+            ->addParameter('context')
+            ->setType(\App\VO\Context::class);
 
         $class->getMethod('postConditionsChecks')
             ->addComment('Use assertions, or remove method and interface from the class if not needed.')
@@ -163,10 +175,17 @@ class CommandAndQueryServicesBuilder implements FileDefinitionBuilderInterface
 
         $class = $fileDefinition->getClass();
 
+        $namespace = $class->getNamespace();
+        $namespace->addUse(\App\VO\Context::class);
+
         $class->addMethod('preConditionsChecks')
             ->setPublic()
             ->setReturnType('void')
             ->addParameter('object');
+
+        $class->getMethod('preConditionsChecks')
+            ->addParameter('context')
+            ->setType(\App\VO\Context::class);
 
         $class->getMethod('preConditionsChecks')
             ->addComment('Use assertions, or remove method and interface from the class if not needed.')
@@ -185,10 +204,17 @@ class CommandAndQueryServicesBuilder implements FileDefinitionBuilderInterface
 
         $class = $fileDefinition->getClass();
 
+        $namespace = $class->getNamespace();
+        $namespace->addUse(\App\VO\Context::class);
+
         $class->addMethod('execute')
             ->setPublic()
             ->setReturnType('void')
             ->addParameter('object');
+
+        $class->getMethod('execute')
+            ->addParameter('context')
+            ->setType(\App\VO\Context::class);
 
         $class->getMethod('execute')
             ->addComment('@throws \Exception');
@@ -206,9 +232,16 @@ class CommandAndQueryServicesBuilder implements FileDefinitionBuilderInterface
 
         $class = $fileDefinition->getClass();
 
+        $namespace = $class->getNamespace();
+        $namespace->addUse(\App\VO\Context::class);
+
         $class->addMethod('fetch')
             ->setPublic()
             ->addParameter('object');
+
+        $class->getMethod('fetch')
+            ->addParameter('context')
+            ->setType(\App\VO\Context::class);
 
         $class->getMethod('fetch')
             ->addComment('@throws \Exception');
@@ -226,16 +259,22 @@ class CommandAndQueryServicesBuilder implements FileDefinitionBuilderInterface
 
         $class = $fileDefinition->getClass();
 
+        $namespace = $class->getNamespace();
+        $namespace->addUse(\App\VO\Context::class);
+
         $class->addMethod('execute')
             ->setPublic()
             ->setReturnType('void')
             ->addParameter('object');
 
         $class->getMethod('execute')
+            ->addParameter('context')
+            ->setType(\App\VO\Context::class);
+
+        $class->getMethod('execute')
             ->addParameter('service')
             ->setType('?string')
             ->setDefaultValue(null);
-
         return $fileDefinition;
     }
 
@@ -249,9 +288,16 @@ class CommandAndQueryServicesBuilder implements FileDefinitionBuilderInterface
 
         $class = $fileDefinition->getClass();
 
+        $namespace = $class->getNamespace();
+        $namespace->addUse(\App\VO\Context::class);
+
         $class->addMethod('fetch')
             ->setPublic()
             ->addParameter('object');
+
+        $class->getMethod('fetch')
+            ->addParameter('context')
+            ->setType(\App\VO\Context::class);
 
         $class->getMethod('fetch')
             ->addParameter('service')
@@ -355,6 +401,7 @@ PHP);
         $namespace->addUse(TaggedIterator::class);
         $namespace->addUse(Assert::class);
         $namespace->addUse(CommandService::class, 'AttributeCommandService');
+        $namespace->addUse(\App\VO\Context::class);
 
         $class->addMethod('__construct')
             ->addPromotedParameter('services')
@@ -373,6 +420,10 @@ PHP);
         $class->addMethod('execute')
             ->setReturnType('void')
             ->addParameter('object');
+
+        $class->getMethod('execute')
+            ->addParameter('context')
+            ->setType(\App\VO\Context::class);
 
         $class->getMethod('execute')
             ->addParameter('service')
@@ -493,6 +544,7 @@ PHP);
         $namespace->addUse(TaggedIterator::class);
         $namespace->addUse(Assert::class);
         $namespace->addUse(QueryService::class, 'AttributeQueryService');
+        $namespace->addUse(\App\VO\Context::class);
 
         $class->addMethod('__construct')
             ->addPromotedParameter('services')
@@ -510,6 +562,10 @@ PHP);
 
         $class->addMethod('fetch')
             ->addParameter('object');
+
+        $class->getMethod('fetch')
+            ->addParameter('context')
+            ->setType(\App\VO\Context::class);
 
         $class->getMethod('fetch')
             ->addParameter('service')
