@@ -32,21 +32,9 @@ return [
 ### Step 3: Configure the Bundle
 
 ```yaml
-# config/services.yaml
+# config/packages/atournayre_maker.yaml
 
-services:
-    _defaults:
-        bind:
-            $rootDir: '%kernel.project_dir%'
-            $rootNamespace: 'App'
-            
-    Atournayre\Bundle\MakerBundle\:
-        resource: '../vendor/atournayre/maker-bundle/src/'
-        exclude:
-            - '../vendor/atournayre/maker-bundle/src/DependencyInjection/'
-            - '../vendor/atournayre/maker-bundle/src/Resources/'
-            - '../vendor/atournayre/maker-bundle/src/AtournayreMakerBundle.php'
-
-    Symfony\Bundle\MakerBundle\Generator: '@maker.generator' 
+atournayre_maker:
+    root_namespace: 'App'
 ```
 
