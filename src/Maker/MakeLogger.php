@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
-use Atournayre\Bundle\MakerBundle\Generator\InterfaceGenerator;
+use Atournayre\Bundle\MakerBundle\Generator\LoggerGenerator;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\Generator;
@@ -16,24 +16,24 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('maker.command')]
-class MakeInterface extends AbstractMaker
+class MakeLogger extends AbstractMaker
 {
     public function __construct(
-        private readonly InterfaceGenerator $interfaceGenerator,
+        private readonly LoggerGenerator $loggerGenerator,
     )
     {
     }
 
     public static function getCommandName(): string
     {
-        return 'make:new:interface';
+        return 'make:new:logger';
     }
 
     public function configureCommand(Command $command, InputConfiguration $inputConfig): void
     {
         $command
-            ->setDescription('Creates a new interface')
-            ->addArgument('name', InputArgument::REQUIRED, 'The name of the interface');
+            ->setDescription('Creates a new logger')
+            ->addArgument('name', InputArgument::REQUIRED, 'The name of the logger');
     }
 
     public function configureDependencies(DependencyBuilder $dependencies): void
@@ -43,21 +43,21 @@ class MakeInterface extends AbstractMaker
 
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
     {
-        $io->title('Creating new Interface');
+        $io->title('Creating new Logger');
         $path = 'Contracts';
         $name = $input->getArgument('name');
 
-        $this->interfaceGenerator->generate($path, $name, MakerConfig::default());
+        $this->loggerGenerator->generate($path, $name, MakerConfig::default());
 
         $this->writeSuccessMessage($io);
 
-        foreach ($this->interfaceGenerator->getGeneratedFiles() as $file) {
+        foreach ($this->loggerGenerator->getGeneratedFiles() as $file) {
             $io->text(sprintf('Created: %s', $file));
         }
     }
 
     public static function getCommandDescription(): string
     {
-        return 'Creates a new interface';
+        return 'Creates a new logger';
     }
 }

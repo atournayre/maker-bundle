@@ -4,36 +4,38 @@ declare(strict_types=1);
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
-use Atournayre\Bundle\MakerBundle\Generator\InterfaceGenerator;
+use Atournayre\Bundle\MakerBundle\Generator\ProjectInstallGenerator;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Bundle\MakerBundle\Maker\AbstractMaker;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('maker.command')]
-class MakeInterface extends AbstractMaker
+class MakeProjectInstall extends AbstractMaker
 {
+    private MakerConfig $config;
+
     public function __construct(
-        private readonly InterfaceGenerator $interfaceGenerator,
+        private readonly ProjectInstallGenerator $projectInstallGenerator,
     )
     {
     }
 
     public static function getCommandName(): string
     {
-        return 'make:new:interface';
+        return 'make:project:install';
     }
 
     public function configureCommand(Command $command, InputConfiguration $inputConfig): void
     {
         $command
-            ->setDescription('Creates a new interface')
-            ->addArgument('name', InputArgument::REQUIRED, 'The name of the interface');
+            ->setDescription('Install a new project')
+            ->addOption('enable-api-platform', null, InputOption::VALUE_OPTIONAL, 'Enable ApiPlatform', false);
     }
 
     public function configureDependencies(DependencyBuilder $dependencies): void
@@ -41,23 +43,30 @@ class MakeInterface extends AbstractMaker
         // no-op
     }
 
+    public function interact(InputInterface $input, ConsoleStyle $io, Command $command): void
+    {
+        parent::interact($input, $io, $command);
+
+        $this->config = new MakerConfig(
+            enableApiPlatform: (bool)$input->getOption('enable-api-platform'),
+        );
+    }
+
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
     {
-        $io->title('Creating new Interface');
-        $path = 'Contracts';
-        $name = $input->getArgument('name');
+        $io->title('Installing new Project');
 
-        $this->interfaceGenerator->generate($path, $name, MakerConfig::default());
+        $this->projectInstallGenerator->generate('', '', $this->config);
 
         $this->writeSuccessMessage($io);
 
-        foreach ($this->interfaceGenerator->getGeneratedFiles() as $file) {
+        foreach ($this->projectInstallGenerator->getGeneratedFiles() as $file) {
             $io->text(sprintf('Created: %s', $file));
         }
     }
 
     public static function getCommandDescription(): string
     {
-        return 'Creates a new interface';
+        return 'Install a new project';
     }
 }
