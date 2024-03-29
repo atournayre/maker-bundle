@@ -6,7 +6,7 @@ namespace Atournayre\Bundle\MakerBundle\DependencyInjection;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\Loader;
+use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 
 class AtournayreMakerExtension extends Extension
 {
@@ -15,7 +15,7 @@ class AtournayreMakerExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container): void
     {
-        $loader = new Loader\PhpFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/../config'));
         $loader->load('services.php');
         $loader->load('makers.php');
 
