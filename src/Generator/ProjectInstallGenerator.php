@@ -16,6 +16,8 @@ use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Logger\LoggerBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Logger\NullLoggerBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Service\CommandAndQueryServicesBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Service\SymfonyResponseServiceBuilder;
+use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Service\SymfonyRoutingServiceBuilder;
+use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Service\SymfonySecurityServiceBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Service\TwigTemplatingServiceBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Trait\EntityIsTraitBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Trait\IdEntityTraitBuilder;
@@ -43,6 +45,8 @@ class ProjectInstallGenerator extends AbstractGenerator
         $this->addFileDefinition(TemplatingInterfaceBuilder::build($config));
         $this->addFileDefinition(TwigTemplatingServiceBuilder::build($config));
         $this->addFileDefinition(SymfonyResponseServiceBuilder::build($config));
+        $this->addFileDefinition(SymfonyRoutingServiceBuilder::build($config));
+        $this->addFileDefinition(SymfonySecurityServiceBuilder::build($config));
         $this->addFileDefinition(ExceptionBuilder::buildFailFast($config));
         $this->addFileDefinition(CommandAndQueryServicesBuilder::filesDefinitions($config));
         $this->addFileDefinition(VOBuilder::buildDatetime($config));
