@@ -28,13 +28,13 @@ class MakeProjectInstall extends AbstractMaker
 
     public static function getCommandName(): string
     {
-        return 'make:project:install';
+        return 'project:getting-started';
     }
 
     public function configureCommand(Command $command, InputConfiguration $inputConfig): void
     {
         $command
-            ->setDescription('Install a new project')
+            ->setDescription(self::getCommandDescription())
             ->addOption('enable-api-platform', null, InputOption::VALUE_OPTIONAL, 'Enable ApiPlatform', false);
     }
 
@@ -54,7 +54,7 @@ class MakeProjectInstall extends AbstractMaker
 
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
     {
-        $io->title('Installing new Project');
+        $io->title('Creating project files');
 
         $this->projectInstallGenerator->generate('', '', $this->config);
 
@@ -67,6 +67,6 @@ class MakeProjectInstall extends AbstractMaker
 
     public static function getCommandDescription(): string
     {
-        return 'Install a new project';
+        return 'Create multiple files to get started with a new project';
     }
 }
