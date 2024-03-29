@@ -10,6 +10,7 @@ use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Contracts\SecurityInter
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Contracts\TemplatingInterfaceBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Contracts\UserInterfaceBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Exception\ExceptionBuilder;
+use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Factory\FactoryBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Logger\AbstractLoggerBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Logger\LoggerBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Logger\NullLoggerBuilder;
@@ -46,6 +47,7 @@ class ProjectInstallGenerator extends AbstractGenerator
         $this->addFileDefinition(CommandAndQueryServicesBuilder::filesDefinitions($config));
         $this->addFileDefinition(VOBuilder::buildDatetime($config));
         $this->addFileDefinition(VOBuilder::buildContext($config));
+        $this->addFileDefinition(FactoryBuilder::build($config, 'Factory', 'Context'));
         $this->generateFiles();
     }
 }
