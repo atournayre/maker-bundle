@@ -62,14 +62,13 @@ abstract class AbstractServiceGenerator extends AbstractGenerator
 
         $attribute = $this->attribute($config);
 
-        $serviceFqdn = '\\' . $fileDefinitionBuilder->fullName() . '::class';
-
         $namespace = $class->getNamespace();
         $namespace->addUse($attribute);
-        $namespace->addUse($serviceFqdn);
+        $namespace->addUse($fileDefinitionBuilder->fullName());
 
         $this->checkIfAttributeAlreadyExists($vo, $class, $attribute);
 
+        $serviceFqdn = $fileDefinitionBuilder->className() . '::class';
         $class->addAttribute($attribute, [
             'serviceName' => new Literal($serviceFqdn),
         ]);
