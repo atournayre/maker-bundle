@@ -13,6 +13,7 @@ use App\Contracts\Service\TagQueryServiceInterface;
 use App\Exception\FailFast;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\InterfaceType;
+use Nette\PhpGenerator\Literal;
 use Override;
 use function Symfony\Component\String\u;
 
@@ -32,8 +33,12 @@ class ServiceQueryBuilder implements FileDefinitionBuilderInterface
 
         $namespace = $class->getNamespace();
         $namespace->addUse(FailFast::class);
+        $namespace->addUse(\Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag::class);
+        $namespace->addUse(\App\Contracts\Service\TagQueryServiceInterface::class);
 
-        $class->addAttribute('AutoconfigureTag', [TagQueryServiceInterface::class]);
+        $class->addAttribute(\Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag::class, [
+            new Literal('TagQueryServiceInterface::class'),
+        ]);
 
         $interfacesToImplement = [
             PreConditionsChecksInterface::class,
