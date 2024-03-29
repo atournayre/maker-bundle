@@ -10,6 +10,8 @@ use App\Contracts\Response\ResponseInterface;
 use App\Contracts\Routing\RoutingInterface;
 use App\Contracts\Templating\TemplatingInterface;
 use Nette\PhpGenerator\ClassType;
+use Nette\PhpGenerator\Literal;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -38,6 +40,10 @@ class SymfonyResponseServiceBuilder implements FileDefinitionBuilderInterface
             ->addUse(JsonResponse::class)
             ->addUse(RedirectResponse::class)
             ->addUse(Response::class)
+            ->addUse(Autowire::class)
+            ->addUse(\App\Service\Templating\TwigTemplatingService::class)
+            ->addUse(\App\Service\Routing\SymfonyRoutingService::class)
+            ->addUse(\App\Logger\DefaultLogger::class)
         ;
 
         self::addConstruct($class);
@@ -56,21 +62,30 @@ class SymfonyResponseServiceBuilder implements FileDefinitionBuilderInterface
     private static function addConstruct(ClassType $class): void
     {
         $class->addMethod('__construct')
-            ->setPrivate()
+            ->setPublic();
+
+        $class->getMethod('__construct')
             ->addPromotedParameter('templating')
-            ->addComment('Add auto-wiring or configure in services.yaml')
+            ->setPrivate()
+            ->addAttribute(Autowire::class, [
+                'service' => new Literal('\App\Service\Templating\TwigTemplatingService::class'),
+            ])
             ->setType(TemplatingInterface::class);
 
         $class->getMethod('__construct')
-            ->setPrivate()
             ->addPromotedParameter('routing')
-            ->addComment('Add auto-wiring or configure in services.yaml')
+            ->setPrivate()
+            ->addAttribute(Autowire::class, [
+                'service' => new Literal('\App\Service\Routing\SymfonyRoutingService::class'),
+            ])
             ->setType(RoutingInterface::class);
 
         $class->getMethod('__construct')
-            ->setPrivate()
             ->addPromotedParameter('logger')
-            ->addComment('Add auto-wiring or configure in services.yaml')
+            ->setPrivate()
+            ->addAttribute(Autowire::class, [
+                'service' => new Literal('\App\Logger\DefaultLogger::class'),
+                ])
             ->setType(LoggerInterface::class);
     }
 
