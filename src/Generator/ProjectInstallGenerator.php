@@ -22,6 +22,7 @@ use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Service\TwigTemplatingS
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Trait\EntityIsTraitBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Trait\IdEntityTraitBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Trait\IsTraitBuilder;
+use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\VO\VONullUserBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\VOBuilder;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 
@@ -52,6 +53,7 @@ class ProjectInstallGenerator extends AbstractGenerator
         $this->addFileDefinition(VOBuilder::buildDatetime($config));
         $this->addFileDefinition(VOBuilder::buildContext($config));
         $this->addFileDefinition(FactoryBuilder::build($config, 'Factory', 'Context'));
+        $this->addFileDefinition(VONullUserBuilder::build($config));
         $this->generateFiles();
     }
 }
