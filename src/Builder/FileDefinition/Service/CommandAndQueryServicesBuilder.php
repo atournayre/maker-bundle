@@ -439,9 +439,11 @@ if (!$this->supports($object, $service)) {
 
 $service ??= $this->getServiceName($object);
 
-Assert::keyExists($this->services, $service, sprintf('Service %s not found', $service));
+$services = $this->getServices();
 
-$this->doExecute($service, $object);
+Assert::keyExists($services, $service, sprintf('Service %s not found', $service));
+
+$this->doExecute($service, $object, $context);
 PHP);
 
         $class->addMethod('doExecute')
@@ -454,8 +456,12 @@ PHP);
             ->addParameter('object');
 
         $class->getMethod('doExecute')
+            ->addParameter('context')
+            ->setType(\App\VO\Context::class);
+
+        $class->getMethod('doExecute')
             ->setBody(<<<'PHP'
-$serviceClass = $this->services[$service];
+$serviceClass = $this->getServices()[$service];
 Assert::methodExists($serviceClass, 'execute');
 
 $serviceReflection = new \ReflectionClass($service);
@@ -463,16 +469,16 @@ $serviceReflection = new \ReflectionClass($service);
 $this->logger->start();
 try {
     if ($serviceReflection->implementsInterface(PreConditionsChecksInterface::class)) {
-        $serviceClass->preConditionsChecks($object);
+        $serviceClass->preConditionsChecks($object, $context);
     }
     if ($serviceReflection->implementsInterface(FailFastInterface::class)) {
-        $serviceClass->failFast($object);
+        $serviceClass->failFast($object, $context);
     }
 
-    $serviceClass->execute($object);
+    $serviceClass->execute($object, $context);
 
     if ($serviceReflection->implementsInterface(PostConditionsChecksInterface::class)) {
-        $serviceClass->postConditionsChecks($object);
+        $serviceClass->postConditionsChecks($object, $context);
     }
 
     $this->logger->success();
@@ -517,6 +523,25 @@ PHP);
 
         $class->getMethod('getServiceName')
             ->setBody('return AttributeHelper::getParameter($object, AttributeCommandService::class, \'serviceName\');');
+
+        $class->addMethod('getServices')
+            ->setPrivate()
+            ->setReturnType('array')
+            ->setBody(<<<'PHP'
+$services = [];
+
+if (is_array($this->services)) {
+    $services = $this->services;
+}
+
+if (is_iterable($this->services)) {
+    $services = iterator_to_array($this->services);
+}
+
+$servicesNames = array_map(fn($object) => get_class($object), $services);
+
+return array_combine($servicesNames, $services);
+PHP);
 
         return $fileDefinition;
     }
@@ -583,12 +608,14 @@ if (!$this->supports($object, $service)) {
 
 $service ??= $this->getServiceName($object);
 
-Assert::keyExists($this->services, $service, sprintf('Service %s not found', $service));
+$services = $this->getServices();
 
-$serviceClass = $this->services[$service];
+Assert::keyExists($services, $service, sprintf('Service %s not found', $service));
+
+$serviceClass = $services[$service];
 Assert::methodExists($serviceClass, '__invoke');
 
-return $this->doQuery($service, $object);
+return $this->doQuery($service, $object, $context);
 PHP);
 
         $class->addMethod('doQuery')
@@ -600,11 +627,15 @@ PHP);
             ->addParameter('object');
 
         $class->getMethod('doQuery')
+            ->addParameter('context')
+            ->setType(\App\VO\Context::class);
+
+        $class->getMethod('doQuery')
             ->addComment('@throws \Exception');
 
         $class->getMethod('doQuery')
             ->setBody(<<<'PHP'
-$serviceClass = $this->services[$service];
+$serviceClass = $this->getServices()[$service];
 Assert::methodExists($serviceClass, 'fetch');
 
 $serviceReflection = new \ReflectionClass($service);
@@ -612,16 +643,16 @@ $serviceReflection = new \ReflectionClass($service);
 $this->logger->start();
 try {
     if ($serviceReflection->implementsInterface(PreConditionsChecksInterface::class)) {
-        $serviceClass->preConditionsChecks($object);
+        $serviceClass->preConditionsChecks($object, $context);
     }
     if ($serviceReflection->implementsInterface(FailFastInterface::class)) {
-        $serviceClass->failFast($object);
+        $serviceClass->failFast($object, $context);
     }
 
-    $result = $serviceClass->fetch($object);
+    $result = $serviceClass->fetch($object, $context);
 
     if ($serviceReflection->implementsInterface(PostConditionsChecksInterface::class)) {
-        $serviceClass->postConditionsChecks($object);
+        $serviceClass->postConditionsChecks($object, $context);
     }
 
     $this->logger->success();
@@ -668,6 +699,25 @@ PHP);
 
         $class->getMethod('getServiceName')
             ->setBody('return AttributeHelper::getParameter($object, AttributeQueryService::class, \'serviceName\');');
+
+        $class->addMethod('getServices')
+            ->setPrivate()
+            ->setReturnType('array')
+            ->setBody(<<<'PHP'
+$services = [];
+
+if (is_array($this->services)) {
+    $services = $this->services;
+}
+
+if (is_iterable($this->services)) {
+    $services = iterator_to_array($this->services);
+}
+
+$servicesNames = array_map(fn($object) => get_class($object), $services);
+
+return array_combine($servicesNames, $services);
+PHP);
 
         return $fileDefinition;
     }
