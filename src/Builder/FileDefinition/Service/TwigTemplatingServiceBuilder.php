@@ -19,7 +19,7 @@ class TwigTemplatingServiceBuilder implements FileDefinitionBuilderInterface
         $fileDefinition = FileDefinitionBuilder::build($namespace, $name, 'Service', $config);
 
         $class = $fileDefinition->file->addClass($fileDefinition->fullName());
-        $class->setFinal();
+        $class->setFinal()->setReadOnly();
         $class->addImplement(TemplatingInterface::class);
 
         $class->getNamespace()
