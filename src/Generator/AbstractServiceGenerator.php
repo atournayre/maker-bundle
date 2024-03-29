@@ -7,8 +7,8 @@ use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Service\CommandAndQuery
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\VOBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinitionBuilder;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
-use Atournayre\Bundle\MakerBundle\Generator\AbstractGenerator;
 use Nette\PhpGenerator\ClassType;
+use Nette\PhpGenerator\Literal;
 
 abstract class AbstractServiceGenerator extends AbstractGenerator
 {
@@ -62,13 +62,16 @@ abstract class AbstractServiceGenerator extends AbstractGenerator
 
         $attribute = $this->attribute($config);
 
+        $serviceFqdn = '\\' . $fileDefinitionBuilder->fullName() . '::class';
+
         $namespace = $class->getNamespace();
         $namespace->addUse($attribute);
+        $namespace->addUse($serviceFqdn);
 
         $this->checkIfAttributeAlreadyExists($vo, $class, $attribute);
 
         $class->addAttribute($attribute, [
-            'serviceName' => '\\'.$fileDefinitionBuilder->fullName().'::class',
+            'serviceName' => new Literal($serviceFqdn),
         ]);
 
         return $voBuilder;
