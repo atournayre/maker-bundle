@@ -33,6 +33,8 @@ class ServiceQueryBuilder implements FileDefinitionBuilderInterface
         $namespace = $class->getNamespace();
         $namespace->addUse(FailFast::class);
 
+        $class->addAttribute('AutoconfigureTag', [TagQueryServiceInterface::class]);
+
         $interfacesToImplement = [
             PreConditionsChecksInterface::class,
             FailFastInterface::class,

@@ -33,6 +33,8 @@ class ServiceCommandBuilder implements FileDefinitionBuilderInterface
         $namespace = $class->getNamespace();
         $namespace->addUse(FailFast::class);
 
+        $class->addAttribute('AutoconfigureTag', [TagCommandServiceInterface::class]);
+
         $interfacesToImplement = [
             PreConditionsChecksInterface::class,
             FailFastInterface::class,
