@@ -36,7 +36,7 @@ class FactoryBuilder implements FileDefinitionBuilderInterface
     private static function construct(ClassType $class): void
     {
         $class->addMethod('__construct')
-            ->setPrivate()
+            ->setPublic()
             ->addPromotedParameter('security')
             ->setType(\App\Contracts\Security\SecurityInterface::class);
 
