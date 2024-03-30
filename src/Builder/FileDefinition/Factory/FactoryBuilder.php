@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Factory;
 
+use App\VO\Null\NullUser;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinitionBuilder;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 use Atournayre\Bundle\MakerBundle\Contracts\Builder\FileDefinitionBuilderInterface;
-use Nette\PhpGenerator\ClassType;
 
 class FactoryBuilder implements FileDefinitionBuilderInterface
 {
@@ -22,19 +22,30 @@ class FactoryBuilder implements FileDefinitionBuilderInterface
         $class = $fileDefinition->getClass();
         $class->setFinal()->setReadOnly();
 
+        return $fileDefinition;
+    }
+
+    public static function buildContext(
+        MakerConfig $config,
+        string $namespace = 'Factory',
+        string $name = ''
+    ): FileDefinitionBuilder
+    {
+        $name = 'Context';
+
+        $fileDefinition = FileDefinitionBuilder::build($namespace, $name, 'Factory', $config);
+        $fileDefinition->file->addClass($fileDefinition->fullName());
+
+        $class = $fileDefinition->getClass();
+        $class->setFinal()->setReadOnly();
+
         $namespace = $class->getNamespace();
         $namespace->addUse(\App\Contracts\Security\SecurityInterface::class);
         $namespace->addUse(\Psr\Clock\ClockInterface::class);
         $namespace->addUse(\App\VO\Context::class);
+        $namespace->addUse(\App\Contracts\Security\UserInterface::class);
 
-        self::construct($class);
-        self::create($class);
 
-        return $fileDefinition;
-    }
-
-    private static function construct(ClassType $class): void
-    {
         $class->addMethod('__construct')
             ->setPublic()
             ->addPromotedParameter('security')
@@ -43,15 +54,27 @@ class FactoryBuilder implements FileDefinitionBuilderInterface
         $class->getMethod('__construct')
             ->addPromotedParameter('clock')
             ->setType(\Psr\Clock\ClockInterface::class);
-    }
 
-    private static function create(ClassType $class): void
-    {
         $class->addMethod('create')
             ->setPublic()
-            ->addBody('return Context::create($this->security->getUser(), $this->clock->now());')
+            ->addBody('return Context::create(')
+            ->addBody('    $user ?? $this->security->getUser() ?? NullUser::create(),')
+            ->addBody('    $dateTime ?? $this->clock->now()')
+            ->addBody(');')
             ->setReturnType(\App\VO\Context::class)
-            ->addComment('@throws \Exception')
-        ;
+            ->addComment('@throws \Exception');
+
+        $class->getMethod('create')
+            ->addParameter('user')
+            ->setType(\App\Contracts\Security\UserInterface::class)
+            ->setDefaultValue(null);
+
+        $class->getMethod('create')
+            ->addParameter('dateTime')
+            ->setType(\DateTimeInterface::class)
+            ->setDefaultValue(null);
+
+        return $fileDefinition;
+
     }
 }
