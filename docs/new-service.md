@@ -263,20 +263,25 @@ readonly class AcmeController
 
     public function index(): JsonResponse
     {
-        $vo = Sample::create('acme');
         $context = $this->contextFactory->create();
         
+        // COMMAND
+        $voForCommand = SampleForCommand::create('acme');
+        
         // Use the command service defined in the VO attribute.
-        $this->commandService->execute($vo, $context);
+        $this->commandService->execute($voForCommand, $context);
         
         // Force using some specific service for the command.
-        $this->commandService->execute($vo, $context, SampleCommandService::class);
+        $this->commandService->execute($voForCommand, $context, SampleCommandService::class);
+        
+        // QUERY
+        $voForQuery = SampleForQuery::create('acme');
 
         // Use the query service defined in the VO attribute.
-        $data = $this->queryService->fetch($vo, $context);
+        $data = $this->queryService->fetch($voForQuery, $context);
 
         // Force using some specific service for the query.
-        $data = $this->queryService->fetch($vo, $context, SampleQueryService::class);
+        $data = $this->queryService->fetch($voForQuery, $context, SampleQueryService::class);
 
         return $this->response->json([]);
     }
