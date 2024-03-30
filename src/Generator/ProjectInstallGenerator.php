@@ -53,6 +53,9 @@ class ProjectInstallGenerator extends AbstractGenerator
         $this->addFileDefinition(VOBuilder::buildDatetime($config));
         $this->addFileDefinition(VOBuilder::buildContext($config));
         $this->addFileDefinition(FactoryBuilder::buildContext($config));
+        $this->generateFiles();
+        $this->clearFilesDefinitions();
+
         $this->addFileDefinition(VONullUserBuilder::build($config));
         $this->generateFiles();
     }
