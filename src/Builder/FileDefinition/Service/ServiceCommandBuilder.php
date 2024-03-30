@@ -40,6 +40,10 @@ class ServiceCommandBuilder implements FileDefinitionBuilderInterface
             new Literal('TagCommandServiceInterface::class'),
         ]);
 
+        $class->addMethod('__invoke')
+            ->setPrivate()
+            ->addComment('This service is not meant to be used directly');
+
         $interfacesToImplement = [
             PreConditionsChecksInterface::class,
             FailFastInterface::class,

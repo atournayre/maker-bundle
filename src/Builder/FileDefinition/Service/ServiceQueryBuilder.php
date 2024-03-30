@@ -40,6 +40,10 @@ class ServiceQueryBuilder implements FileDefinitionBuilderInterface
             new Literal('TagQueryServiceInterface::class'),
         ]);
 
+        $class->addMethod('__invoke')
+            ->setPrivate()
+            ->addComment('This service is not meant to be used directly');
+
         $interfacesToImplement = [
             PreConditionsChecksInterface::class,
             FailFastInterface::class,
