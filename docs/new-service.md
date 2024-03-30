@@ -89,6 +89,8 @@ final class SampleForQuery
 
 Then, create a new **command** service using command `make:new:service`.
 
+The following code will be generated and all you need to do is implement the logic or remove the method and interface from the class if not needed.
+
 ```php
 <?php
 // src/Service/Command/SampleCommandService.php
@@ -159,6 +161,8 @@ final class SampleForCommand { /* ... */ }
 ```
 
 Then, create a new **query** service using command `make:new:service`.
+
+The following code will be generated and all you need to do is implement the logic or remove the method and interface from the class if not needed.
 
 ```php
 <?php
@@ -233,7 +237,7 @@ Finally, you can use the service.
 
 ```php
 <?php
-// src/Service/Command/MyCommand.php
+// src/Controller/AcmeController.php
 
 namespace App\Controller;
 
@@ -265,13 +269,13 @@ readonly class AcmeController
         // Use the command service defined in the VO attribute.
         $this->commandService->execute($vo, $context);
         
-        // Use the command service directly.
+        // Force using some specific service for the command.
         $this->commandService->execute($vo, $context, SampleCommandService::class);
 
         // Use the query service defined in the VO attribute.
         $data = $this->queryService->fetch($vo, $context);
 
-        // Use the query service directly.
+        // Force using some specific service for the query.
         $data = $this->queryService->fetch($vo, $context, SampleQueryService::class);
 
         return $this->response->json([]);
