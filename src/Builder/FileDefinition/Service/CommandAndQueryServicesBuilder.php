@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Service;
 
 use App\Attribute\CommandService;
+use App\Attribute\CommandService as AttributeCommandService;
 use App\Attribute\QueryService;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\InterfaceBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinitionBuilder;
@@ -522,7 +523,15 @@ PHP);
             ->addParameter('object');
 
         $class->getMethod('getServiceName')
-            ->setBody('return AttributeHelper::getParameter($object, AttributeCommandService::class, \'serviceName\');');
+            ->setBody(<<<'PHP'
+$serviceName = AttributeHelper::getParameter($object, AttributeCommandService::class, 'serviceName');
+
+if (empty($serviceName)) {
+    throw new \LogicException(sprintf('The Value Object %s requested a CommandService but does not have the attribute CommandService.', get_class($object)));
+}
+
+return $serviceName;
+PHP);
 
         $class->addMethod('getServices')
             ->setPrivate()
@@ -698,7 +707,15 @@ PHP);
             ->addParameter('object');
 
         $class->getMethod('getServiceName')
-            ->setBody('return AttributeHelper::getParameter($object, AttributeQueryService::class, \'serviceName\');');
+            ->setBody(<<<'PHP'
+$serviceName = AttributeHelper::getParameter($object, AttributeQueryService::class, 'serviceName');
+
+if (empty($serviceName)) {
+    throw new \LogicException(sprintf('The Value Object %s requested a QueryService but does not have the attribute QueryService.', get_class($object)));
+}
+
+return $serviceName;
+PHP);
 
         $class->addMethod('getServices')
             ->setPrivate()
