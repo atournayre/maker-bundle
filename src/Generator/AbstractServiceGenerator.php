@@ -56,7 +56,7 @@ abstract class AbstractServiceGenerator extends AbstractGenerator
     {
         $vo = $config->rootNamespace() . '\\' . $config->extraProperties()['vo'];
 
-        $voBuilder = VOBuilder::from($config, $vo);
+        $voBuilder = FileDefinitionBuilder::buildFrom($config, $vo);
 
         $class = $voBuilder->getClass();
 

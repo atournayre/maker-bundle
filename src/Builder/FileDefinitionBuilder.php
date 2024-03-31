@@ -139,4 +139,21 @@ final class FileDefinitionBuilder
     {
         return $this->file->getClasses()[$this->fullName()];
     }
+
+    public static function buildFrom(MakerConfig $config, string $className): self
+    {
+        $path = u($className)
+            ->replace('\\', '/')
+            ->replace($config->rootNamespace(), 'src')
+            ->append('.php')
+            ->prepend($config->rootDir() . '/')
+            ->toString();
+
+        $file = PhpFile::fromCode(file_get_contents($path));
+
+        $class = $file->getClasses()[$className];
+
+        return FileDefinitionBuilder::build('VO', $class->getName(), '', $config)
+            ->withFile($file);
+    }
 }

@@ -12,23 +12,6 @@ use function Symfony\Component\String\u;
 
 class VOBuilder implements FileDefinitionBuilderInterface
 {
-    public static function from(MakerConfig $config, string $className): FileDefinitionBuilder
-    {
-        $path = u($className)
-            ->replace('\\', '/')
-            ->replace($config->rootNamespace(), 'src')
-            ->append('.php')
-            ->prepend($config->rootDir() . '/')
-            ->toString();
-
-        $file = PhpFile::fromCode(file_get_contents($path));
-
-        $class = $file->getClasses()[$className];
-
-        return FileDefinitionBuilder::build('VO', $class->getName(), '', $config)
-            ->withFile($file);
-    }
-
     public static function build(
         MakerConfig $config,
         string $namespace = 'VO',
