@@ -22,7 +22,10 @@ class TraitBuilder implements FileDefinitionBuilderInterface
 
         $fileDefinition = FileDefinitionBuilder::build($namespace, $name, 'Trait', $config);
 
-        $trait = $fileDefinition->file->addTrait($fileDefinition->fullName());
+        $trait = $fileDefinition
+            ->file
+            ->addTrait($fileDefinition->fullName())
+        ;
 
         foreach ($config->traitProperties() as $property) {
             if ($config->traitIsUsedByEntity()) {
@@ -54,7 +57,10 @@ class TraitBuilder implements FileDefinitionBuilderInterface
 
         $fileDefinition = FileDefinitionBuilder::build($namespace, $name, 'Trait', $config);
 
-        $trait = $fileDefinition->file->addTrait($fileDefinition->fullName());
+        $trait = $fileDefinition
+            ->file
+            ->addTrait($fileDefinition->fullName())
+        ;
 
         foreach ($config->traitProperties() as $property) {
             self::defineProperty($trait, $property, $config);
@@ -217,7 +223,9 @@ class TraitBuilder implements FileDefinitionBuilderInterface
 
         $fileDefinition = FileDefinitionBuilder::build($namespace, $name, 'Trait', $config);
 
-        $trait = $fileDefinition->file->addTrait($fileDefinition->fullName());
+        $trait = $fileDefinition
+            ->file
+            ->addTrait($fileDefinition->fullName());
 
         foreach ($config->traitProperties() as $property) {
             self::defineProperty($trait, $property, $config);

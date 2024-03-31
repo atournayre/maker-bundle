@@ -41,9 +41,11 @@ class DTOBuilder implements FileDefinitionBuilderInterface
             $fileDefinition->file->addComment($line);
         }
 
-        $class = $fileDefinition->file->addClass($fileDefinition->fullName());
-
-        $class->setFinal();
+        $class = $fileDefinition
+            ->file
+            ->addClass($fileDefinition->fullName())
+            ->setFinal()
+        ;
 
         foreach ($config->dtoProperties() as $property) {
             self::defineProperty($class, $property);

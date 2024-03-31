@@ -37,8 +37,11 @@ class VOBuilder implements FileDefinitionBuilderInterface
 
         self::addFileComment($fileDefinition->file);
 
-        $class = $fileDefinition->file->addClass($fileDefinition->fullName());
-        $class->setFinal();
+        $class = $fileDefinition
+            ->file
+            ->addClass($fileDefinition->fullName())
+            ->setFinal()
+        ;
 
         self::constructor($class, $config->voProperties());
         self::namedConstructor($class, $config->voProperties());
@@ -66,8 +69,11 @@ class VOBuilder implements FileDefinitionBuilderInterface
 
         self::addFileComment($fileDefinition->file);
 
-        $class = $fileDefinition->file->addClass($fileDefinition->fullName());
-        $class->setFinal();
+        $class = $fileDefinition
+            ->file
+            ->addClass($fileDefinition->fullName())
+            ->setFinal()
+        ;
 
         $entityNamespace = u($config->voRelatedToAnEntity())->ensureStart($config->rootNamespace().'\\')->prepend('\\')->toString();
         self::namedConstructorFromEntity($class, $entityNamespace, $config->voProperties());

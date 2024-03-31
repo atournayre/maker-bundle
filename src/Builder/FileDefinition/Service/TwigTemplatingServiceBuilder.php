@@ -7,6 +7,7 @@ use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 use Atournayre\Bundle\MakerBundle\Contracts\Builder\FileDefinitionBuilderInterface;
 use App\Contracts\Templating\TemplatingInterface;
 use Nette\PhpGenerator\ClassType;
+use Nette\PhpGenerator\Method;
 
 class TwigTemplatingServiceBuilder implements FileDefinitionBuilderInterface
 {
@@ -18,43 +19,49 @@ class TwigTemplatingServiceBuilder implements FileDefinitionBuilderInterface
     {
         $fileDefinition = FileDefinitionBuilder::build($namespace, $name, 'Service', $config);
 
-        $class = $fileDefinition->file->addClass($fileDefinition->fullName());
-        $class->setFinal()->setReadOnly();
-        $class->addImplement(TemplatingInterface::class);
+        $class = $fileDefinition
+            ->file
+            ->addClass($fileDefinition->fullName())
+            ->setFinal()
+            ->setReadOnly()
+            ->addImplement(TemplatingInterface::class)
+            ->addMember(self::addConstruct())
+            ->addMember(self::addMethodRender())
+        ;
 
         $class->getNamespace()
             ->addUse('Twig\Environment')
             ->addUse(TemplatingInterface::class)
         ;
 
-        self::addConstruct($class);
-        self::addMethodRender($class);
-
         return $fileDefinition;
     }
 
-    private static function addConstruct(ClassType $class): void
+    private static function addConstruct(): Method
     {
-        $class->addMethod('__construct')
+        $method = new Method('__construct');
+        $method
             ->addPromotedParameter('twig')
             ->setPrivate()
             ->setType('Twig\Environment');
+        return $method;
     }
 
-    private static function addMethodRender(ClassType $class): void
+    private static function addMethodRender(): Method
     {
-        $class->addMethod('render')
+        $method = new Method('render');
+        $method
             ->setPublic()
             ->setReturnType('string')
             ->addParameter('template')
             ->setType('string');
 
-        $class->getMethod('render')
+        $method
             ->addParameter('parameters')
             ->setType('array')
             ->setDefaultValue([]);
 
-        $class->getMethod('render')
-            ->setBody('return $this->twig->render($template, $parameters);');
+        $method->setBody('return $this->twig->render($template, $parameters);');
+        return $method;
     }
 }

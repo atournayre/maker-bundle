@@ -25,7 +25,8 @@ class ExceptionBuilder implements FileDefinitionBuilderInterface
         $class = $fileDefinition->file
             ->addClass($fileDefinition->fullName())
             ->setFinal()
-            ->setExtends($exceptionType);
+            ->setExtends($exceptionType)
+        ;
 
         self::addNamedConstructor($class, $config);
 

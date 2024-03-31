@@ -2,9 +2,11 @@
 
 namespace Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Contracts;
 
+use Atournayre\Bundle\MakerBundle\Builder\BuilderHelper;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinitionBuilder;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 use Atournayre\Bundle\MakerBundle\Contracts\Builder\FileDefinitionBuilderInterface;
+use Nette\PhpGenerator\Method;
 
 class SecurityInterfaceBuilder implements FileDefinitionBuilderInterface
 {
@@ -19,16 +21,22 @@ class SecurityInterfaceBuilder implements FileDefinitionBuilderInterface
 
         $fileDefinition = FileDefinitionBuilder::build($namespace, $name, 'Interface', $config);
 
-        $interface = $fileDefinition->file->addInterface($fileDefinition->fullName());
+        $interface = $fileDefinition
+            ->file
+            ->addInterface($fileDefinition->fullName())
+            ->addMember(self::addMethodGetUser())
+        ;
 
-        $namespace1 = $interface->getNamespace();
-        $namespace1->addUse(\App\Contracts\Security\UserInterface::class);
-
-        $interface->addMethod('getUser')
-            ->setPublic()
-            ->setReturnType(\App\Contracts\Security\UserInterface::class)
-            ->setReturnNullable();
+        $interface->getNamespace()
+            ->addUse(\App\Contracts\Security\UserInterface::class);
 
         return $fileDefinition;
+    }
+
+    private static function addMethodGetUser(): Method
+    {
+        $method = new Method('getUser');
+        $method->setPublic()->setReturnType(\App\Contracts\Security\UserInterface::class)->setReturnNullable();
+        return $method;
     }
 }

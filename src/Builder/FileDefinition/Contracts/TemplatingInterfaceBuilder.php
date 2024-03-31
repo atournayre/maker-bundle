@@ -5,7 +5,7 @@ namespace Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Contracts;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinitionBuilder;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 use Atournayre\Bundle\MakerBundle\Contracts\Builder\FileDefinitionBuilderInterface;
-use Nette\PhpGenerator\InterfaceType;
+use Nette\PhpGenerator\Method;
 
 class TemplatingInterfaceBuilder implements FileDefinitionBuilderInterface
 {
@@ -17,24 +17,20 @@ class TemplatingInterfaceBuilder implements FileDefinitionBuilderInterface
     {
         $fileDefinition = FileDefinitionBuilder::build($namespace, $name, 'Interface', $config);
 
-        $interface = $fileDefinition->file->addInterface($fileDefinition->fullName());
-
-        self::addMethodRender($interface);
+        $fileDefinition
+            ->file
+            ->addInterface($fileDefinition->fullName())
+            ->addMember(self::addMethodRender());
 
         return $fileDefinition;
     }
 
-    private static function addMethodRender(InterfaceType $interface): void
+    private static function addMethodRender(): Method
     {
-        $interface->addMethod('render')
-            ->setPublic()
-            ->setReturnType('string')
-            ->addParameter('template')
-            ->setType('string');
-
-        $interface->getMethod('render')
-            ->addParameter('parameters')
-            ->setType('array')
-            ->setDefaultValue([]);
+        $method = new Method('render');
+        $method->setPublic()->setReturnType('string');
+        $method->addParameter('template')->setType('string');
+        $method->addParameter('parameters')->setType('array')->setDefaultValue([]);
+        return $method;
     }
 }

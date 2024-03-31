@@ -7,7 +7,7 @@ use App\Contracts\Security\UserInterface;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinitionBuilder;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 use Atournayre\Bundle\MakerBundle\Contracts\Builder\FileDefinitionBuilderInterface;
-use Nette\PhpGenerator\ClassType;
+use Nette\PhpGenerator\Method;
 
 class SymfonySecurityServiceBuilder implements FileDefinitionBuilderInterface
 {
@@ -19,9 +19,15 @@ class SymfonySecurityServiceBuilder implements FileDefinitionBuilderInterface
     {
         $fileDefinition = FileDefinitionBuilder::build($namespace, $name, 'Service', $config);
 
-        $class = $fileDefinition->file->addClass($fileDefinition->fullName());
-        $class->setFinal()->setReadOnly();
-        $class->addImplement(\App\Contracts\Security\SecurityInterface::class);;
+        $class = $fileDefinition
+            ->file
+            ->addClass($fileDefinition->fullName())
+            ->setFinal()
+            ->setReadOnly()
+            ->addImplement(\App\Contracts\Security\SecurityInterface::class)
+            ->addMember(self::addConstruct())
+            ->addMember(self::getUser())
+        ;
 
         $class->getNamespace()
             ->addUse(\Symfony\Bundle\SecurityBundle\Security::class)
@@ -30,34 +36,30 @@ class SymfonySecurityServiceBuilder implements FileDefinitionBuilderInterface
             ->addUse(\App\VO\Null\NullUser::class)
         ;
 
-        self::addConstruct($class);
-        self::getUser($class);
-
         return $fileDefinition;
     }
 
-    private static function addConstruct(ClassType $class): void
+    private static function addConstruct(): Method
     {
-        $class->addMethod('__construct')
-            ->setPublic();
+        $method = new Method('__construct');
+        $method->setPublic();
 
-        $class->getMethod('__construct')
+        $method
             ->addPromotedParameter('security')
             ->setPrivate()
             ->setType(\Symfony\Bundle\SecurityBundle\Security::class);
+        return $method;
     }
 
-    private static function getUser(ClassType $class): void
+    private static function getUser(): Method
     {
-        $namespace = $class->getNamespace();
-        $namespace->addUse(\App\Contracts\Security\UserInterface::class);
-
-        $class->addMethod('getUser')
-            ->setReturnType(\App\Contracts\Security\UserInterface::class);
-
-        $class->getMethod('getUser')
+        $method = new Method('getUser');
+        $method
+            ->setPublic()
+            ->setReturnType(\App\Contracts\Security\UserInterface::class)
             ->addBody('/** @var UserInterface $user */')
             ->addBody('$user = $this->security->getUser();')
             ->addBody('return $user ?? NullUser::create();');
+        return $method;
     }
 }

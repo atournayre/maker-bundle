@@ -2,11 +2,13 @@
 
 namespace Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Contracts;
 
+use Atournayre\Bundle\MakerBundle\Builder\BuilderHelper;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinitionBuilder;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 use Atournayre\Bundle\MakerBundle\Contracts\Builder\FileDefinitionBuilderInterface;
-use Nette\PhpGenerator\InterfaceType;
+use Nette\PhpGenerator\Constant;
 use Nette\PhpGenerator\Literal;
+use Nette\PhpGenerator\Method;
 
 class RoutingInterfaceBuilder implements FileDefinitionBuilderInterface
 {
@@ -18,62 +20,63 @@ class RoutingInterfaceBuilder implements FileDefinitionBuilderInterface
     {
         $fileDefinition = FileDefinitionBuilder::build($namespace, $name, 'Interface', $config);
 
-        $interface = $fileDefinition->file->addInterface($fileDefinition->fullName());
-
-        self::addConstantAbsoluteUrl($interface);
-        self::addConstantAbsolutePath($interface);
-        self::addConstantRelativePath($interface);
-        self::addConstantNetworkPath($interface);
-        self::addMethodGenerate($interface);
+        $fileDefinition
+            ->file
+            ->addInterface($fileDefinition->fullName())
+            ->addMember(self::addConstantAbsoluteUrl())
+            ->addMember(self::addConstantAbsolutePath())
+            ->addMember(self::addConstantRelativePath())
+            ->addMember(self::addConstantNetworkPath())
+            ->addMember(self::addMethodGenerate())
+        ;
 
         return $fileDefinition;
     }
 
-    private static function addConstantAbsoluteUrl(InterfaceType $interface): void
+    private static function addConstantAbsoluteUrl(): Constant
     {
-        $interface->addConstant('ABSOLUTE_URL', 0)
-            ->setPublic()
-            ->addComment('Generates an absolute URL, e.g. "http://example.com/dir/file".');
+        $constant = new Constant('ABSOLUTE_URL');
+        $constant->setValue(0);
+        $constant->setPublic();
+        $constant->addComment('Generates an absolute URL, e.g. "http://example.com/dir/file".');
+        return $constant;
     }
 
-    private static function addConstantAbsolutePath(InterfaceType $interface): void
+    private static function addConstantAbsolutePath(): Constant
     {
-        $interface->addConstant('ABSOLUTE_PATH', 1)
-            ->setPublic()
-            ->addComment('Generates an absolute path, e.g. "/dir/file".');
+        $constant = new Constant('ABSOLUTE_PATH');
+        $constant->setValue(1);
+        $constant->setPublic();
+        $constant->addComment('Generates an absolute path, e.g. "/dir/file".');
+        return $constant;
     }
 
-    private static function addConstantRelativePath(InterfaceType $interface): void
+    private static function addConstantRelativePath(): Constant
     {
-        $interface->addConstant('RELATIVE_PATH', 2)
-            ->setPublic()
-            ->addComment('Generates a relative path based on the current request path, e.g. "../parent-file".');
+        $constant = new Constant('RELATIVE_PATH');
+        $constant->setValue(2);
+        $constant->setPublic();
+        $constant->addComment('Generates a relative path based on the current request path, e.g. "../parent-file".');
+        return $constant;
     }
 
-    private static function addConstantNetworkPath(InterfaceType $interface): void
+    private static function addConstantNetworkPath(): Constant
     {
-        $interface->addConstant('NETWORK_PATH', 3)
-            ->setPublic()
-            ->addComment('Generates a network path, e.g. "//example.com/dir/file".')
-            ->addComment('Such reference reuses the current scheme but specifies the host.');
+        $constant = new Constant('NETWORK_PATH');
+        $constant->setValue(3);
+        $constant->setPublic();
+        $constant->addComment('Generates a network path, e.g. "//example.com/dir/file".');
+        $constant->addComment('Such reference reuses the current scheme but specifies the host.');
+        return $constant;
     }
 
-    private static function addMethodGenerate(InterfaceType $interface): void
+    private static function addMethodGenerate(): Method
     {
-        $interface->addMethod('generate')
-            ->setPublic()
-            ->setReturnType('string')
-            ->addParameter('name')
-            ->setType('string');
-
-        $interface->getMethod('generate')
-            ->addParameter('parameters')
-            ->setType('array')
-            ->setDefaultValue([]);
-
-        $interface->getMethod('generate')
-            ->addParameter('referenceType')
-            ->setType('int')
-            ->setDefaultValue(new Literal('self::ABSOLUTE_PATH'));
+        $method = new Method('generate');
+        $method->setPublic()->setReturnType('string');
+        $method->addParameter('name')->setType('string');
+        $method->addParameter('parameters')->setType('array')->setDefaultValue([]);
+        $method->addParameter('referenceType')->setType('int')->setDefaultValue(new Literal('self::ABSOLUTE_PATH'));
+        return $method;
     }
 }

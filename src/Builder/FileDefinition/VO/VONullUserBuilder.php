@@ -21,10 +21,13 @@ class VONullUserBuilder implements FileDefinitionBuilderInterface
         $namespace = 'VO\\Null';
         $fileDefinition = FileDefinitionBuilder::build($namespace, $name, '', $config);
 
-        $class = $fileDefinition->file->addClass($fileDefinition->fullName());
-        $class->setFinal()->setReadOnly();
-
-        $class->addImplement(\App\Contracts\Security\UserInterface::class);
+        $class = $fileDefinition
+            ->file
+            ->addClass($fileDefinition->fullName())
+            ->setFinal()
+            ->setReadOnly()
+            ->addImplement(\App\Contracts\Security\UserInterface::class)
+        ;
 
         $class->addMethod('create')
             ->setStatic()

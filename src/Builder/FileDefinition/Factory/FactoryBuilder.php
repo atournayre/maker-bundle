@@ -7,6 +7,7 @@ use App\VO\Null\NullUser;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinitionBuilder;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 use Atournayre\Bundle\MakerBundle\Contracts\Builder\FileDefinitionBuilderInterface;
+use Nette\PhpGenerator\Method;
 
 class FactoryBuilder implements FileDefinitionBuilderInterface
 {
@@ -17,10 +18,13 @@ class FactoryBuilder implements FileDefinitionBuilderInterface
     ): FileDefinitionBuilder
     {
         $fileDefinition = FileDefinitionBuilder::build($namespace, $name, 'Factory', $config);
-        $fileDefinition->file->addClass($fileDefinition->fullName());
 
-        $class = $fileDefinition->getClass();
-        $class->setFinal()->setReadOnly();
+        $fileDefinition
+            ->file
+            ->addClass($fileDefinition->fullName())
+            ->setFinal()
+            ->setReadOnly()
+        ;
 
         return $fileDefinition;
     }
@@ -31,31 +35,17 @@ class FactoryBuilder implements FileDefinitionBuilderInterface
         string $name = ''
     ): FileDefinitionBuilder
     {
-        $name = 'Context';
-
-        $fileDefinition = FileDefinitionBuilder::build($namespace, $name, 'Factory', $config);
-        $fileDefinition->file->addClass($fileDefinition->fullName());
-
-        $class = $fileDefinition->getClass();
-        $class->setFinal()->setReadOnly();
-
-        $namespace = $class->getNamespace();
-        $namespace->addUse(\App\Contracts\Security\SecurityInterface::class);
-        $namespace->addUse(\Psr\Clock\ClockInterface::class);
-        $namespace->addUse(\App\VO\Context::class);
-        $namespace->addUse(\App\Contracts\Security\UserInterface::class);
-
-
-        $class->addMethod('__construct')
+        $methodConstruct = new Method('__construct');
+        $methodConstruct
             ->setPublic()
             ->addPromotedParameter('security')
             ->setType(\App\Contracts\Security\SecurityInterface::class);
-
-        $class->getMethod('__construct')
+        $methodConstruct
             ->addPromotedParameter('clock')
             ->setType(\Psr\Clock\ClockInterface::class);
 
-        $class->addMethod('create')
+        $methodCreate = new Method('create');
+        $methodCreate
             ->setPublic()
             ->addBody('return Context::create(')
             ->addBody('    $user ?? $this->security->getUser() ?? NullUser::create(),')
@@ -63,18 +53,36 @@ class FactoryBuilder implements FileDefinitionBuilderInterface
             ->addBody(');')
             ->setReturnType(\App\VO\Context::class)
             ->addComment('@throws \Exception');
-
-        $class->getMethod('create')
+        $methodCreate
             ->addParameter('user')
             ->setType(\App\Contracts\Security\UserInterface::class)
             ->setDefaultValue(null);
-
-        $class->getMethod('create')
+        $methodCreate
             ->addParameter('dateTime')
             ->setType(\DateTimeInterface::class)
             ->setDefaultValue(null);
 
-        return $fileDefinition;
+        $name = 'Context';
 
+        $fileDefinition = FileDefinitionBuilder::build($namespace, $name, 'Factory', $config);
+
+        $class = $fileDefinition
+            ->file
+            ->addClass($fileDefinition->fullName())
+            ->setFinal()
+            ->setReadOnly()
+            ->addMember($methodConstruct)
+            ->addMember($methodCreate)
+        ;
+
+        $class->getNamespace()
+            ->addUse(\App\Contracts\Security\SecurityInterface::class)
+            ->addUse(\Psr\Clock\ClockInterface::class)
+            ->addUse(\App\VO\Context::class)
+            ->addUse(\App\Contracts\Security\UserInterface::class)
+            ->addUse(\App\VO\Null\NullUser::class)
+        ;
+
+        return $fileDefinition;
     }
 }

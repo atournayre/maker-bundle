@@ -21,9 +21,10 @@ class LoggerInterfaceBuilder implements FileDefinitionBuilderInterface
 
         $fileDefinition = FileDefinitionBuilder::build($namespace, $name, 'Interface', $config);
 
-        $interface = $fileDefinition->file->addInterface($fileDefinition->fullName());
-
-        $interface->addExtend(LoggerInterface::class);
+        $interface = $fileDefinition
+            ->file
+            ->addInterface($fileDefinition->fullName())
+            ->addExtend(LoggerInterface::class);
 
         self::addMethodsWithMessage($interface);
         self::addLogMethod($interface);

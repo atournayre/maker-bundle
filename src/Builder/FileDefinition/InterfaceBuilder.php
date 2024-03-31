@@ -16,7 +16,10 @@ class InterfaceBuilder implements FileDefinitionBuilderInterface
     {
         $fileDefinition = FileDefinitionBuilder::build($namespace, $name, 'Interface', $config);
 
-        $fileDefinition->file->addInterface($fileDefinition->fullName());
+        $fileDefinition
+            ->file
+            ->addInterface($fileDefinition->fullName())
+        ;
 
         return $fileDefinition;
     }

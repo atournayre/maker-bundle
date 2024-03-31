@@ -5,6 +5,7 @@ namespace Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Trait;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinitionBuilder;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 use Atournayre\Bundle\MakerBundle\Contracts\Builder\FileDefinitionBuilderInterface;
+use Nette\PhpGenerator\Method;
 use Webmozart\Assert\Assert;
 
 class EntityIsTraitBuilder implements FileDefinitionBuilderInterface
@@ -17,29 +18,41 @@ class EntityIsTraitBuilder implements FileDefinitionBuilderInterface
     {
         $fileDefinition = FileDefinitionBuilder::build($namespace, $name, 'Trait', $config);
 
-        $trait = $fileDefinition->file->addTrait($fileDefinition->fullName());
+        $trait = $fileDefinition
+            ->file
+            ->addTrait($fileDefinition->fullName())
+            ->addMember(self::addMethodIs())
+            ->addMember(self::addMethodIsNot())
+        ;
 
-        $namespace = $trait->getNamespace();
-        $namespace->addUse(Assert::class);
+        $trait->getNamespace()
+            ->addUse(Assert::class)
+        ;
 
-        $trait->addMethod('is')
-            ->addParameter('entity')
-            ->setType('self');
+        return $fileDefinition;
+    }
 
-        $trait->getMethod('is')
+    public static function addMethodIs(): Method
+    {
+        $method = new Method('is');
+        $method->setPublic()->addParameter('entity')->setType('self');
+
+        $method
             ->setReturnType('bool')
             ->addBody('Assert::propertyExists($entity, \'id\', \'Entity must have an id property\');')
             ->addBody('return $this->id === $entity->id;');
+        return $method;
+    }
 
-        $trait->addMethod('isNot')
-            ->addParameter('entity')
-            ->setType('self');
+    public static function addMethodIsNot(): Method
+    {
+        $method = new Method('isNot');
+        $method->setPublic()->addParameter('entity')->setType('self');
 
-        $trait->getMethod('isNot')
+        $method
             ->setReturnType('bool')
             ->addBody('Assert::propertyExists($entity, \'id\', \'Entity must have an id property\');')
             ->addBody('return $this->id !== $entity->id;');
-
-        return $fileDefinition;
+        return $method;
     }
 }

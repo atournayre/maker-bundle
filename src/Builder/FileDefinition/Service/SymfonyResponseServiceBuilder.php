@@ -9,8 +9,8 @@ use App\Contracts\Logger\LoggerInterface;
 use App\Contracts\Response\ResponseInterface;
 use App\Contracts\Routing\RoutingInterface;
 use App\Contracts\Templating\TemplatingInterface;
-use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\Literal;
+use Nette\PhpGenerator\Method;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -27,9 +27,22 @@ class SymfonyResponseServiceBuilder implements FileDefinitionBuilderInterface
     {
         $fileDefinition = FileDefinitionBuilder::build($namespace, $name, 'Service', $config);
 
-        $class = $fileDefinition->file->addClass($fileDefinition->fullName());
-        $class->setFinal()->setReadOnly();
-        $class->addImplement(ResponseInterface::class);
+        $class = $fileDefinition
+            ->file
+            ->addClass($fileDefinition->fullName())
+            ->setFinal()
+            ->setReadOnly()
+            ->addImplement(ResponseInterface::class)
+            ->addMember(self::addConstruct())
+            ->addMember(self::addMethodRedirectToUrl())
+            ->addMember(self::addMethodRedirectToRoute())
+            ->addMember(self::addMethodRender())
+            ->addMember(self::addMethodJson())
+            ->addMember(self::addMethodJsonError())
+            ->addMember(self::addMethodFile())
+            ->addMember(self::addMethodEmpty())
+            ->addMember(self::addMethodError())
+        ;
 
         $class->getNamespace()
             ->addUse(LoggerInterface::class)
@@ -46,25 +59,15 @@ class SymfonyResponseServiceBuilder implements FileDefinitionBuilderInterface
             ->addUse(\App\Logger\DefaultLogger::class)
         ;
 
-        self::addConstruct($class);
-        self::addMethodRedirectToUrl($class);
-        self::addMethodRedirectToRoute($class);
-        self::addMethodRender($class);
-        self::addMethodJson($class);
-        self::addMethodJsonError($class);
-        self::addMethodFile($class);
-        self::addMethodEmpty($class);
-        self::addMethodError($class);
-
         return $fileDefinition;
     }
 
-    private static function addConstruct(ClassType $class): void
+    private static function addConstruct(): Method
     {
-        $class->addMethod('__construct')
-            ->setPublic();
+        $method = new Method('__construct');
+        $method->setPublic();
 
-        $class->getMethod('__construct')
+        $method
             ->addPromotedParameter('templating')
             ->setPrivate()
             ->addAttribute(Autowire::class, [
@@ -72,7 +75,7 @@ class SymfonyResponseServiceBuilder implements FileDefinitionBuilderInterface
             ])
             ->setType(TemplatingInterface::class);
 
-        $class->getMethod('__construct')
+        $method
             ->addPromotedParameter('routing')
             ->setPrivate()
             ->addAttribute(Autowire::class, [
@@ -80,58 +83,64 @@ class SymfonyResponseServiceBuilder implements FileDefinitionBuilderInterface
             ])
             ->setType(RoutingInterface::class);
 
-        $class->getMethod('__construct')
+        $method
             ->addPromotedParameter('logger')
             ->setPrivate()
             ->addAttribute(Autowire::class, [
                 'service' => new Literal('\App\Logger\DefaultLogger::class'),
                 ])
             ->setType(LoggerInterface::class);
+        return $method;
     }
 
-    private static function addMethodRedirectToUrl(ClassType $class): void
+    private static function addMethodRedirectToUrl(): Method
     {
-        $class->addMethod('redirectToUrl')
+        $method = new Method('redirectToUrl');
+        $method
             ->setReturnType(RedirectResponse::class)
             ->addParameter('url')
             ->setType('string');
 
-        $class->getMethod('redirectToUrl')
+        $method
             ->addBody('$this->logger->info(\'Redirecting to URL: \' . $url);')
             ->addBody('return new RedirectResponse($url);');
+        return $method;
     }
 
-    private static function addMethodRedirectToRoute(ClassType $class): void
+    private static function addMethodRedirectToRoute(): Method
     {
-        $class->addMethod('redirectToRoute')
+        $method = new Method('redirectToRoute');
+        $method
             ->setReturnType(RedirectResponse::class)
             ->addParameter('route')
             ->setType('string');
 
-        $class->getMethod('redirectToRoute')
+        $method
             ->addParameter('parameters')
             ->setType('array')
             ->setDefaultValue([]);
 
-        $class->getMethod('redirectToRoute')
+        $method
             ->addBody('$url = $this->routing->generate($route, $parameters);')
             ->addBody('$this->logger->info(\'Redirecting to route: \' . $route, [\'parameters\' => $parameters]);')
             ->addBody('return $this->redirectToUrl($url);');
+        return $method;
     }
 
-    private static function addMethodRender(ClassType $class): void
+    private static function addMethodRender(): Method
     {
-        $class->addMethod('render')
+        $method = new Method('render');
+        $method
             ->setReturnType(Response::class)
             ->addParameter('view')
             ->setType('string');
 
-        $class->getMethod('render')
+        $method
             ->addParameter('parameters')
             ->setType('array')
             ->setDefaultValue([]);
 
-        $class->getMethod('render')
+        $method
             ->addBody('try {')
             ->addBody('    $this->logger->info(\'Rendering view: \' . $view, [\'parameters\' => $parameters]);')
             ->addBody('    $render = $this->templating->render($view, $parameters);')
@@ -140,31 +149,33 @@ class SymfonyResponseServiceBuilder implements FileDefinitionBuilderInterface
             ->addBody('    $this->logger->error(\'An error occurred while rendering view\', [\'error\' => $e->getMessage()]);')
             ->addBody('    return $this->error(\'error.html.twig\', [\'error\' => \'An error occurred\']);')
             ->addBody('}');
+        return $method;
     }
 
-    private static function addMethodJson(ClassType $class): void
+    private static function addMethodJson(): Method
     {
-        $class->addMethod('json')
+        $method = new Method('json');
+        $method
             ->setReturnType(JsonResponse::class)
             ->addParameter('data')
             ->setType('array');
 
-        $class->getMethod('json')
+        $method
             ->addParameter('status')
             ->setType('int')
             ->setDefaultValue(200);
 
-        $class->getMethod('json')
+        $method
             ->addParameter('headers')
             ->setType('array')
             ->setDefaultValue([]);
 
-        $class->getMethod('json')
+        $method
             ->addParameter('json')
             ->setType('bool')
             ->setDefaultValue(false);
 
-        $class->getMethod('json')
+        $method
             ->addBody('try {')
             ->addBody('    $this->logger->info(\'Returning JSON response\', [\'data\' => $data, \'status\' => $status, \'headers\' => $headers]);')
             ->addBody('    return new JsonResponse($data, $status, $headers, $json);')
@@ -172,96 +183,105 @@ class SymfonyResponseServiceBuilder implements FileDefinitionBuilderInterface
             ->addBody('    $this->logger->error(\'An error occurred while returning JSON response\', [\'error\' => $e->getMessage()]);')
             ->addBody('    return $this->jsonError([\'error\' => \'An error occurred\'], 500);')
             ->addBody('}');
+        return $method;
     }
 
-    private static function addMethodJsonError(ClassType $class): void
+    private static function addMethodJsonError(): Method
     {
-        $class->addMethod('jsonError')
+        $method = new Method('jsonError');
+        $method
             ->setReturnType(JsonResponse::class)
             ->addParameter('data')
             ->setType('array');
 
-        $class->getMethod('jsonError')
+        $method
             ->addParameter('status')
             ->setType('int')
             ->setDefaultValue(400);
 
-        $class->getMethod('jsonError')
+        $method
             ->addParameter('headers')
             ->setType('array')
             ->setDefaultValue([]);
 
-        $class->getMethod('jsonError')
+        $method
             ->addParameter('json')
             ->setType('bool')
             ->setDefaultValue(false);
 
-        $class->getMethod('jsonError')
+        $method
             ->addBody('$this->logger->error(\'Returning JSON error response\', [\'data\' => $data, \'status\' => $status, \'headers\' => $headers]);')
             ->addBody('return new JsonResponse($data, $status, $headers, $json);');
+        return $method;
     }
 
-    private static function addMethodFile(ClassType $class): void
+    private static function addMethodFile(): Method
     {
-        $class->addMethod('file')
+        $method = new Method('file');
+        $method
             ->setReturnType(BinaryFileResponse::class)
             ->addParameter('file')
             ->setType('string');
 
-        $class->getMethod('file')
+        $method
             ->addParameter('filename')
             ->setType('string');
 
-        $class->getMethod('file')
+        $method
             ->addParameter('headers')
             ->setType('array')
             ->setDefaultValue([]);
 
-        $class->getMethod('file')
+        $method
             ->addBody('$contentDisposition = $headers[\'Content-Disposition\'] ?? \'attachment\';')
             ->addBody('$headers[\'Content-Disposition\'] = sprintf(\'%s; filename="%s"\', $contentDisposition, $filename);')
             ->addBody('$this->logger->info(\'Returning file: \' . $file, [\'filename\' => $filename, \'headers\' => $headers]);')
             ->addBody('return new BinaryFileResponse($file, 200, $headers);');
+        return $method;
     }
 
-    private static function addMethodEmpty(ClassType $class): void
+    private static function addMethodEmpty(): Method
     {
-        $class->addMethod('empty')
+        $method = new Method('empty');
+        $method
             ->setReturnType(Response::class)
             ->addParameter('status')
             ->setType('int')
             ->setDefaultValue(204);
 
-        $class->getMethod('empty')
+        $method
             ->addParameter('headers')
             ->setType('array')
             ->setDefaultValue([]);
 
-        $class->getMethod('empty')
+        $method
             ->addBody('$this->logger->info(\'Returning empty response\', [\'status\' => $status, \'headers\' => $headers]);')
             ->addBody('return new Response(null, $status, $headers);');
+        return $method;
     }
 
-    private static function addMethodError(ClassType $class): void
+    private static function addMethodError(): Method
     {
-        $class->addMethod('error')
+        $method = new Method('error');
+        $method
             ->setReturnType(Response::class)
             ->addParameter('view')
             ->setType('string');
 
-        $class->getMethod('error')
+        $method
             ->addParameter('parameters')
             ->setType('array')
             ->setDefaultValue([]);
 
-        $class->getMethod('error')
+        $method
             ->addParameter('status')
             ->setType('int')
             ->setDefaultValue(500);
 
-        $class->getMethod('error')
+        $method
             ->addBody('$this->logger->info(\'Returning error response\', [\'view\' => $view, \'parameters\' => $parameters, \'status\' => $status]);')
             ->addBody('$render = $this->templating->render($view, $parameters);')
             ->addBody('return new Response($render, $status);');
+        return $method;
     }
 }

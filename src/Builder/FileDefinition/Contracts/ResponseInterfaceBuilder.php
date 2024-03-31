@@ -5,7 +5,7 @@ namespace Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Contracts;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinitionBuilder;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 use Atournayre\Bundle\MakerBundle\Contracts\Builder\FileDefinitionBuilderInterface;
-use Nette\PhpGenerator\InterfaceType;
+use Nette\PhpGenerator\Method;
 
 class ResponseInterfaceBuilder implements FileDefinitionBuilderInterface
 {
@@ -17,146 +17,96 @@ class ResponseInterfaceBuilder implements FileDefinitionBuilderInterface
     {
         $fileDefinition = FileDefinitionBuilder::build($namespace, $name, 'Interface', $config);
 
-        $interface = $fileDefinition->file->addInterface($fileDefinition->fullName());
-
-        self::addMethodRedirectToUrl($interface);
-        self::addMethodRedirectToRoute($interface);
-        self::addMethodRender($interface);
-        self::addMethodJson($interface);
-        self::addMethodJsonError($interface);
-        self::addMethodFile($interface);
-        self::addMethodEmpty($interface);
-        self::addMethodError($interface);
+        $fileDefinition
+            ->file
+            ->addInterface($fileDefinition->fullName())
+            ->addMember(self::addMethodRedirectToUrl())
+            ->addMember(self::addMethodRedirectToRoute())
+            ->addMember(self::addMethodRender())
+            ->addMember(self::addMethodJson())
+            ->addMember(self::addMethodJsonError())
+            ->addMember(self::addMethodFile())
+            ->addMember(self::addMethodEmpty())
+            ->addMember(self::addMethodError())
+        ;
 
         return $fileDefinition;
     }
 
-    private static function addMethodRedirectToUrl(InterfaceType $interface): void
+    private static function addMethodRedirectToUrl(): Method
     {
-        $interface->addMethod('redirectToUrl')
-            ->setPublic()
-            ->addParameter('url')
-            ->setType('string');
+        $method = new Method('redirectToUrl');
+        $method->setPublic();
+        $method->addParameter('url')->setType('string');
+        return $method;
     }
 
-    private static function addMethodRedirectToRoute(InterfaceType $interface): void
+    private static function addMethodRedirectToRoute(): Method
     {
-        $interface->addMethod('redirectToRoute')
-            ->setPublic()
-            ->addParameter('route')
-            ->setType('string');
-
-        $interface->getMethod('redirectToRoute')
-            ->addParameter('parameters')
-            ->setType('array')
-            ->setDefaultValue([]);
+        $method = new Method('redirectToRoute');
+        $method->setPublic();
+        $method->addParameter('route')->setType('string');
+        $method->addParameter('parameters')->setType('array')->setDefaultValue([]);
+        return $method;
     }
 
-    private static function addMethodRender(InterfaceType $interface): void
+    private static function addMethodRender(): Method
     {
-        $interface->addMethod('render')
-            ->setPublic()
-            ->addParameter('view')
-            ->setType('string');
-
-        $interface->getMethod('render')
-            ->addParameter('parameters')
-            ->setType('array')
-            ->setDefaultValue([]);
+        $method = new Method('render');
+        $method->setPublic();
+        $method->addParameter('view')->setType('string');
+        $method->addParameter('parameters')->setType('array')->setDefaultValue([]);
+        return $method;
     }
 
-    private static function addMethodJson(InterfaceType $interface): void
+    private static function addMethodJson(): Method
     {
-        $interface->addMethod('json')
-            ->setPublic()
-            ->addParameter('data')
-            ->setType('array');
-
-        $interface->getMethod('json')
-            ->addParameter('status')
-            ->setType('int')
-            ->setDefaultValue(200);
-
-        $interface->getMethod('json')
-            ->addParameter('headers')
-            ->setType('array')
-            ->setDefaultValue([]);
-
-        $interface->getMethod('json')
-            ->addParameter('json')
-            ->setType('bool')
-            ->setDefaultValue(false);
+        $method = new Method('json');
+        $method->setPublic();
+        $method->addParameter('data')->setType('array');
+        $method->addParameter('status')->setType('int')->setDefaultValue(200);
+        $method->addParameter('headers')->setType('array')->setDefaultValue([]);
+        $method->addParameter('json')->setType('bool')->setDefaultValue(false);
+        return $method;
     }
 
-    private static function addMethodJsonError(InterfaceType $interface): void
+    private static function addMethodJsonError(): Method
     {
-        $interface->addMethod('jsonError')
-            ->setPublic()
-            ->addParameter('data')
-            ->setType('array');
-
-        $interface->getMethod('jsonError')
-            ->addParameter('status')
-            ->setType('int')
-            ->setDefaultValue(400);
-
-        $interface->getMethod('jsonError')
-            ->addParameter('headers')
-            ->setType('array')
-            ->setDefaultValue([]);
-
-        $interface->getMethod('jsonError')
-            ->addParameter('json')
-            ->setType('bool')
-            ->setDefaultValue(false);
+        $method = new Method('jsonError');
+        $method->setPublic();
+        $method->addParameter('data')->setType('array');
+        $method->addParameter('status')->setType('int')->setDefaultValue(400);
+        $method->addParameter('headers')->setType('array')->setDefaultValue([]);
+        $method->addParameter('json')->setType('bool')->setDefaultValue(false);
+        return $method;
     }
 
-    private static function addMethodFile(InterfaceType $interface): void
+    private static function addMethodFile(): Method
     {
-        $interface->addMethod('file')
-            ->setPublic()
-            ->addParameter('file')
-            ->setType('string');
-
-        $interface->getMethod('file')
-            ->addParameter('filename')
-            ->setType('string');
-
-        $interface->getMethod('file')
-            ->addParameter('headers')
-            ->setType('array')
-            ->setDefaultValue([]);
+        $method = new Method('file');
+        $method->setPublic();
+        $method->addParameter('file')->setType('string');
+        $method->addParameter('filename')->setType('string');
+        $method->addParameter('headers')->setType('array')->setDefaultValue([]);
+        return $method;
     }
 
-    private static function addMethodEmpty(InterfaceType $interface): void
+    private static function addMethodEmpty(): Method
     {
-        $interface->addMethod('empty')
-            ->setPublic()
-            ->addParameter('status')
-            ->setType('int')
-            ->setDefaultValue(204);
-
-        $interface->getMethod('empty')
-            ->addParameter('headers')
-            ->setType('array')
-            ->setDefaultValue([]);
+        $method = new Method('empty');
+        $method->setPublic();
+        $method->addParameter('status')->setType('int')->setDefaultValue(204);
+        $method->addParameter('headers')->setType('array')->setDefaultValue([]);
+        return $method;
     }
 
-    private static function addMethodError(InterfaceType $interface): void
+    private static function addMethodError(): Method
     {
-        $interface->addMethod('error')
-            ->setPublic()
-            ->addParameter('view')
-            ->setType('string');
-
-        $interface->getMethod('error')
-            ->addParameter('parameters')
-            ->setType('array')
-            ->setDefaultValue([]);
-
-        $interface->getMethod('error')
-            ->addParameter('status')
-            ->setType('int')
-            ->setDefaultValue(500);
+        $method = new Method('error');
+        $method->setPublic();
+        $method->addParameter('view')->setType('string');
+        $method->addParameter('parameters')->setType('array')->setDefaultValue([]);
+        $method->addParameter('status')->setType('int')->setDefaultValue(500);
+        return $method;
     }
 }

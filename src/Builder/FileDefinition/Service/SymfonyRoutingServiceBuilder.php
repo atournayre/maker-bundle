@@ -7,8 +7,8 @@ use App\Contracts\Security\UserInterface;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinitionBuilder;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 use Atournayre\Bundle\MakerBundle\Contracts\Builder\FileDefinitionBuilderInterface;
-use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\Literal;
+use Nette\PhpGenerator\Method;
 
 class SymfonyRoutingServiceBuilder implements FileDefinitionBuilderInterface
 {
@@ -20,52 +20,49 @@ class SymfonyRoutingServiceBuilder implements FileDefinitionBuilderInterface
     {
         $fileDefinition = FileDefinitionBuilder::build($namespace, $name, 'Service', $config);
 
-        $class = $fileDefinition->file->addClass($fileDefinition->fullName());
-        $class->setFinal()->setReadOnly();
-        $class->addImplement(\App\Contracts\Routing\RoutingInterface::class);
+        $class = $fileDefinition
+            ->file
+            ->addClass($fileDefinition->fullName())
+            ->setFinal()
+            ->setReadOnly()
+            ->addImplement(\App\Contracts\Routing\RoutingInterface::class)
+            ->addMember(self::addConstruct())
+            ->addMember(self::generate())
+        ;
 
         $class->getNamespace()
             ->addUse(\Symfony\Component\Routing\RouterInterface::class)
             ->addUse(\App\Contracts\Routing\RoutingInterface::class)
         ;
 
-        self::addConstruct($class);
-        self::generate($class);
-
         return $fileDefinition;
     }
 
-    private static function addConstruct(ClassType $class): void
+    private static function addConstruct(): Method
     {
-        $class->addMethod('__construct')
-            ->setPublic();
+        $method = new Method('__construct');
+        $method->setPublic();
 
-        $class->getMethod('__construct')
+        $method
             ->addPromotedParameter('router')
             ->setPrivate()
             ->setType(\Symfony\Component\Routing\RouterInterface::class);
+        return $method;
     }
 
-    private static function generate(ClassType $class): void
+    private static function generate(): Method
     {
-        $class->addMethod('generate')
-            ->setReturnType('string');
+        $method = new Method('generate');
+        $method->setReturnType('string');
+        $method->addParameter('name') ->setType('string');
+        $method->addParameter('parameters') ->setType('array')->setDefaultValue([]);
 
-        $class->getMethod('generate')
-            ->addParameter('name')
-            ->setType('string');
-
-        $class->getMethod('generate')
-            ->addParameter('parameters')
-            ->setType('array')
-            ->setDefaultValue([]);
-
-        $class->getMethod('generate')
+        $method
             ->addParameter('referenceType')
             ->setType('int')
             ->setDefaultValue(new Literal('RoutingInterface::ABSOLUTE_PATH'));
 
-        $class->getMethod('generate')
-            ->addBody('return $this->router->generate($name, $parameters, $referenceType);');
+        $method->addBody('return $this->router->generate($name, $parameters, $referenceType);');
+        return $method;
     }
 }
