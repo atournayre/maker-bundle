@@ -21,6 +21,8 @@ use App\Contracts\Service\TagQueryServiceInterface;
 use App\Exception\FailFast;
 use App\Helper\AttributeHelper;
 use Nette\PhpGenerator\Literal;
+use Nette\PhpGenerator\Method;
+use Nette\PhpGenerator\Property;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 use Webmozart\Assert\Assert;
 
@@ -52,7 +54,6 @@ class CommandAndQueryServicesBuilder implements FileDefinitionBuilderInterface
         throw new \Exception('Use filesDefinitions() instead.');
     }
 
-
     public static function buildAttributeCommandService(
         string $namespace,
         string $name,
@@ -61,21 +62,22 @@ class CommandAndQueryServicesBuilder implements FileDefinitionBuilderInterface
     {
         $fileDefinition = FileDefinitionBuilder::build($namespace, $name, '', $config);
 
-        $fileDefinition->file->addClass($fileDefinition->fullName())
+        $method = new Method('__construct');
+        $method->addParameter('serviceName')->setType('string');
+        $construct = $method;
+
+        $property = new Property('serviceName');
+        $property->setPublic()->setType('string')->setReadOnly();
+
+        $fileDefinition
+            ->file
+            ->addClass($fileDefinition->fullName())
             ->addAttribute('Attribute', [
                 new Literal('\Attribute::TARGET_CLASS'),
-            ]);
-
-        $class = $fileDefinition->getClass();
-
-        $class->addMethod('__construct')
-            ->addParameter('serviceName')
-            ->setType('string');
-
-        $class->addProperty('serviceName')
-            ->setPublic()
-            ->setType('string')
-            ->setReadOnly();
+            ])
+            ->addMember($property)
+            ->addMember($construct)
+        ;
 
         return $fileDefinition;
     }
@@ -88,21 +90,22 @@ class CommandAndQueryServicesBuilder implements FileDefinitionBuilderInterface
     {
         $fileDefinition = FileDefinitionBuilder::build($namespace, $name, '', $config);
 
-        $fileDefinition->file->addClass($fileDefinition->fullName())
+        $method = new Method('__construct');
+        $method->addParameter('serviceName')->setType('string');
+        $construct = $method;
+
+        $property = new Property('serviceName');
+        $property->setPublic()->setType('string')->setReadOnly();
+
+        $fileDefinition
+            ->file
+            ->addClass($fileDefinition->fullName())
             ->addAttribute('Attribute', [
                 new Literal('\Attribute::TARGET_CLASS'),
-            ]);
-
-        $class = $fileDefinition->getClass();
-
-        $class->addMethod('__construct')
-            ->addParameter('serviceName')
-            ->setType('string');
-
-        $class->addProperty('serviceName')
-            ->setPublic()
-            ->setType('string')
-            ->setReadOnly();
+            ])
+            ->addMember($property)
+            ->addMember($construct)
+        ;
 
         return $fileDefinition;
     }
@@ -115,24 +118,21 @@ class CommandAndQueryServicesBuilder implements FileDefinitionBuilderInterface
     {
         $fileDefinition = InterfaceBuilder::build($config, $namespace, $name);
 
-        $class = $fileDefinition->getClass();
+        $method = new Method('failFast');
+        $method->setPublic()->setReturnType('void');
+        $method->addParameter('object');
+        $method->addParameter('context')->setType(\App\VO\Context::class);
+        $method->addComment('Implement logic here, or remove method and interface from the class if not needed.');
+        $method->addComment('@throws FailFast');
 
-        $namespace = $class->getNamespace();
-        $namespace->addUse(\App\VO\Context::class);
-        $namespace->addUse(FailFast::class);
+        $class = $fileDefinition->getClass()
+            ->addMember($method)
+        ;
 
-        $class->addMethod('failFast')
-            ->setPublic()
-            ->setReturnType('void')
-            ->addParameter('object');
-
-        $class->getMethod('failFast')
-            ->addParameter('context')
-            ->setType(\App\VO\Context::class);
-
-        $class->getMethod('failFast')
-            ->addComment('Implement logic here, or remove method and interface from the class if not needed.')
-            ->addComment('@throws FailFast');
+        $class->getNamespace()
+            ->addUse(\App\VO\Context::class)
+            ->addUse(FailFast::class)
+        ;
 
         return $fileDefinition;
     }
@@ -203,24 +203,25 @@ class CommandAndQueryServicesBuilder implements FileDefinitionBuilderInterface
     {
         $fileDefinition = InterfaceBuilder::build($config, $namespace, $name);
 
-        $class = $fileDefinition->getClass();
+        $class = $fileDefinition->getClass()
+            ->addMember(self::executeInterfaceTagCommandService())
+        ;
 
-        $namespace = $class->getNamespace();
-        $namespace->addUse(\App\VO\Context::class);
-
-        $class->addMethod('execute')
-            ->setPublic()
-            ->setReturnType('void')
-            ->addParameter('object');
-
-        $class->getMethod('execute')
-            ->addParameter('context')
-            ->setType(\App\VO\Context::class);
-
-        $class->getMethod('execute')
-            ->addComment('@throws \Exception');
+        $class->getNamespace()
+            ->addUse(\App\VO\Context::class)
+        ;
 
         return $fileDefinition;
+    }
+
+    public static function executeInterfaceTagCommandService(): Method
+    {
+        $method = new Method('execute');
+        $method->setPublic()->setReturnType('void');
+        $method->addParameter('object');
+        $method->addParameter('context')->setType(\App\VO\Context::class);
+        $method->addComment('@throws \Exception');
+        return $method;
     }
 
     public static function buildInterfaceTagQueryService(
@@ -231,23 +232,25 @@ class CommandAndQueryServicesBuilder implements FileDefinitionBuilderInterface
     {
         $fileDefinition = InterfaceBuilder::build($config, $namespace, $name);
 
-        $class = $fileDefinition->getClass();
+        $class = $fileDefinition->getClass()
+            ->addMember(self::fetchInterfaceCommandService())
+        ;
 
-        $namespace = $class->getNamespace();
-        $namespace->addUse(\App\VO\Context::class);
-
-        $class->addMethod('fetch')
-            ->setPublic()
-            ->addParameter('object');
-
-        $class->getMethod('fetch')
-            ->addParameter('context')
-            ->setType(\App\VO\Context::class);
-
-        $class->getMethod('fetch')
-            ->addComment('@throws \Exception');
+        $class->getNamespace()
+            ->addUse(\App\VO\Context::class)
+        ;
 
         return $fileDefinition;
+    }
+
+    public static function fetchInterfaceCommandService(): Method
+    {
+        $method = new Method('fetch');
+        $method->setPublic();
+        $method->addParameter('object');
+        $method->addParameter('context')->setType(\App\VO\Context::class);
+        $method->addComment('@throws \Exception');
+        return $method;
     }
 
     public static function buildInterfaceCommandService(
@@ -387,29 +390,46 @@ PHP);
     {
         $fileDefinition = FileDefinitionBuilder::build($namespace, $name, '', $config);
 
-        $class = $fileDefinition->file->addClass($fileDefinition->fullName());
-        $class->addImplement(CommandServiceInterface::class);
-        $class->setFinal()->setReadOnly();
+        $class = $fileDefinition
+            ->file
+            ->addClass($fileDefinition->fullName())
+            ->addImplement(CommandServiceInterface::class)
+            ->setFinal()
+            ->setReadOnly()
+            ->addMember(self::constructCommand())
+            ->addMember(self::execute())
+            ->addMember(self::doExecute())
+            ->addMember(self::supportsCommand())
+            ->addMember(self::getServiceNameCommand())
+            ->addMember(self::getServicesCommand())
+        ;
 
-        $namespace = $class->getNamespace();
-        $namespace->addUse(CommandServiceInterface::class);
-        $namespace->addUse(FailFastInterface::class);
-        $namespace->addUse(PostConditionsChecksInterface::class);
-        $namespace->addUse(PreConditionsChecksInterface::class);
-        $namespace->addUse(TagCommandServiceInterface::class);
-        $namespace->addUse(AttributeHelper::class);
-        $namespace->addUse(LoggerInterface::class);
-        $namespace->addUse(TaggedIterator::class);
-        $namespace->addUse(Assert::class);
-        $namespace->addUse(CommandService::class, 'AttributeCommandService');
-        $namespace->addUse(\App\VO\Context::class);
+        $class->getNamespace()
+            ->addUse(CommandServiceInterface::class)
+            ->addUse(FailFastInterface::class)
+            ->addUse(PostConditionsChecksInterface::class)
+            ->addUse(PreConditionsChecksInterface::class)
+            ->addUse(TagCommandServiceInterface::class)
+            ->addUse(AttributeHelper::class)
+            ->addUse(LoggerInterface::class)
+            ->addUse(TaggedIterator::class)
+            ->addUse(Assert::class)
+            ->addUse(CommandService::class, 'AttributeCommandService')
+            ->addUse(\App\VO\Context::class)
+        ;
 
-        $class->addMethod('__construct')
+        return $fileDefinition;
+    }
+
+    public static function constructCommand(): Method
+    {
+        $method = new Method('__construct');
+        $method
             ->addPromotedParameter('logger')
             ->setPrivate()
             ->setType(LoggerInterface::class);
 
-        $class->getMethod('__construct')
+        $method
             ->addPromotedParameter('services')
             ->setPrivate()
             ->setType('iterable')
@@ -417,23 +437,12 @@ PHP);
             ->addAttribute(TaggedIterator::class, [
                 new Literal('TagCommandServiceInterface::class')
             ]);
+        return $method;
+    }
 
-        $class->addMethod('execute')
-            ->setReturnType('void')
-            ->addParameter('object');
-
-        $class->getMethod('execute')
-            ->addParameter('context')
-            ->setType(\App\VO\Context::class);
-
-        $class->getMethod('execute')
-            ->addParameter('service')
-            ->setType('?string')
-            ->setDefaultValue(null);
-
-        $class->getMethod('execute')
-            ->addComment('@throws \Exception')
-            ->setBody(<<<'PHP'
+    public static function execute(): Method
+    {
+        $body = <<<'PHP'
 if (!$this->supports($object, $service)) {
     return;
 }
@@ -445,23 +454,21 @@ $services = $this->getServices();
 Assert::keyExists($services, $service, sprintf('Service %s not found', $service));
 
 $this->doExecute($service, $object, $context);
-PHP);
+PHP;
 
-        $class->addMethod('doExecute')
-            ->setPrivate()
-            ->setReturnType('void')
-            ->addParameter('service')
-            ->setType('string');
+        $method = new Method('execute');
+        $method->setPublic()->setReturnType('void');
+        $method->addParameter('object');
+        $method->addParameter('context')->setType(\App\VO\Context::class);
+        $method->addParameter('service')->setType('?string')->setDefaultValue(null);
+        $method->addComment('@throws \Exception');
+        $method->setBody($body);
+        return $method;
+    }
 
-        $class->getMethod('doExecute')
-            ->addParameter('object');
-
-        $class->getMethod('doExecute')
-            ->addParameter('context')
-            ->setType(\App\VO\Context::class);
-
-        $class->getMethod('doExecute')
-            ->setBody(<<<'PHP'
+    public static function doExecute(): Method
+    {
+        $body = <<<'PHP'
 $serviceClass = $this->getServices()[$service];
 Assert::methodExists($serviceClass, 'execute');
 
@@ -489,20 +496,22 @@ try {
     $this->logger->end();
     throw $e;
 }
-PHP);
+PHP;
 
-        $class->addMethod('supports')
-            ->setPrivate()
-            ->setReturnType('bool')
-            ->addParameter('object');
+        $method = new Method('doExecute');
+        $method->setPrivate()->setReturnType('void');
+        $method->addParameter('service')->setType('string');
+        $method->addParameter('object');
+        $method->addParameter('context')->setType(\App\VO\Context::class);
+        $method->addComment('@throws \Exception');
+        $method->setBody($body);
+        return $method;
 
-        $class->getMethod('supports')
-            ->addParameter('service')
-            ->setType('?string')
-            ->setDefaultValue(null);
+    }
 
-        $class->getMethod('supports')
-            ->setBody(<<<'PHP'
+    public static function supportsCommand(): Method
+    {
+        $body = <<<'PHP'
 $service ??= $this->getServiceName($object);
 
 if (empty($service)) {
@@ -515,15 +524,20 @@ if (!class_exists($service)) {
 
 return (new \ReflectionClass($service))
     ->implementsInterface(TagCommandServiceInterface::class);
-PHP);
+PHP;
 
-        $class->addMethod('getServiceName')
-            ->setPrivate()
-            ->setReturnType('string')
-            ->addParameter('object');
+            $method = new Method('supports');
+            $method->setPrivate();
+            $method->setReturnType('bool');
+            $method->addParameter('object');
+            $method->addParameter('service')->setType('?string')->setDefaultValue(null);
+            $method->setBody($body);
+            return $method;
+    }
 
-        $class->getMethod('getServiceName')
-            ->setBody(<<<'PHP'
+    public static function getServiceNameCommand(): Method
+    {
+        $body = <<<'PHP'
 $serviceName = AttributeHelper::getParameter($object, AttributeCommandService::class, 'serviceName');
 
 if (empty($serviceName)) {
@@ -531,12 +545,19 @@ if (empty($serviceName)) {
 }
 
 return $serviceName;
-PHP);
+PHP;
 
-        $class->addMethod('getServices')
-            ->setPrivate()
-            ->setReturnType('array')
-            ->setBody(<<<'PHP'
+        $method = new Method('getServiceName');
+        $method->setPrivate();
+        $method->setReturnType('string');
+        $method->addParameter('object');
+        $method->setBody($body);
+        return $method;
+    }
+
+    public static function getServicesCommand(): Method
+    {
+        $body = <<<'PHP'
 $services = [];
 
 if (is_array($this->services)) {
@@ -550,9 +571,13 @@ if (is_iterable($this->services)) {
 $servicesNames = array_map(fn($object) => get_class($object), $services);
 
 return array_combine($servicesNames, $services);
-PHP);
+PHP;
 
-        return $fileDefinition;
+        $method = new Method('getServices');
+        $method->setPrivate();
+        $method->setReturnType('array');
+        $method->setBody($body);
+        return $method;
     }
 
     public static function buildServiceQuery(
@@ -563,54 +588,51 @@ PHP);
     {
         $fileDefinition = FileDefinitionBuilder::build($namespace, $name, '', $config);
 
-        $class = $fileDefinition->file->addClass($fileDefinition->fullName());
-        $class->addImplement(QueryServiceInterface::class);
-        $class->setFinal()->setReadOnly();
+        $class = $fileDefinition
+            ->file
+            ->addClass($fileDefinition->fullName())
+            ->addImplement(QueryServiceInterface::class)
+            ->setFinal()
+            ->setReadOnly()
+            ->addMember(self::constructQuery())
+            ->addMember(self::fetch())
+            ->addMember(self::doQuery())
+            ->addMember(self::supportsQuery())
+            ->addMember(self::getServiceNameQuery())
+            ->addMember(self::getServicesQuery())
+        ;
 
-        $namespace = $class->getNamespace();
-        $namespace->addUse(QueryServiceInterface::class);
-        $namespace->addUse(FailFastInterface::class);
-        $namespace->addUse(PostConditionsChecksInterface::class);
-        $namespace->addUse(PreConditionsChecksInterface::class);
-        $namespace->addUse(TagQueryServiceInterface::class);
-        $namespace->addUse(AttributeHelper::class);
-        $namespace->addUse(LoggerInterface::class);
-        $namespace->addUse(TaggedIterator::class);
-        $namespace->addUse(Assert::class);
-        $namespace->addUse(QueryService::class, 'AttributeQueryService');
-        $namespace->addUse(\App\VO\Context::class);
+        $class->getNamespace()
+            ->addUse(QueryServiceInterface::class)
+            ->addUse(FailFastInterface::class)
+            ->addUse(PostConditionsChecksInterface::class)
+            ->addUse(PreConditionsChecksInterface::class)
+            ->addUse(TagQueryServiceInterface::class)
+            ->addUse(AttributeHelper::class)
+            ->addUse(LoggerInterface::class)
+            ->addUse(TaggedIterator::class)
+            ->addUse(Assert::class)
+            ->addUse(QueryService::class, 'AttributeQueryService')
+            ->addUse(\App\VO\Context::class)
+        ;
 
-        $class->addMethod('__construct')
-            ->addPromotedParameter('logger')
-            ->setPrivate()
-            ->setType(LoggerInterface::class);
+        return $fileDefinition;
+    }
 
-        $class->getMethod('__construct')
-            ->addPromotedParameter('services')
-            ->setPrivate()
-            ->setType('iterable')
-            ->setDefaultValue([])
-            ->addAttribute(TaggedIterator::class, [
-                new Literal('TagQueryServiceInterface::class')
-            ]);
+    private static function constructQuery(): Method
+    {
+        $method = new Method('__construct');
+        $method->addPromotedParameter('logger')->setType(LoggerInterface::class);
+        $method->addPromotedParameter('services')->setType('iterable')->setDefaultValue([]);
+        $method->addAttribute(TaggedIterator::class, [
+            new Literal('TagQueryServiceInterface::class')
+        ]);
+        return $method;
+    }
 
-        $class->addMethod('fetch')
-            ->addParameter('object');
-
-        $class->getMethod('fetch')
-            ->addParameter('context')
-            ->setType(\App\VO\Context::class);
-
-        $class->getMethod('fetch')
-            ->addParameter('service')
-            ->setType('?string')
-            ->setDefaultValue(null);
-
-        $class->getMethod('fetch')
-            ->addComment('@throws \Exception');
-
-        $class->getMethod('fetch')
-            ->setBody(<<<'PHP'
+    private static function fetch(): Method
+    {
+        $body = <<<'PHP'
 if (!$this->supports($object, $service)) {
     return;
 }
@@ -625,25 +647,20 @@ $serviceClass = $services[$service];
 Assert::methodExists($serviceClass, '__invoke');
 
 return $this->doQuery($service, $object, $context);
-PHP);
+PHP;
 
-        $class->addMethod('doQuery')
-            ->setPrivate()
-            ->addParameter('service')
-            ->setType('string');
+        $method = new Method('fetch');
+        $method->addParameter('object');
+        $method->addParameter('context')->setType(\App\VO\Context::class);
+        $method->addParameter('service')->setType('?string')->setDefaultValue(null);
+        $method->addComment('@throws \Exception');
+        $method->setBody($body);
+        return $method;
+    }
 
-        $class->getMethod('doQuery')
-            ->addParameter('object');
-
-        $class->getMethod('doQuery')
-            ->addParameter('context')
-            ->setType(\App\VO\Context::class);
-
-        $class->getMethod('doQuery')
-            ->addComment('@throws \Exception');
-
-        $class->getMethod('doQuery')
-            ->setBody(<<<'PHP'
+    private static function doQuery(): Method
+    {
+        $body = <<<'PHP'
 $serviceClass = $this->getServices()[$service];
 Assert::methodExists($serviceClass, 'fetch');
 
@@ -673,20 +690,22 @@ try {
     $this->logger->end();
     throw $e;
 }
-PHP);
+PHP;
 
-        $class->addMethod('supports')
-            ->setPrivate()
-            ->setReturnType('bool')
-            ->addParameter('object');
+            $method = new Method('doQuery');
+            $method->setPrivate();
+            $method->addParameter('service')->setType('string');
+            $method->addParameter('object');
+            $method->addParameter('context')->setType(\App\VO\Context::class);
+            $method->addComment('@throws \Exception');
+            $method->setBody($body);
+            return $method;
 
-        $class->getMethod('supports')
-            ->addParameter('service')
-            ->setType('?string')
-            ->setDefaultValue(null);
+    }
 
-        $class->getMethod('supports')
-            ->setBody(<<<'PHP'
+    private static function supportsQuery(): Method
+    {
+        $body = <<<'PHP'
 $service ??= $this->getServiceName($object);
 
 if (empty($service)) {
@@ -699,15 +718,20 @@ if (!class_exists($service)) {
 
 return (new \ReflectionClass($service))
     ->implementsInterface(TagQueryServiceInterface::class);
-PHP);
+PHP;
 
-        $class->addMethod('getServiceName')
-            ->setPrivate()
-            ->setReturnType('string')
-            ->addParameter('object');
+            $method = new Method('supports');
+            $method->setPrivate();
+            $method->setReturnType('bool');
+            $method->addParameter('object');
+            $method->addParameter('service')->setType('?string')->setDefaultValue(null);
+            $method->setBody($body);
+            return $method;
+    }
 
-        $class->getMethod('getServiceName')
-            ->setBody(<<<'PHP'
+    private static function getServiceNameQuery(): Method
+    {
+        $body = <<<'PHP'
 $serviceName = AttributeHelper::getParameter($object, AttributeQueryService::class, 'serviceName');
 
 if (empty($serviceName)) {
@@ -715,12 +739,19 @@ if (empty($serviceName)) {
 }
 
 return $serviceName;
-PHP);
+PHP;
 
-        $class->addMethod('getServices')
-            ->setPrivate()
-            ->setReturnType('array')
-            ->setBody(<<<'PHP'
+            $method = new Method('getServiceName');
+            $method->setPrivate();
+            $method->setReturnType('string');
+            $method->addParameter('object');
+            $method->setBody($body);
+            return $method;
+    }
+
+    private static function getServicesQuery(): Method
+    {
+        $body = <<<'PHP'
 $services = [];
 
 if (is_array($this->services)) {
@@ -734,9 +765,12 @@ if (is_iterable($this->services)) {
 $servicesNames = array_map(fn($object) => get_class($object), $services);
 
 return array_combine($servicesNames, $services);
-PHP);
+PHP;
 
-        return $fileDefinition;
+        $method = new Method('getServices');
+        $method->setPrivate();
+        $method->setReturnType('array');
+        $method->setBody($body);
+        return $method;
     }
-
 }
