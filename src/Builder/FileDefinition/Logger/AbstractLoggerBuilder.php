@@ -5,15 +5,16 @@ namespace Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Logger;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinitionBuilder;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 use Atournayre\Bundle\MakerBundle\Contracts\Builder\FileDefinitionBuilderInterface;
-use Nette\PhpGenerator\ClassType;
+use Nette\PhpGenerator\Method;
+use Nette\PhpGenerator\Property;
 use Psr\Log\LoggerInterface;
 
 class AbstractLoggerBuilder implements FileDefinitionBuilderInterface
 {
     public static function build(
         MakerConfig $config,
-        string $namespace = '',
-        string $name = ''
+        string      $namespace = '',
+        string      $name = ''
     ): FileDefinitionBuilder
     {
         $namespace = 'Logger';
@@ -21,173 +22,124 @@ class AbstractLoggerBuilder implements FileDefinitionBuilderInterface
 
         $fileDefinition = FileDefinitionBuilder::build($namespace, $name, '', $config);
 
-        $class = $fileDefinition->file->addClass($fileDefinition->fullName())
-            ->setAbstract();
+        $class = $fileDefinition
+            ->file
+            ->addClass($fileDefinition->fullName())
+            ->setAbstract()
+            ->addImplement(LoggerInterface::class)
+            ->addMember(self::propertyLogIdentifier())
+            ->addMember(self::construct())
+            ->addMember(self::setLoggerIdentifier())
+            ->addMember(self::getLoggerIdentifier())
+            ->addMember(self::methodPrefixMessage())
+            ->addMember(self::abstractMethodWithMessage('emergency'))
+            ->addMember(self::abstractMethodWithMessage('alert'))
+            ->addMember(self::abstractMethodWithMessage('critical'))
+            ->addMember(self::abstractMethodWithMessage('error'))
+            ->addMember(self::abstractMethodWithMessage('warning'))
+            ->addMember(self::abstractMethodWithMessage('notice'))
+            ->addMember(self::abstractMethodWithMessage('info'))
+            ->addMember(self::abstractMethodWithMessage('debug'))
+            ->addMember(self::methodLog())
+            ->addMember(self::methodException())
+            ->addMember(self::abstractMethodWithoutMessage('start'))
+            ->addMember(self::abstractMethodWithoutMessage('end'))
+            ->addMember(self::abstractMethodWithoutMessage('success'))
+            ->addMember(self::abstractMethodWithoutMessage('failFast'));
 
-        $namespace = $class->getNamespace();
-        $namespace->addUse(LoggerInterface::class);
-
-        $class->addImplement(LoggerInterface::class);
-
-        self::addProperties($class);
-
-        self::addConstruct($class);
-        self::addSetters($class);
-        self::addGetters($class);
-        self::addPrefixMessageMethod($class);
-
-        self::addMethodsWithMessage($class);
-        self::addLogMethod($class);
-        self::addExceptionMethod($class);
-        self::addMethodsWithoutMessage($class);
+        $class->getNamespace()
+            ->addUse(LoggerInterface::class);
 
         return $fileDefinition;
     }
 
-    private static function addMethodsWithMessage(ClassType $class): void
+    private static function propertyLogIdentifier(): Property
     {
-        $methods = [
-            'emergency',
-            'alert',
-            'critical',
-            'error',
-            'warning',
-            'notice',
-            'info',
-            'debug',
-        ];
-
-        foreach ($methods as $method) {
-            $class->addMethod($method)
-                ->setPublic()
-                ->setAbstract()
-                ->addParameter('message')
-                ->setType('\Stringable|string');
-
-            $class->getMethod($method)
-                ->addParameter('context')
-                ->setType('array')
-                ->setDefaultValue([]);
-
-            $class->getMethod($method)
-                ->setReturnType('void');
-        }
+        $property = new Property('logIdentifier');
+        $property->setPrivate();
+        $property->setType('?string');
+        $property->setValue(null);
+        return $property;
     }
 
-    private static function addLogMethod(ClassType $class): void
+    private static function construct(): Method
     {
-        $class->addMethod('log')
-            ->setPublic()
-            ->setAbstract()
-            ->addParameter('level');
-
-        $class->getMethod('log')
-            ->addParameter('message')
-            ->setType('\Stringable|string');
-
-        $class->getMethod('log')
-            ->addParameter('context')
-            ->setType('array')
-            ->setDefaultValue([]);
-
-        $class->getMethod('log')
-            ->setReturnType('void');
+        $method = new Method('__construct');
+        $method->addPromotedParameter('logger')->setProtected()->setType(LoggerInterface::class);
+        return $method;
     }
 
-    private static function addExceptionMethod(ClassType $class): void
+    private static function setLoggerIdentifier(): Method
     {
-        $class->addMethod('exception')
-            ->setPublic()
-            ->setAbstract()
-            ->addParameter('exception')
-            ->setType('\Exception');
-
-        $class->getMethod('exception')
-            ->addParameter('context')
-            ->setType('array')
-            ->setDefaultValue([]);
-
-        $class->getMethod('exception')
-            ->setReturnType('void');
+        $method = new Method('setLoggerIdentifier');
+        $method->setProtected()->addParameter('identifier')->setType('string');
+        $method->setReturnType('void');
+        $method->addBody('$this->logIdentifier = $identifier;');
+        return $method;
     }
 
-    private static function addMethodsWithoutMessage(ClassType $class): void
+    private static function getLoggerIdentifier(): Method
     {
-        $methods = [
-            'start',
-            'end',
-            'success',
-            'failFast',
-        ];
-
-        foreach ($methods as $method) {
-            $class->addMethod($method)
-                ->setPublic()
-                ->setAbstract()
-                ->addParameter('context')
-                ->setType('array')
-                ->setDefaultValue([]);
-
-            $class->getMethod($method)
-                ->setReturnType('void');
-        }
+        $method = new Method('getLoggerIdentifier');
+        $method->setProtected()
+            ->setReturnType('string')
+            ->addBody('return $this->logIdentifier ?? static::class;');
+        return $method;
     }
 
-    private static function addConstruct(ClassType $class): void
+    private static function methodPrefixMessage(): Method
     {
-        $method = $class->addMethod('__construct');
-        $method->addPromotedParameter('logger')
-            ->setProtected()
-            ->setType(LoggerInterface::class);
-    }
-
-    private static function addPrefixMessageMethod(ClassType $class): void
-    {
-        $class->addMethod('prefixMessage')
-            ->setProtected()
-            ->addParameter('prefix')
-            ->setType('string');
-
-        $class->getMethod('prefixMessage')
-            ->addParameter('message')
-            ->setType('\Stringable|string');
+        $method = new Method('prefixMessage');
+        $method->setProtected()->addParameter('prefix')->setType('string');
+        $method->addParameter('message')->setType('\Stringable|string');
 
         $methodBody = <<<'PHP'
 return sprintf('[%s] %s', $prefix, $message);
 PHP;
 
-        $class->getMethod('prefixMessage')
-            ->setBody($methodBody);
+        $method->setBody($methodBody);
 
-        $class->getMethod('prefixMessage')
-            ->setReturnType('string');
+        $method->setReturnType('string');
+        return $method;
     }
 
-    private static function addProperties(ClassType $class): void
+    private static function abstractMethodWithMessage(string $methodName): Method
     {
-        $class->addProperty('logIdentifier')
-            ->setPrivate()
-            ->setType('?string')
-            ->setValue(null);
+        $method = new Method($methodName);
+        $method->setPublic()->setAbstract();
+        $method->addParameter('message')->setType('\Stringable|string');
+        $method->addParameter('context')->setType('array')->setDefaultValue([]);
+        $method->setReturnType('void');
+        return $method;
     }
 
-    private static function addSetters(ClassType $class): void
+    private static function methodLog(): Method
     {
-        $class->addMethod('setLoggerIdentifier')
-            ->setProtected()
-            ->addParameter('identifier')
-            ->setType('string');
-
-        $class->getMethod('setLoggerIdentifier')
-            ->setReturnType('void')
-            ->addBody('$this->logIdentifier = $identifier;');
+        $method = new Method('log');
+        $method->setPublic()->setAbstract();
+        $method->addParameter('level');
+        $method->addParameter('message')->setType('\Stringable|string');
+        $method->addParameter('context')->setType('array')->setDefaultValue([]);
+        $method->setReturnType('void');
+        return $method;
     }
 
-    private static function addGetters(ClassType $class): void
+    private static function methodException(): Method
     {
-        $class->addMethod('getLoggerIdentifier')
-            ->setProtected()
-            ->setReturnType('string')
-            ->addBody('return $this->logIdentifier ?? static::class;');
+        $method = new Method('exception');
+        $method->setPublic()->setAbstract();
+        $method->addParameter('exception')->setType('\Exception');
+        $method->addParameter('context')->setType('array')->setDefaultValue([]);
+        $method->setReturnType('void');
+        return $method;
+    }
+
+    private static function abstractMethodWithoutMessage(string $methodName): Method
+    {
+        $method = new Method($methodName);
+        $method->setPublic()->setAbstract();
+        $method->addParameter('context')->setType('array')->setDefaultValue([]);
+        $method->setReturnType('void');
+        return $method;
     }
 }

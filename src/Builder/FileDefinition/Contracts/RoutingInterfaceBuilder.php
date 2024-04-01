@@ -23,17 +23,17 @@ class RoutingInterfaceBuilder implements FileDefinitionBuilderInterface
         $fileDefinition
             ->file
             ->addInterface($fileDefinition->fullName())
-            ->addMember(self::addConstantAbsoluteUrl())
-            ->addMember(self::addConstantAbsolutePath())
-            ->addMember(self::addConstantRelativePath())
-            ->addMember(self::addConstantNetworkPath())
-            ->addMember(self::addMethodGenerate())
+            ->addMember(self::constantAbsoluteUrl())
+            ->addMember(self::constantAbsolutePath())
+            ->addMember(self::constantRelativePath())
+            ->addMember(self::constantNetworkPath())
+            ->addMember(self::methodGenerate())
         ;
 
         return $fileDefinition;
     }
 
-    private static function addConstantAbsoluteUrl(): Constant
+    private static function constantAbsoluteUrl(): Constant
     {
         $constant = new Constant('ABSOLUTE_URL');
         $constant->setValue(0);
@@ -42,7 +42,7 @@ class RoutingInterfaceBuilder implements FileDefinitionBuilderInterface
         return $constant;
     }
 
-    private static function addConstantAbsolutePath(): Constant
+    private static function constantAbsolutePath(): Constant
     {
         $constant = new Constant('ABSOLUTE_PATH');
         $constant->setValue(1);
@@ -51,7 +51,7 @@ class RoutingInterfaceBuilder implements FileDefinitionBuilderInterface
         return $constant;
     }
 
-    private static function addConstantRelativePath(): Constant
+    private static function constantRelativePath(): Constant
     {
         $constant = new Constant('RELATIVE_PATH');
         $constant->setValue(2);
@@ -60,7 +60,7 @@ class RoutingInterfaceBuilder implements FileDefinitionBuilderInterface
         return $constant;
     }
 
-    private static function addConstantNetworkPath(): Constant
+    private static function constantNetworkPath(): Constant
     {
         $constant = new Constant('NETWORK_PATH');
         $constant->setValue(3);
@@ -70,7 +70,7 @@ class RoutingInterfaceBuilder implements FileDefinitionBuilderInterface
         return $constant;
     }
 
-    private static function addMethodGenerate(): Method
+    private static function methodGenerate(): Method
     {
         $method = new Method('generate');
         $method->setPublic()->setReturnType('string');

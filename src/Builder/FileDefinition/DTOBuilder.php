@@ -6,6 +6,8 @@ use Atournayre\Bundle\MakerBundle\Builder\FileDefinitionBuilder;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 use Atournayre\Bundle\MakerBundle\Contracts\Builder\FileDefinitionBuilderInterface;
 use Nette\PhpGenerator\ClassType;
+use Nette\PhpGenerator\Method;
+use Nette\PhpGenerator\Property;
 use Webmozart\Assert\Assert;
 use function Symfony\Component\String\u;
 
@@ -48,12 +50,13 @@ class DTOBuilder implements FileDefinitionBuilderInterface
         ;
 
         foreach ($config->dtoProperties() as $property) {
-            self::defineProperty($class, $property);
+            $class->addMember(self::property($property));
         }
 
-        self::namedConstructorFromArray($class, $config->dtoProperties());
-
-        self::methodValidate($class, $config->dtoProperties());
+        $class
+            ->addMember(self::namedConstructorFromArray($config->dtoProperties()))
+            ->addMember(self::methodValidate($class, $config->dtoProperties()))
+        ;
 
         return $fileDefinition;
     }
@@ -74,7 +77,7 @@ class DTOBuilder implements FileDefinitionBuilderInterface
         ];
     }
 
-    private static function defineProperty(ClassType $class, array $property): void
+    private static function property(array $property): Property
     {
         Assert::inArray(
             $property['type'],
@@ -82,9 +85,8 @@ class DTOBuilder implements FileDefinitionBuilderInterface
             sprintf('Property "%s" should be of type %s; %s given', $property['fieldName'], implode(', ', array_keys(self::correspondingTypes())), $property['type'])
         );
 
-        $class->addProperty($property['fieldName'])
-            ->setVisibility('public')
-            ->setType(self::correspondingTypes()[$property['type']]);
+        $property = new Property($property['fieldName']);
+        $property->setVisibility('public')->setType(self::correspondingTypes()[$property['type']]);
 
         $defaultValue = match ($property['type']) {
             'string' => '',
@@ -94,27 +96,21 @@ class DTOBuilder implements FileDefinitionBuilderInterface
             'datetime' => null,
         };
 
-        $class->getProperty($property['fieldName'])
-            ->setValue($defaultValue);
+        $property->setValue($defaultValue);
 
         if (null === $defaultValue) {
-            $class->getProperty($property['fieldName'])
-                ->setNullable();
+            $property->setNullable();
         }
 
         if ($property['nullable']) {
-            $class->getProperty($property['fieldName'])
-                ->setValue(null)
-                ->setNullable();
+            $property->setValue(null)->setNullable();
         }
+
+        return $property;
     }
 
-    private static function methodValidate(ClassType $class, array $properties): void
+    private static function methodValidate(ClassType $class, array $properties): Method
     {
-        $class->addMethod('validate')
-            ->setPublic()
-            ->setReturnType('array');
-
         $validationErrors = [];
         foreach ($properties as $property) {
             $if = 'if (%s) {'.PHP_EOL.'    $errors[\'%s\'] = \'validation.%s.%s.empty\';'.PHP_EOL.'}';
@@ -136,27 +132,31 @@ class DTOBuilder implements FileDefinitionBuilderInterface
 
 return $errors;';
 
-        $class->getMethod('validate')
+        return (new Method('validate'))
+            ->setPublic()
+            ->setReturnType('array')
             ->setBody(sprintf($errors, implode("\n", $validationErrors)));
     }
 
-    private static function namedConstructorFromArray(ClassType $class, array $properties): void
+    private static function namedConstructorFromArray(array $properties): Method
     {
-        $method = $class->addMethod('fromArray')
-            ->setStatic()
-            ->setPublic()
-            ->setReturnType('self');
+        $body = array_merge([
+            '$dto = new self();',
+        ], array_map(function (array $property) {
+            return sprintf('$dto->%s = $data[\'%s\'];', $property['fieldName'], $property['fieldName']);
+        }, [
+            '',
+            'return $dto;',
+        ]));
 
-        $method->addParameter('data')
-            ->setType('array');
+        $method = new Method('fromArray');
+        $method->setStatic()->setPublic()->setReturnType('self');
+        $method->addParameter('data')->setType('array');
 
-        $method->addBody('$dto = new self();');
-
-        foreach ($properties as $property) {
-            $method->addBody(sprintf('$dto->%s = $data[\'%s\'];', $property['fieldName'], $property['fieldName']));
+        foreach ($body as $line) {
+            $method->addBody($line);
         }
 
-        $method->addBody('');
-        $method->addBody('return $dto;');
+        return $method;
     }
 }

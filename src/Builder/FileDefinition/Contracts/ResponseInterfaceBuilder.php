@@ -20,20 +20,20 @@ class ResponseInterfaceBuilder implements FileDefinitionBuilderInterface
         $fileDefinition
             ->file
             ->addInterface($fileDefinition->fullName())
-            ->addMember(self::addMethodRedirectToUrl())
-            ->addMember(self::addMethodRedirectToRoute())
-            ->addMember(self::addMethodRender())
-            ->addMember(self::addMethodJson())
-            ->addMember(self::addMethodJsonError())
-            ->addMember(self::addMethodFile())
-            ->addMember(self::addMethodEmpty())
-            ->addMember(self::addMethodError())
+            ->addMember(self::methodRedirectToUrl())
+            ->addMember(self::methodRedirectToRoute())
+            ->addMember(self::methodRender())
+            ->addMember(self::methodJson())
+            ->addMember(self::methodJsonError())
+            ->addMember(self::methodFile())
+            ->addMember(self::methodEmpty())
+            ->addMember(self::methodError())
         ;
 
         return $fileDefinition;
     }
 
-    private static function addMethodRedirectToUrl(): Method
+    private static function methodRedirectToUrl(): Method
     {
         $method = new Method('redirectToUrl');
         $method->setPublic();
@@ -41,7 +41,7 @@ class ResponseInterfaceBuilder implements FileDefinitionBuilderInterface
         return $method;
     }
 
-    private static function addMethodRedirectToRoute(): Method
+    private static function methodRedirectToRoute(): Method
     {
         $method = new Method('redirectToRoute');
         $method->setPublic();
@@ -50,7 +50,7 @@ class ResponseInterfaceBuilder implements FileDefinitionBuilderInterface
         return $method;
     }
 
-    private static function addMethodRender(): Method
+    private static function methodRender(): Method
     {
         $method = new Method('render');
         $method->setPublic();
@@ -59,7 +59,7 @@ class ResponseInterfaceBuilder implements FileDefinitionBuilderInterface
         return $method;
     }
 
-    private static function addMethodJson(): Method
+    private static function methodJson(): Method
     {
         $method = new Method('json');
         $method->setPublic();
@@ -70,7 +70,7 @@ class ResponseInterfaceBuilder implements FileDefinitionBuilderInterface
         return $method;
     }
 
-    private static function addMethodJsonError(): Method
+    private static function methodJsonError(): Method
     {
         $method = new Method('jsonError');
         $method->setPublic();
@@ -81,7 +81,7 @@ class ResponseInterfaceBuilder implements FileDefinitionBuilderInterface
         return $method;
     }
 
-    private static function addMethodFile(): Method
+    private static function methodFile(): Method
     {
         $method = new Method('file');
         $method->setPublic();
@@ -91,7 +91,7 @@ class ResponseInterfaceBuilder implements FileDefinitionBuilderInterface
         return $method;
     }
 
-    private static function addMethodEmpty(): Method
+    private static function methodEmpty(): Method
     {
         $method = new Method('empty');
         $method->setPublic();
@@ -100,7 +100,7 @@ class ResponseInterfaceBuilder implements FileDefinitionBuilderInterface
         return $method;
     }
 
-    private static function addMethodError(): Method
+    private static function methodError(): Method
     {
         $method = new Method('error');
         $method->setPublic();

@@ -9,8 +9,8 @@ use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Contracts\RoutingInterf
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Contracts\SecurityInterfaceBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Contracts\TemplatingInterfaceBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Contracts\UserInterfaceBuilder;
-use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Exception\ExceptionBuilder;
-use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Factory\FactoryBuilder;
+use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Exception\FailFastExceptionBuilder;
+use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Factory\ContactFactoryBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Logger\AbstractLoggerBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Logger\LoggerBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Logger\NullLoggerBuilder;
@@ -22,8 +22,9 @@ use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Service\TwigTemplatingS
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Trait\EntityIsTraitBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Trait\IdEntityTraitBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Trait\IsTraitBuilder;
+use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\VO\VOContextBuilder;
+use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\VO\VODateTimeBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\VO\VONullUserBuilder;
-use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\VOBuilder;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 
 class ProjectInstallGenerator extends AbstractGenerator
@@ -48,11 +49,11 @@ class ProjectInstallGenerator extends AbstractGenerator
         $this->addFileDefinition(SymfonyResponseServiceBuilder::build($config));
         $this->addFileDefinition(SymfonyRoutingServiceBuilder::build($config));
         $this->addFileDefinition(SymfonySecurityServiceBuilder::build($config));
-        $this->addFileDefinition(ExceptionBuilder::buildFailFast($config));
+        $this->addFileDefinition(FailFastExceptionBuilder::build($config));
         $this->addFileDefinition(CommandAndQueryServicesBuilder::filesDefinitions($config));
-        $this->addFileDefinition(VOBuilder::buildDatetime($config));
-        $this->addFileDefinition(VOBuilder::buildContext($config));
-        $this->addFileDefinition(FactoryBuilder::buildContext($config));
+        $this->addFileDefinition(VODateTimeBuilder::build($config));
+        $this->addFileDefinition(VOContextBuilder::build($config));
+        $this->addFileDefinition(ContactFactoryBuilder::build($config));
         $this->generateFiles();
         $this->clearFilesDefinitions();
 

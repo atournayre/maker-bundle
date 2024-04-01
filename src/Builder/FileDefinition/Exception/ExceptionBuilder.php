@@ -6,6 +6,7 @@ use Atournayre\Bundle\MakerBundle\Builder\FileDefinitionBuilder;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 use Atournayre\Bundle\MakerBundle\Contracts\Builder\FileDefinitionBuilderInterface;
 use Nette\PhpGenerator\ClassType;
+use Nette\PhpGenerator\Method;
 use function Symfony\Component\String\u;
 
 class ExceptionBuilder implements FileDefinitionBuilderInterface
@@ -28,7 +29,10 @@ class ExceptionBuilder implements FileDefinitionBuilderInterface
             ->setExtends($exceptionType)
         ;
 
-        self::addNamedConstructor($class, $config);
+        if ('' === $config->getExtraProperty('exceptionNamedConstructor')) {
+            $class->addMember(self::methodNamedConstructor($class, $config));
+        }
+
 
         return $fileDefinition;
     }
@@ -42,36 +46,14 @@ class ExceptionBuilder implements FileDefinitionBuilderInterface
         return u($name)->replace('Exception', '')->toString();
     }
 
-    private static function addNamedConstructor(ClassType $class, MakerConfig $config): void
+    private static function methodNamedConstructor(ClassType $class, MakerConfig $config): Method
     {
         $methodName = $config->getExtraProperty('exceptionNamedConstructor');
-
-        if ('' === $methodName) {
-            return;
-        }
-
         $fullName = $class->getNamespace()->getName() . '\\' . $class->getName();
 
-        $class->addMethod($methodName)
-            ->setStatic()
-            ->setPublic()
-            ->setReturnType($fullName);
-
-        $class->getMethod($methodName)
-            ->addBody("return new {$class->getName()}('Oops, an error occured.');");
-    }
-
-    public static function buildFailFast(
-        MakerConfig $config,
-        string $namespace = 'Exception',
-        string $name = 'FailFast'
-    ): FileDefinitionBuilder
-    {
-        $config = $config
-            ->withExtraProperty('exceptionType', \RuntimeException::class)
-            ->withExtraProperty('exceptionNamedConstructor', 'ifTrue')
-        ;
-
-        return self::build($config, $namespace, $name);
+        $method = new Method($methodName);
+        $method->setStatic()->setPublic()->setReturnType($fullName);
+        $method->addBody("return new {$class->getName()}('Oops, an error occured.');");
+        return $method;
     }
 }

@@ -23,17 +23,17 @@ class UserInterfaceBuilder implements FileDefinitionBuilderInterface
         $fileDefinition
             ->file
             ->addInterface($fileDefinition->fullName())
-            ->addMember(self::getRoles())
-            ->addMember(self::getPassword())
-            ->addMember(self::getSalt())
-            ->addMember(self::getUsername())
-            ->addMember(self::eraseCredentials())
+            ->addMember(self::methodGetRoles())
+            ->addMember(self::methodGetPassword())
+            ->addMember(self::methodGetSalt())
+            ->addMember(self::methodGetUsername())
+            ->addMember(self::methodEraseCredentials())
         ;
 
         return $fileDefinition;
     }
 
-    private static function getRoles(): Method
+    private static function methodGetRoles(): Method
     {
         $method = new Method('getRoles');
         $method
@@ -50,7 +50,7 @@ class UserInterfaceBuilder implements FileDefinitionBuilderInterface
         return $method;
     }
 
-    private static function getPassword(): Method
+    private static function methodGetPassword(): Method
     {
         $method = new Method('getPassword');
         $method
@@ -63,7 +63,7 @@ class UserInterfaceBuilder implements FileDefinitionBuilderInterface
         return $method;
     }
 
-    private static function getSalt(): Method
+    private static function methodGetSalt(): Method
     {
         $method = new Method('getSalt');
         $method
@@ -75,7 +75,7 @@ class UserInterfaceBuilder implements FileDefinitionBuilderInterface
         return $method;
     }
 
-    private static function getUsername(): Method
+    private static function methodGetUsername(): Method
     {
         $method = new Method('getUsername');
         $method
@@ -86,7 +86,7 @@ class UserInterfaceBuilder implements FileDefinitionBuilderInterface
         return $method;
     }
 
-    private static function eraseCredentials(): Method
+    private static function methodEraseCredentials(): Method
     {
         $method = new Method('eraseCredentials');
         $method

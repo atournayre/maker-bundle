@@ -20,12 +20,12 @@ class TemplatingInterfaceBuilder implements FileDefinitionBuilderInterface
         $fileDefinition
             ->file
             ->addInterface($fileDefinition->fullName())
-            ->addMember(self::addMethodRender());
+            ->addMember(self::methodRender());
 
         return $fileDefinition;
     }
 
-    private static function addMethodRender(): Method
+    private static function methodRender(): Method
     {
         $method = new Method('render');
         $method->setPublic()->setReturnType('string');

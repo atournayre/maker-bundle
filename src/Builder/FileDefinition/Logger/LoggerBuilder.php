@@ -7,7 +7,7 @@ use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 use Atournayre\Bundle\MakerBundle\Contracts\Builder\FileDefinitionBuilderInterface;
 use App\Contracts\Logger\LoggerInterface;
 use App\Logger\AbstractLogger;
-use Nette\PhpGenerator\ClassType;
+use Nette\PhpGenerator\Method;
 
 class LoggerBuilder implements FileDefinitionBuilderInterface
 {
@@ -19,117 +19,90 @@ class LoggerBuilder implements FileDefinitionBuilderInterface
     {
         $fileDefinition = FileDefinitionBuilder::build($namespace, $name, 'Logger', $config);
 
-        $class = $fileDefinition->file->addClass($fileDefinition->fullName())
+        $class = $fileDefinition
+            ->file
+            ->addClass($fileDefinition->fullName())
             ->setExtends(AbstractLogger::class)
             ->addImplement(LoggerInterface::class)
-            ->setFinal();
+            ->setFinal()
+            ->addMember(self::methodException())
+            ->addMember(self::addMethodByName('error'))
+            ->addMember(self::addMethodByName('emergency'))
+            ->addMember(self::addMethodByName('alert'))
+            ->addMember(self::addMethodByName('critical'))
+            ->addMember(self::addMethodByName('warning'))
+            ->addMember(self::addMethodByName('notice'))
+            ->addMember(self::addMethodByName('info'))
+            ->addMember(self::addMethodByName('debug'))
+            ->addMember(self::methodLog())
+            ->addMember(self::addMethodWithInfoLog('start', 'start'))
+            ->addMember(self::addMethodWithInfoLog('end', 'end'))
+            ->addMember(self::addMethodWithInfoLog('success', 'success'))
+            ->addMember(self::addMethodWithInfoLog('failFast', 'fail fast'))
+        ;
 
-        $namespace = $class->getNamespace();
-        $namespace->addUse(LoggerInterface::class);
-
-        self::addExceptionMethod($class);
-        self::addMethodByName($class, 'error');
-        self::addMethodByName($class, 'emergency');
-        self::addMethodByName($class, 'alert');
-        self::addMethodByName($class, 'critical');
-        self::addMethodByName($class, 'warning');
-        self::addMethodByName($class, 'notice');
-        self::addMethodByName($class, 'info');
-        self::addMethodByName($class, 'debug');
-
-        self::addLogMethod($class);
-
-        self::addMethodWithInfoLog($class, 'start', 'start');
-        self::addMethodWithInfoLog($class, 'end', 'end');
-        self::addMethodWithInfoLog($class, 'success', 'success');
-        self::addMethodWithInfoLog($class, 'failFast', 'fail fast');
+        $class->getNamespace()
+            ->addUse(LoggerInterface::class)
+        ;
 
         return $fileDefinition;
     }
 
-    private static function addExceptionMethod(ClassType $class): void
+    private static function methodException(): Method
     {
-        $class->addMethod('exception')
-            ->setPublic()
-            ->addParameter('exception')
-            ->setType('\Exception');
-
-        $class->getMethod('exception')
-            ->addParameter('context')
-            ->setType('array')
-            ->setDefaultValue([]);
-
-        $class->getMethod('exception')
-            ->setReturnType('void');
+        $method = new Method('exception');
+        $method->setPublic();
+        $method->addParameter('exception')->setType('\Exception');
+        $method->addParameter('context')->setType('array')->setDefaultValue([]);
+        $method->setReturnType('void');
 
         $methodBody = <<<'PHP'
 $context['exception'] = $exception;
 $this->logger->error($exception->getMessage(), $context);
 PHP;
 
-        $class->getMethod('exception')
-            ->setBody($methodBody);
+        $method->setBody($methodBody);
+        return $method;
     }
 
-    private static function addMethodByName(ClassType $class, string $name): void
+    private static function addMethodByName(string $name): Method
     {
-        $class->addMethod($name)
-            ->setPublic()
-            ->addParameter('message')
-            ->setType('\Stringable|string');
-
-        $class->getMethod($name)
-            ->addParameter('context')
-            ->setType('array')
-            ->setDefaultValue([]);
-
-        $class->getMethod($name)
-            ->setReturnType('void');
+        $method = new Method($name);
+        $method->setPublic()->addParameter('message')->setType('\Stringable|string');
+        $method->addParameter('context')->setType('array')->setDefaultValue([]);
+        $method->setReturnType('void');
 
         $methodBody = '$this->logger->'.$name.'($this->prefixMessage($this->getLoggerIdentifier(), $message), $context);';
 
-            $class->getMethod($name)
-                ->setBody($methodBody);
+        $method->setBody($methodBody);
+        return $method;
     }
 
-    private static function addLogMethod(ClassType $class): void
+    private static function methodLog(): Method
     {
-        $class->addMethod('log')
-            ->setPublic()
-            ->addParameter('level');
-
-        $class->getMethod('log')
-            ->addParameter('message')
-            ->setType('\Stringable|string');
-
-        $class->getMethod('log')
-            ->addParameter('context')
-            ->setType('array')
-            ->setDefaultValue([]);
-
-        $class->getMethod('log')
-            ->setReturnType('void');
+        $method = new Method('log');
+        $method->setPublic();
+        $method->addParameter('level');
+        $method->addParameter('message')->setType('\Stringable|string');
+        $method->addParameter('context')->setType('array')->setDefaultValue([]);
+        $method->setReturnType('void');
 
         $methodBody = '$this->logger->log($level, $this->prefixMessage($this->getLoggerIdentifier(), $message), $context);';
 
-        $class->getMethod('log')
-            ->setBody($methodBody);
+        $method->setBody($methodBody);
+        return $method;
     }
 
-    private static function addMethodWithInfoLog(ClassType $class, string $name, string $message): void
+    private static function addMethodWithInfoLog(string $name, string $message): Method
     {
-        $class->addMethod($name)
-            ->setPublic()
-            ->addParameter('context')
-            ->setType('array')
-            ->setDefaultValue([]);
-
-        $class->getMethod($name)
-            ->setReturnType('void');
+        $method = new Method($name);
+        $method->setPublic();
+        $method->addParameter('context')->setType('array')->setDefaultValue([]);
+        $method->setReturnType('void');
 
         $methodBody = '$this->logger->info($this->prefixMessage($this->getLoggerIdentifier(), \''.$message.'\'), $context);';
 
-        $class->getMethod($name)
-            ->setBody($methodBody);
+        $method->setBody($methodBody);
+        return $method;
     }
 }

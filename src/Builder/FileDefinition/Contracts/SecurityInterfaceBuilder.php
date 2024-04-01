@@ -24,7 +24,7 @@ class SecurityInterfaceBuilder implements FileDefinitionBuilderInterface
         $interface = $fileDefinition
             ->file
             ->addInterface($fileDefinition->fullName())
-            ->addMember(self::addMethodGetUser())
+            ->addMember(self::methodGetUser())
         ;
 
         $interface->getNamespace()
@@ -33,7 +33,7 @@ class SecurityInterfaceBuilder implements FileDefinitionBuilderInterface
         return $fileDefinition;
     }
 
-    private static function addMethodGetUser(): Method
+    private static function methodGetUser(): Method
     {
         $method = new Method('getUser');
         $method->setPublic()->setReturnType(\App\Contracts\Security\UserInterface::class)->setReturnNullable();

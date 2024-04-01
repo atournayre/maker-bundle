@@ -9,27 +9,9 @@ use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 use Atournayre\Bundle\MakerBundle\Contracts\Builder\FileDefinitionBuilderInterface;
 use Nette\PhpGenerator\Method;
 
-class FactoryBuilder implements FileDefinitionBuilderInterface
+class ContactFactoryBuilder implements FileDefinitionBuilderInterface
 {
     public static function build(
-        MakerConfig $config,
-        string $namespace = 'Factory',
-        string $name = ''
-    ): FileDefinitionBuilder
-    {
-        $fileDefinition = FileDefinitionBuilder::build($namespace, $name, 'Factory', $config);
-
-        $fileDefinition
-            ->file
-            ->addClass($fileDefinition->fullName())
-            ->setFinal()
-            ->setReadOnly()
-        ;
-
-        return $fileDefinition;
-    }
-
-    public static function buildContext(
         MakerConfig $config,
         string $namespace = 'Factory',
         string $name = ''

@@ -11,9 +11,11 @@ use App\Contracts\Service\PostConditionsChecksInterface;
 use App\Contracts\Service\PreConditionsChecksInterface;
 use App\Contracts\Service\TagCommandServiceInterface;
 use App\Exception\FailFast;
+use Nette\PhpGenerator\Attribute;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\InterfaceType;
 use Nette\PhpGenerator\Literal;
+use Nette\PhpGenerator\Method;
 use Override;
 use function Symfony\Component\String\u;
 
@@ -25,24 +27,8 @@ class ServiceCommandBuilder implements FileDefinitionBuilderInterface
         string $name = ''
     ): FileDefinitionBuilder
     {
-        $fileDefinition = FileDefinitionBuilder::build($namespace, $name, 'CommandService', $config);
-        $fileDefinition->file->addClass($fileDefinition->fullName());
-
-        $class = $fileDefinition->getClass();
-        $class->setFinal()->setReadOnly();
-
-        $namespace = $class->getNamespace();
-        $namespace->addUse(FailFast::class);
-        $namespace->addUse(\Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag::class);
-        $namespace->addUse(\App\Contracts\Service\TagCommandServiceInterface::class);
-
-        $class->addAttribute(\Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag::class, [
-            new Literal('TagCommandServiceInterface::class'),
-        ]);
-
-        $class->addMethod('__invoke')
-            ->setPrivate()
-            ->addComment('This service is not meant to be used directly');
+        $voParameter = $config->rootNamespace() . '\\' . $config->extraProperties()['vo'];
+        $voClassName = u($voParameter)->afterLast('\\')->toString();
 
         $interfacesToImplement = [
             PreConditionsChecksInterface::class,
@@ -51,17 +37,34 @@ class ServiceCommandBuilder implements FileDefinitionBuilderInterface
             PostConditionsChecksInterface::class,
         ];
 
-        foreach ($interfacesToImplement as $interface) {
-            $class->addImplement($interface);
-            $namespace->addUse($interface);
+        $uses = array_merge($interfacesToImplement, [
+            FailFast::class,
+            \Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag::class,
+            \App\Contracts\Service\TagCommandServiceInterface::class,
+            $voParameter,
+        ]);
+
+        $fileDefinition = FileDefinitionBuilder::build($namespace, $name, 'CommandService', $config);
+
+        $class = $fileDefinition
+            ->file
+            ->addClass($fileDefinition->fullName())
+            ->setFinal()
+            ->setReadOnly()
+            ->setAttributes([
+                self::attributeAutoconfigureTag(),
+            ])
+            ->addMember(self::invoke())
+        ;
+
+        $namespace = $class->getNamespace();
+
+        foreach ($uses as $use) {
+            $namespace->addUse($use);
         }
 
-        $voParameter = $config->rootNamespace() . '\\' . $config->extraProperties()['vo'];
-        $voClassName = u($voParameter)->afterLast('\\')->toString();
-
-        $namespace->addUse($voParameter);
-
         foreach ($interfacesToImplement as $interface) {
+            $class->addImplement($interface);
             $sourceInterface = InterfaceType::from($interface);
             self::implementMethods($sourceInterface, $class, $voClassName);
         }
@@ -69,17 +72,31 @@ class ServiceCommandBuilder implements FileDefinitionBuilderInterface
         return $fileDefinition;
     }
 
+    private static function invoke(): Method
+    {
+        return (new Method('__invoke'))
+            ->setPrivate()
+            ->addComment('This service is not meant to be used directly');
+    }
+
+    private static function attributeAutoconfigureTag(): Attribute
+    {
+        return new Attribute(\Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag::class, [
+            new Literal('TagCommandServiceInterface::class'),
+        ]);
+    }
+
     private static function implementMethods($sourceInterface, ClassType $class, string $objectType): void
     {
         foreach ($sourceInterface->getMethods() as $method) {
-            self::implementMethod($method->getName(), $sourceInterface, $class, $objectType);
+            $class->addMember(self::implementMethod($method->getName(), $sourceInterface, $objectType));
         }
     }
 
-    private static function implementMethod(string $method, $sourceInterface, ClassType $class, string $objectType): void
+    private static function implementMethod(string $method, $sourceInterface, string $objectType): Method
     {
         $sourceMethod = $sourceInterface->getMethod($method);
-        $class->addMethod($sourceMethod->getName())
+        return (new Method($sourceMethod->getName()))
             ->setPublic()
             ->addComment($sourceMethod->getComment())
             ->addComment('@param '.$objectType.' $object')
