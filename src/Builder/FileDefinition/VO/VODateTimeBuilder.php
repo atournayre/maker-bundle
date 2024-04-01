@@ -2,7 +2,6 @@
 
 namespace Atournayre\Bundle\MakerBundle\Builder\FileDefinition\VO;
 
-use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\VOBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinitionBuilder;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 use Atournayre\Bundle\MakerBundle\Contracts\Builder\FileDefinitionBuilderInterface;
