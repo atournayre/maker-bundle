@@ -90,9 +90,8 @@ class CommandAndQueryServicesBuilder implements FileDefinitionBuilderInterface
     {
         $fileDefinition = FileDefinitionBuilder::build($namespace, $name, '', $config);
 
-        $method = new Method('__construct');
-        $method->addParameter('serviceName')->setType('string');
-        $construct = $method;
+        $construct = new Method('__construct');
+        $construct->addParameter('serviceName')->setType('string');
 
         $property = new Property('serviceName');
         $property->setPublic()->setType('string')->setReadOnly();
@@ -145,23 +144,20 @@ class CommandAndQueryServicesBuilder implements FileDefinitionBuilderInterface
     {
         $fileDefinition = InterfaceBuilder::build($config, $namespace, $name);
 
-        $class = $fileDefinition->getClass();
-
-        $namespace = $class->getNamespace();
-        $namespace->addUse(\App\VO\Context::class);
-
-        $class->addMethod('postConditionsChecks')
-            ->setPublic()
-            ->setReturnType('void')
-            ->addParameter('object');
-
-        $class->getMethod('postConditionsChecks')
-            ->addParameter('context')
-            ->setType(\App\VO\Context::class);
-
-        $class->getMethod('postConditionsChecks')
+        $method = new Method('postConditionsChecks');
+        $method->setPublic()->setReturnType('void')->addParameter('object');
+        $method->addParameter('context')->setType(\App\VO\Context::class);
+        $method
             ->addComment('Use assertions, or remove method and interface from the class if not needed.')
             ->addComment('@throws \Exception');
+
+        $class = $fileDefinition->getClass()
+            ->addMember($method)
+        ;
+
+        $class->getNamespace()
+            ->addUse(\App\VO\Context::class)
+        ;
 
         return $fileDefinition;
     }
@@ -174,23 +170,21 @@ class CommandAndQueryServicesBuilder implements FileDefinitionBuilderInterface
     {
         $fileDefinition = InterfaceBuilder::build($config, $namespace, $name);
 
-        $class = $fileDefinition->getClass();
+        $method = new Method('preConditionsChecks');
+        $method->setPublic()->setReturnType('void')->addParameter('object');
+        $method->addParameter('context')->setType(\App\VO\Context::class);
 
-        $namespace = $class->getNamespace();
-        $namespace->addUse(\App\VO\Context::class);
-
-        $class->addMethod('preConditionsChecks')
-            ->setPublic()
-            ->setReturnType('void')
-            ->addParameter('object');
-
-        $class->getMethod('preConditionsChecks')
-            ->addParameter('context')
-            ->setType(\App\VO\Context::class);
-
-        $class->getMethod('preConditionsChecks')
+        $method
             ->addComment('Use assertions, or remove method and interface from the class if not needed.')
             ->addComment('@throws \Exception');
+
+        $class = $fileDefinition->getClass()
+            ->addMember($method)
+        ;
+
+        $class->getNamespace()
+            ->addUse(\App\VO\Context::class)
+        ;
 
         return $fileDefinition;
     }
@@ -261,24 +255,18 @@ class CommandAndQueryServicesBuilder implements FileDefinitionBuilderInterface
     {
         $fileDefinition = InterfaceBuilder::build($config, $namespace, $name);
 
+        $method = new Method('execute');
+        $method->setPublic()->setReturnType('void');
+        $method->addParameter('object');
+        $method->addParameter('context')->setType(\App\VO\Context::class);
+        $method->addParameter('service')->setType('?string')->setDefaultValue(null);
+
         $class = $fileDefinition->getClass();
+        $class->addMember($method);
 
-        $namespace = $class->getNamespace();
-        $namespace->addUse(\App\VO\Context::class);
-
-        $class->addMethod('execute')
-            ->setPublic()
-            ->setReturnType('void')
-            ->addParameter('object');
-
-        $class->getMethod('execute')
-            ->addParameter('context')
-            ->setType(\App\VO\Context::class);
-
-        $class->getMethod('execute')
-            ->addParameter('service')
-            ->setType('?string')
-            ->setDefaultValue(null);
+        $class->getNamespace()
+            ->addUse(\App\VO\Context::class)
+        ;
         return $fileDefinition;
     }
 
@@ -290,23 +278,18 @@ class CommandAndQueryServicesBuilder implements FileDefinitionBuilderInterface
     {
         $fileDefinition = InterfaceBuilder::build($config, $namespace, $name);
 
+        $method = new Method('fetch');
+        $method->setPublic();
+        $method->addParameter('object');
+        $method->addParameter('context')->setType(\App\VO\Context::class);
+        $method->addParameter('service')->setType('?string')->setDefaultValue(null);
+
         $class = $fileDefinition->getClass();
+        $class->addMember($method);
 
-        $namespace = $class->getNamespace();
-        $namespace->addUse(\App\VO\Context::class);
-
-        $class->addMethod('fetch')
-            ->setPublic()
-            ->addParameter('object');
-
-        $class->getMethod('fetch')
-            ->addParameter('context')
-            ->setType(\App\VO\Context::class);
-
-        $class->getMethod('fetch')
-            ->addParameter('service')
-            ->setType('?string')
-            ->setDefaultValue(null);
+        $class->getNamespace()
+            ->addUse(\App\VO\Context::class)
+        ;
 
         return $fileDefinition;
     }
@@ -319,20 +302,19 @@ class CommandAndQueryServicesBuilder implements FileDefinitionBuilderInterface
     {
         $fileDefinition = FileDefinitionBuilder::build($namespace, $name, 'Helper', $config);
 
-        $class = $fileDefinition->file->addClass($fileDefinition->fullName());
+        $fileDefinition
+            ->file
+            ->addClass($fileDefinition->fullName())
+            ->addMember(self::helperAttributeGetNamedArguments())
+            ->addMember(self::helperAttributeGetParameter())
+        ;
 
-        $class->addMethod('getNamedArguments')
-            ->setStatic()
-            ->setPublic()
-            ->setReturnType('array')
-            ->addParameter('objectOrClass');
+        return $fileDefinition;
+    }
 
-        $class->getMethod('getNamedArguments')
-            ->addParameter('attributeName')
-            ->setType('string');
-
-        $class->getMethod('getNamedArguments')
-            ->setBody(<<<'PHP'
+    public static function helperAttributeGetNamedArguments(): Method
+    {
+        $body = <<<'PHP'
 $reflectionClass = new \ReflectionClass(get_class($objectOrClass));
 $attributes = $reflectionClass->getAttributes();
 
@@ -357,29 +339,34 @@ foreach ($attributes as $attribute) {
 }
 
 return $namedArguments;
-PHP);
+PHP;
 
-        $class->addMethod('getParameter')
-            ->setStatic()
-            ->setPublic()
-            ->setReturnType('?string')
-            ->addParameter('objectOrClass');
+            $method = new Method('getNamedArguments');
+            $method->setStatic();
+            $method->setPublic();
+            $method->setReturnType('array');
+            $method->addParameter('objectOrClass');
+            $method->addParameter('attributeName')->setType('string');
+            $method->setBody($body);
+            return $method;
+    }
 
-        $class->getMethod('getParameter')
-            ->addParameter('attributeName')
-            ->setType('string');
-
-        $class->getMethod('getParameter')
-            ->addParameter('paramName')
-            ->setType('string');
-
-        $class->getMethod('getParameter')
-            ->setBody(<<<'PHP'
+    public static function helperAttributeGetParameter(): Method
+    {
+        $body = <<<'PHP'
 $params = self::getNamedArguments($objectOrClass, $attributeName);
 return $params[$paramName] ?? null;
-PHP);
+PHP;
 
-        return $fileDefinition;
+        $method = new Method('getParameter');
+        $method->setStatic();
+        $method->setPublic();
+        $method->setReturnType('?string');
+        $method->addParameter('objectOrClass');
+        $method->addParameter('attributeName')->setType('string');
+        $method->addParameter('paramName')->setType('string');
+        $method->setBody($body);
+        return $method;
     }
 
     public static function buildServiceCommand(

@@ -140,20 +140,19 @@ return $errors;';
 
     private static function namedConstructorFromArray(array $properties): Method
     {
-        $body = array_merge([
-            '$dto = new self();',
-        ], array_map(function (array $property) {
-            return sprintf('$dto->%s = $data[\'%s\'];', $property['fieldName'], $property['fieldName']);
-        }, [
-            '',
-            'return $dto;',
-        ]));
+        $bodyParts = [];
+        $bodyParts[] = '$dto = new self();';
+        foreach ($properties as $property) {
+            $bodyParts[] = sprintf('$dto->%s = $data[\'%s\'];', $property['fieldName'], $property['fieldName']);
+        }
+        $bodyParts[] = '';
+        $bodyParts[] = 'return $dto;';
 
         $method = new Method('fromArray');
         $method->setStatic()->setPublic()->setReturnType('self');
         $method->addParameter('data')->setType('array');
 
-        foreach ($body as $line) {
+        foreach ($bodyParts as $line) {
             $method->addBody($line);
         }
 
