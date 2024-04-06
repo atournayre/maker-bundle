@@ -25,7 +25,7 @@ class LoggerInterfaceBuilder implements FileDefinitionBuilderInterface
             ->file
             ->addInterface($fileDefinition->fullName())
             ->addExtend(LoggerInterface::class)
-            ->addMember(self::methodWithMessage('emmergency'))
+            ->addMember(self::methodWithMessage('emergency'))
             ->addMember(self::methodWithMessage('alert'))
             ->addMember(self::methodWithMessage('critical'))
             ->addMember(self::methodWithMessage('error'))
