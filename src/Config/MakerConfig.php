@@ -100,4 +100,9 @@ class MakerConfig
     {
         return $this->extraProperties[$name] ?? null;
     }
+
+    public function hasExtraProperty(string $name): bool
+    {
+        return null !== $this->getExtraProperty($name);
+    }
 }

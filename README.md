@@ -64,9 +64,9 @@ services:
 | Command                   | Description                                                             |
 |---------------------------|-------------------------------------------------------------------------|
 | `make:new:dto`            | Create a new DTO                                                        |
-| `make:new:exception`      | Create a new Exception                                                  |
+| `make:new:exception`      | [Create a new Exception](docs/new-default.md)                           |
 | `make:new:interface`      | Create a new Interface                                                  |
-| `make:new:logger`         | Create a new Logger                                                     |
+| `make:new:logger`         | [Create a new Logger](docs/new-logger.md)                               |
 | `make:new:service`        | [Create a new Service](docs/new-service.md)                             |
 | `make:new:trait`          | Create a new Trait                                                      |
 | `make:new:vo`             | Create a new VO                                                         |

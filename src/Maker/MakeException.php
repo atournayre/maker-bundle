@@ -21,7 +21,7 @@ class MakeException extends AbstractMaker
 {
     private string $exceptionName;
     private string $exceptionType;
-    private string $exceptionNamedConstructor = '';
+    private ?string $exceptionNamedConstructor = null;
 
     public function __construct(
         private readonly ExceptionGenerator $exceptionGenerator,

@@ -29,7 +29,7 @@ class ExceptionBuilder implements FileDefinitionBuilderInterface
             ->setExtends($exceptionType)
         ;
 
-        if ('' === $config->getExtraProperty('exceptionNamedConstructor')) {
+        if ($config->hasExtraProperty('exceptionNamedConstructor')) {
             $class->addMember(self::methodNamedConstructor($class, $config));
         }
 
