@@ -58,6 +58,25 @@ final class FileDefinitionBuilder
         return $fileDefinitionBuilder->withDefaultFile();
     }
 
+    public static function buildFromTemplate(
+        string $template,
+        string $nameSuffix,
+        MakerConfig $config
+    ): self
+    {
+        $name = u($template)->afterLast('/')->beforeLast('.')->toString();
+        $namespace = u($template)->beforeLast('/')->replace('/', '\\\\')->toString();
+        $templatePath = u(__DIR__)->replace('Builder', 'Resources/templates')->append('/')->append($template)->toString();
+
+        $content = file_get_contents($templatePath);
+        $phpFile = PhpFile::fromCode($content)
+            ->addComment('This file has been auto-generated')
+        ;
+
+        return self::build($namespace, $name, $nameSuffix, $config)
+            ->withFile($phpFile);
+    }
+
     private function withDefaultFile(): self
     {
         $clone = clone $this;
