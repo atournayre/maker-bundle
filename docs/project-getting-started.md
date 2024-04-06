@@ -26,6 +26,7 @@ Creates the following files:
 - src/Contracts/Service/TagCommandServiceInterface.php
 - src/Contracts/Service/TagQueryServiceInterface.php
 - src/Contracts/Templating/TemplatingInterface.php
+- src/Contracts/Type/Primitive/ScalarObjectInterface.php
 - src/Exception/FailFast.php
 - src/Factory/ContextFactory.php
 - src/Helper/AttributeHelper.php
@@ -41,6 +42,14 @@ Creates the following files:
 - src/Trait/EntityIsTrait.php
 - src/Trait/IdEntityTrait.php
 - src/Trait/IsTrait.php
+- src/Type/Primitive/AbstractCollectionType.php
+- src/Type/Primitive/BooleanType.php
+- src/Type/Primitive/IntegerType.php
+- src/Type/Primitive/ListImmutableType.php
+- src/Type/Primitive/ListType.php
+- src/Type/Primitive/MapImmutableType.php
+- src/Type/Primitive/MapType.php
+- src/Type/Primitive/StringType.php
 - src/VO/Context.php
 - src/VO/DateTime.php
 - src/VO/Null/NullUser.php

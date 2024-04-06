@@ -141,6 +141,7 @@ final class FileDefinitionBuilder
             ->append($this->className)
             ->append('.php')
             ->replace('\\', '/')
+            ->replace('//', '/')
             ->toString();
     }
 

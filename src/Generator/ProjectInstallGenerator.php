@@ -11,6 +11,7 @@ use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Contracts\TemplatingInt
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Contracts\UserInterfaceBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Exception\FailFastExceptionBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Factory\ContactFactoryBuilder;
+use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\FromTemplateBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Logger\AbstractLoggerBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Logger\LoggerBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Logger\NullLoggerBuilder;
@@ -55,11 +56,40 @@ class ProjectInstallGenerator extends AbstractGenerator
         $this->addFileDefinition(VODateTimeBuilder::build($config));
         $this->addFileDefinition(VOContextBuilder::build($config));
         $this->addFileDefinition(ContactFactoryBuilder::build($config));
-        $this->addFileDefinition(AbstractCollectionTypeBuilder::build($config));
+
+        foreach ($this->templatesEndingWithType() as $template) {
+            $this->addFileDefinition(FromTemplateBuilder::build($config, $template, 'Type'));
+        }
+
+        foreach ($this->templatesEndingWithInterface() as $template) {
+            $this->addFileDefinition(FromTemplateBuilder::build($config, $template, 'Interface'));
+        }
+
         $this->generateFiles();
         $this->clearFilesDefinitions();
 
         $this->addFileDefinition(VONullUserBuilder::build($config));
         $this->generateFiles();
+    }
+
+    private function templatesEndingWithType(): array
+    {
+        return [
+            'Type/Primitive/AbstractCollectionType.php',
+            'Type/Primitive/BooleanType.php',
+            'Type/Primitive/IntegerType.php',
+            'Type/Primitive/ListImmutableType.php',
+            'Type/Primitive/ListType.php',
+            'Type/Primitive/MapImmutableType.php',
+            'Type/Primitive/MapType.php',
+            'Type/Primitive/StringType.php',
+        ];
+    }
+
+    private function templatesEndingWithInterface(): array
+    {
+        return [
+            'Contracts/Type/Primitive/ScalarObjectInterface.php',
+        ];
     }
 }
