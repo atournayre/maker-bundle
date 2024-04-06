@@ -3,25 +3,7 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Generator;
 
-use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Contracts\LoggerInterfaceBuilder;
-use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Contracts\ResponseInterfaceBuilder;
-use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Contracts\RoutingInterfaceBuilder;
-use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Contracts\SecurityInterfaceBuilder;
-use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Contracts\TemplatingInterfaceBuilder;
-use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Contracts\UserInterfaceBuilder;
-use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Exception\FailFastExceptionBuilder;
-use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\FromTemplateBuilder;
-use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Logger\AbstractLoggerBuilder;
-use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Logger\LoggerBuilder;
-use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Logger\NullLoggerBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Service\CommandAndQueryServicesBuilder;
-use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Service\SymfonyResponseServiceBuilder;
-use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Service\SymfonyRoutingServiceBuilder;
-use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Service\SymfonySecurityServiceBuilder;
-use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Service\TwigTemplatingServiceBuilder;
-use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Trait\EntityIsTraitBuilder;
-use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Trait\IdEntityTraitBuilder;
-use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Trait\IsTraitBuilder;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 
 class ProjectInstallGenerator extends AbstractGenerator
@@ -30,61 +12,49 @@ class ProjectInstallGenerator extends AbstractGenerator
     {
         $config = $this->addRootToConfig($config);
 
-        $this->addFileDefinition(LoggerInterfaceBuilder::build($config));
-        $this->addFileDefinition(SecurityInterfaceBuilder::build($config));
-        $this->addFileDefinition(UserInterfaceBuilder::build($config));
-        $this->addFileDefinition(AbstractLoggerBuilder::build($config));
-        $this->addFileDefinition(LoggerBuilder::build($config));
-        $this->addFileDefinition(NullLoggerBuilder::build($config));
-        $this->addFileDefinition(EntityIsTraitBuilder::build($config));
-        $this->addFileDefinition(IsTraitBuilder::build($config));
-        $this->addFileDefinition(IdEntityTraitBuilder::build($config));
-        $this->addFileDefinition(ResponseInterfaceBuilder::build($config));
-        $this->addFileDefinition(RoutingInterfaceBuilder::build($config));
-        $this->addFileDefinition(TemplatingInterfaceBuilder::build($config));
-        $this->addFileDefinition(TwigTemplatingServiceBuilder::build($config));
-        $this->addFileDefinition(SymfonyResponseServiceBuilder::build($config));
-        $this->addFileDefinition(SymfonyRoutingServiceBuilder::build($config));
-        $this->addFileDefinition(SymfonySecurityServiceBuilder::build($config));
-        $this->addFileDefinition(FailFastExceptionBuilder::build($config));
         $this->addFileDefinition(CommandAndQueryServicesBuilder::filesDefinitions($config));
 
-        foreach ($this->templates() as $type => $templates) {
-            foreach ($templates as $template) {
-                $this->addFileDefinition(FromTemplateBuilder::build($config, $template, $type));
-            }
-        }
+        $this->addFileDefinitionFromTemplate('ArgumentValueResolver', 'ArgumentValueResolver/ContextArgumentValueResolver.php', $config);
+        $this->addFileDefinitionFromTemplate('', 'Exception/FailFast.php', $config);
+        $this->addFileDefinitionFromTemplate('Factory', 'Factory/ContextFactory.php', $config);
+        $this->addFileDefinitionFromTemplate('Interface', 'Contracts/Logger/LoggerInterface.php', $config);
+        $this->addFileDefinitionFromTemplate('Interface', 'Contracts/Response/ResponseInterface.php', $config);
+        $this->addFileDefinitionFromTemplate('Interface', 'Contracts/Routing/RoutingInterface.php', $config);
+        $this->addFileDefinitionFromTemplate('Interface', 'Contracts/Security/SecurityInterface.php', $config);
+        $this->addFileDefinitionFromTemplate('Interface', 'Contracts/Security/UserInterface.php', $config);
+        $this->addFileDefinitionFromTemplate('Interface', 'Contracts/Service/CommandServiceInterface.php', $config);
+        $this->addFileDefinitionFromTemplate('Interface', 'Contracts/Service/FailFastInterface.php', $config);
+        $this->addFileDefinitionFromTemplate('Interface', 'Contracts/Service/PostConditionsChecksInterface.php', $config);
+        $this->addFileDefinitionFromTemplate('Interface', 'Contracts/Service/PreConditionsChecksInterface.php', $config);
+        $this->addFileDefinitionFromTemplate('Interface', 'Contracts/Service/QueryServiceInterface.php', $config);
+        $this->addFileDefinitionFromTemplate('Interface', 'Contracts/Service/TagCommandServiceInterface.php', $config);
+        $this->addFileDefinitionFromTemplate('Interface', 'Contracts/Service/TagQueryServiceInterface.php', $config);
+        $this->addFileDefinitionFromTemplate('Interface', 'Contracts/Templating/TemplatingInterface.php', $config);
+        $this->addFileDefinitionFromTemplate('Interface', 'Contracts/Type/Primitive/ScalarObjectInterface.php', $config);
+        $this->addFileDefinitionFromTemplate('Logger', 'Logger/AbstractLogger.php', $config);
+        $this->addFileDefinitionFromTemplate('Logger', 'Logger/DefaultLogger.php', $config);
+        $this->addFileDefinitionFromTemplate('Logger', 'Logger/NullLogger.php', $config);
+        $this->addFileDefinitionFromTemplate('Service', 'Service/Response/SymfonyResponseService.php', $config);
+        $this->addFileDefinitionFromTemplate('Service', 'Service/Routing/SymfonyRoutingService.php', $config);
+        $this->addFileDefinitionFromTemplate('Service', 'Service/Security/SymfonySecurityService.php', $config);
+        $this->addFileDefinitionFromTemplate('Service', 'Service/Templating/TwigTemplatingService.php', $config);
+        $this->addFileDefinitionFromTemplate('Service', 'Service/CommandService.php', $config);
+        $this->addFileDefinitionFromTemplate('Service', 'Service/QueryService.php', $config);
+        $this->addFileDefinitionFromTemplate('Trait', 'Trait/EntityIsTrait.php', $config);
+        $this->addFileDefinitionFromTemplate('Trait', 'Trait/IdEntityTrait.php', $config);
+        $this->addFileDefinitionFromTemplate('Trait', 'Trait/IsTrait.php', $config);
+        $this->addFileDefinitionFromTemplate('Type', 'Type/Primitive/AbstractCollectionType.php', $config);
+        $this->addFileDefinitionFromTemplate('Type', 'Type/Primitive/BooleanType.php', $config);
+        $this->addFileDefinitionFromTemplate('Type', 'Type/Primitive/IntegerType.php', $config);
+        $this->addFileDefinitionFromTemplate('Type', 'Type/Primitive/ListImmutableType.php', $config);
+        $this->addFileDefinitionFromTemplate('Type', 'Type/Primitive/ListType.php', $config);
+        $this->addFileDefinitionFromTemplate('Type', 'Type/Primitive/MapImmutableType.php', $config);
+        $this->addFileDefinitionFromTemplate('Type', 'Type/Primitive/MapType.php', $config);
+        $this->addFileDefinitionFromTemplate('Type', 'Type/Primitive/StringType.php', $config);
+        $this->addFileDefinitionFromTemplate('', 'VO/Context.php', $config);
+        $this->addFileDefinitionFromTemplate('', 'VO/DateTime.php', $config);
+        $this->addFileDefinitionFromTemplate('', 'VO/Null/NullUser.php', $config);
 
         $this->generateFiles();
-    }
-
-    private function templates(): array
-    {
-        return [
-            'ArgumentValueResolver' => [
-                'ArgumentValueResolver/ContextArgumentValueResolver.php',
-            ],
-            'Factory' => [
-                'Factory/ContextFactory.php',
-            ],
-            'Interface' => [
-                'Contracts/Type/Primitive/ScalarObjectInterface.php',
-            ],
-            'Type' => [
-                'Type/Primitive/AbstractCollectionType.php',
-                'Type/Primitive/BooleanType.php',
-                'Type/Primitive/IntegerType.php',
-                'Type/Primitive/ListImmutableType.php',
-                'Type/Primitive/ListType.php',
-                'Type/Primitive/MapImmutableType.php',
-                'Type/Primitive/MapType.php',
-                'Type/Primitive/StringType.php',
-            ],
-            '' => [
-                'VO/Null/NullUser.php',
-                'VO/Context.php',
-                'VO/DateTime.php',
-            ],
-        ];
     }
 }

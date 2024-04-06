@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Generator;
 
+use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\FromTemplateBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinitionBuilder;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 use Symfony\Component\Filesystem\Filesystem;
@@ -54,6 +55,11 @@ abstract class AbstractGenerator
         }
 
         $this->filesDefinitions[] = $fileDefinition;
+    }
+
+    protected function addFileDefinitionFromTemplate(string $type, string $template, MakerConfig $config): void
+    {
+        $this->addFileDefinition(FromTemplateBuilder::build($config, $template, $type));
     }
 
     public function getGeneratedFiles(): array

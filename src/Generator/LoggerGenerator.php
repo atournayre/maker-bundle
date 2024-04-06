@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Atournayre\Bundle\MakerBundle\Generator;
 
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Logger\LoggerBuilder;
-use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Logger\NullLoggerBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinitionBuilder;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 
@@ -20,10 +19,6 @@ class LoggerGenerator extends AbstractGenerator
 
     private function logger(MakerConfig $config, string $namespace, string $name): FileDefinitionBuilder
     {
-        if (in_array($name, ['Null', 'NullLogger', 'null', 'nullLogger'])) {
-            return NullLoggerBuilder::build($config, $namespace, $name);
-        }
-
         return LoggerBuilder::build($config, $namespace, $name);
     }
 }
