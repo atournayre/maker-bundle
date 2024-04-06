@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Generator;
 
-use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Service\CommandAndQueryServicesBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinitionBuilder;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\Literal;
+use Webmozart\Assert\Assert;
 
 abstract class AbstractServiceGenerator extends AbstractGenerator
 {
@@ -20,7 +20,7 @@ abstract class AbstractServiceGenerator extends AbstractGenerator
     {
         $config = $this->addRootToConfig($config);
 
-        $this->createCommandAndQueryServiceIfNotExists($config);
+        $this->checkIfCommandAndQueryServicesExists($config);
 
         $serviceCommand = $this->serviceDefinition($config, $namespace, $name);
 
@@ -32,18 +32,13 @@ abstract class AbstractServiceGenerator extends AbstractGenerator
         $this->generateFiles();
     }
 
-    private function createCommandAndQueryServiceIfNotExists(MakerConfig $config): void
+    private function checkIfCommandAndQueryServicesExists(MakerConfig $config): void
     {
         $classNameCommandService = $config->rootNamespace().'\\Service\\CommandService';
+        Assert::classExists($classNameCommandService, 'CommandService class does not exist');
+
         $classNameQueryService = $config->rootNamespace().'\\Service\\QueryService';
-
-        if (class_exists($classNameCommandService) && class_exists($classNameQueryService)) {
-            return;
-        }
-
-        $this->addFileDefinition(CommandAndQueryServicesBuilder::filesDefinitions($config));
-        $this->generateFiles();
-        $this->clearFilesDefinitions();
+        Assert::classExists($classNameQueryService, 'QueryService class does not exist');
     }
 
     abstract protected function attribute(MakerConfig $config): string;

@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Generator;
 
-use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Service\CommandAndQueryServicesBuilder;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 
 class ProjectInstallGenerator extends AbstractGenerator
@@ -12,11 +11,12 @@ class ProjectInstallGenerator extends AbstractGenerator
     {
         $config = $this->addRootToConfig($config);
 
-        $this->addFileDefinition(CommandAndQueryServicesBuilder::filesDefinitions($config));
-
+        $this->addFileDefinitionFromTemplate('', 'Attribute/CommandService.php', $config);
+        $this->addFileDefinitionFromTemplate('', 'Attribute/QueryService.php', $config);
         $this->addFileDefinitionFromTemplate('ArgumentValueResolver', 'ArgumentValueResolver/ContextArgumentValueResolver.php', $config);
         $this->addFileDefinitionFromTemplate('', 'Exception/FailFast.php', $config);
         $this->addFileDefinitionFromTemplate('Factory', 'Factory/ContextFactory.php', $config);
+        $this->addFileDefinitionFromTemplate('Helper', 'Helper/AttributeHelper.php', $config);
         $this->addFileDefinitionFromTemplate('Interface', 'Contracts/Logger/LoggerInterface.php', $config);
         $this->addFileDefinitionFromTemplate('Interface', 'Contracts/Response/ResponseInterface.php', $config);
         $this->addFileDefinitionFromTemplate('Interface', 'Contracts/Routing/RoutingInterface.php', $config);
