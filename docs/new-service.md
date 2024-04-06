@@ -2,7 +2,7 @@
 
 ## Command
 
-```console
+```shell
 php bin/console make:new:service
 ```
 
