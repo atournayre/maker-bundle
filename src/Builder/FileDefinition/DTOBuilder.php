@@ -77,18 +77,18 @@ class DTOBuilder implements FileDefinitionBuilderInterface
         ];
     }
 
-    private static function property(array $property): Property
+    private static function property(array $propertyDatas): Property
     {
         Assert::inArray(
-            $property['type'],
+            $propertyDatas['type'],
             array_keys(self::correspondingTypes()),
-            sprintf('Property "%s" should be of type %s; %s given', $property['fieldName'], implode(', ', array_keys(self::correspondingTypes())), $property['type'])
+            sprintf('Property "%s" should be of type %s; %s given', $propertyDatas['fieldName'], implode(', ', array_keys(self::correspondingTypes())), $propertyDatas['type'])
         );
 
-        $property = new Property($property['fieldName']);
-        $property->setVisibility('public')->setType(self::correspondingTypes()[$property['type']]);
+        $property = new Property($propertyDatas['fieldName']);
+        $property->setVisibility('public')->setType(self::correspondingTypes()[$propertyDatas['type']]);
 
-        $defaultValue = match ($property['type']) {
+        $defaultValue = match ($propertyDatas['type']) {
             'string' => '',
             'integer' => 0,
             'float' => 0.0,
@@ -102,7 +102,7 @@ class DTOBuilder implements FileDefinitionBuilderInterface
             $property->setNullable();
         }
 
-        if ($property['nullable']) {
+        if ($propertyDatas['nullable']) {
             $property->setValue(null)->setNullable();
         }
 

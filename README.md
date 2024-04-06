@@ -63,11 +63,11 @@ services:
 
 | Command                   | Description                                                             |
 |---------------------------|-------------------------------------------------------------------------|
-| `make:new:dto`            | Create a new DTO                                                        |
+| `make:new:dto`            | [Create a new DTO](docs/new-default.md)                                 |
 | `make:new:exception`      | [Create a new Exception](docs/new-default.md)                           |
-| `make:new:interface`      | Create a new Interface                                                  |
+| `make:new:interface`      | [Create a new Interface](docs/new-default.md)                           |
 | `make:new:logger`         | [Create a new Logger](docs/new-logger.md)                               |
 | `make:new:service`        | [Create a new Service](docs/new-service.md)                             |
-| `make:new:trait`          | Create a new Trait                                                      |
-| `make:new:vo`             | Create a new VO                                                         |
+| `make:new:trait`          | [Create a new Trait](docs/new-default.md)                               |
+| `make:new:vo`             | [Create a new VO](docs/new-default.md)                                  |
 | `project:getting-started` | [Add minimal files to start a project](docs/project-getting-started.md) |
