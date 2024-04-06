@@ -54,15 +54,13 @@ class ProjectInstallGenerator extends AbstractGenerator
         $this->addFileDefinition(FailFastExceptionBuilder::build($config));
         $this->addFileDefinition(CommandAndQueryServicesBuilder::filesDefinitions($config));
         $this->addFileDefinition(VODateTimeBuilder::build($config));
-        $this->addFileDefinition(VOContextBuilder::build($config));
-        $this->addFileDefinition(ContactFactoryBuilder::build($config));
+//        $this->addFileDefinition(VOContextBuilder::build($config));
+//        $this->addFileDefinition(ContactFactoryBuilder::build($config));
 
-        foreach ($this->templatesEndingWithType() as $template) {
-            $this->addFileDefinition(FromTemplateBuilder::build($config, $template, 'Type'));
-        }
-
-        foreach ($this->templatesEndingWithInterface() as $template) {
-            $this->addFileDefinition(FromTemplateBuilder::build($config, $template, 'Interface'));
+        foreach ($this->templates() as $type => $templates) {
+            foreach ($templates as $template) {
+                $this->addFileDefinition(FromTemplateBuilder::build($config, $template, $type));
+            }
         }
 
         $this->generateFiles();
@@ -72,24 +70,25 @@ class ProjectInstallGenerator extends AbstractGenerator
         $this->generateFiles();
     }
 
-    private function templatesEndingWithType(): array
+    private function templates(): array
     {
         return [
-            'Type/Primitive/AbstractCollectionType.php',
-            'Type/Primitive/BooleanType.php',
-            'Type/Primitive/IntegerType.php',
-            'Type/Primitive/ListImmutableType.php',
-            'Type/Primitive/ListType.php',
-            'Type/Primitive/MapImmutableType.php',
-            'Type/Primitive/MapType.php',
-            'Type/Primitive/StringType.php',
-        ];
-    }
-
-    private function templatesEndingWithInterface(): array
-    {
-        return [
-            'Contracts/Type/Primitive/ScalarObjectInterface.php',
+            'Type' => [
+                'Type/Primitive/AbstractCollectionType.php',
+                'Type/Primitive/BooleanType.php',
+                'Type/Primitive/IntegerType.php',
+                'Type/Primitive/ListImmutableType.php',
+                'Type/Primitive/ListType.php',
+                'Type/Primitive/MapImmutableType.php',
+                'Type/Primitive/MapType.php',
+                'Type/Primitive/StringType.php',
+            ],
+            'Interface' => [
+                'Contracts/Type/Primitive/ScalarObjectInterface.php',
+            ],
+            'ArgumentValueResolver' => [
+                'ArgumentValueResolver/ContextArgumentValueResolver.php',
+            ],
         ];
     }
 }
