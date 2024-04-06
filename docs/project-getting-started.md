@@ -11,6 +11,7 @@ php bin/console project:getting-started
 This command will create files and directories to start a project.
 
 Creates the following files:
+- src/ArgumentValueResolver/ContextArgumentValueResolver.php
 - src/Attribute/CommandService.php
 - src/Attribute/QueryService.php
 - src/Contracts/Logger/LoggerInterface.php
