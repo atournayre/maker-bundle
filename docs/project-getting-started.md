@@ -54,3 +54,153 @@ Creates the following files:
 - src/VO/Context.php
 - src/VO/DateTime.php
 - src/VO/Null/NullUser.php
+
+## Usage
+
+### Decoupling from Symfony
+
+Following interfaces are provided to decouple from Symfony:
+- Logger/LoggerInterface (2 implementations: NullLogger, DefaultLogger)
+- Response/ResponseInterface (1 implementation: SymfonyResponseService)
+- Routing/RoutingInterface (1 implementation: SymfonyRoutingService)
+- Security/SecurityInterface (1 implementation: SymfonySecurityService)
+- Templating/TemplatingInterface (1 implementation: TwigTemplatingService)
+
+
+### Controller
+
+A type hinted argument can be used to get the context.
+
+```php
+<?php
+namespace App\Controller;
+
+use App\VO\Context;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
+
+class AcmeController extends AbstractController
+{
+    public function index(Context $context, AcmeService $acme): Response
+    {
+        // ...
+        $user = $context->user();
+        $createdAt = $context->createdAt()->toDateTime();
+        // ...
+        $acme->doSomething($context);
+        $data = $acme->fetchSomething($context);
+        // ...
+    }
+}
+```
+
+See the Value Object Context to have more information.
+
+### Logger
+
+#### NullLogger
+
+```yaml
+# config/services.yaml
+services:
+    app.logger.null: '@App\Logger\NullLogger'
+```
+
+```php
+// your controller (service, etc.)
+public function index(
+    #[Autowire(service: 'app.logger.null')] LoggerInterface $logger,
+): Response
+{
+    $logger->info('Hello world');
+    return new Response('<body></body>');
+}
+```
+
+Logs are disabled.
+
+
+#### DefaultLogger
+
+
+`DefaultLogger` implements `\Psr\Log\LoggerInterface` and add the following methods:`exception()`, `start()`, `end()`, `success()`, `failFast()` 
+
+By default messages are prefixed by the class name of the logger.
+```console
+[App\Logger\DefaultLogger] Hello world
+```
+
+To customize the prefix, use the `calls` key in the service definition.
+    
+```yaml
+# config/services.yaml
+services:
+    app.logger.acme:
+        class: App\Logger\DefaultLogger
+        calls:
+            - [setLoggerIdentifier, ['acme']]
+```
+    
+```php
+// your controller (service, etc.)
+public function index(
+    #[Autowire(service: 'app.logger.acme')] LoggerInterface $logger,
+): Response
+{
+    $logger->info('Hello world');
+    return new Response('<body></body>');
+}
+```
+
+```console
+[acme] Hello world
+```
+
+#### Custom logger
+Create a logger, see [specific documentation](new-logger.md).
+
+### Primitive types
+
+To be more DDD compliant, primitive types are provided.
+
+- BooleanType
+- IntegerType
+- StringType
+- ListType
+- ListImmutableType
+- MapType
+- MapImmutableType
+
+There is no FloatType on purpose, use IntegerType instead, then use ->toFloat().
+
+Create your own types by extending from the type you need.
+
+
+### Service
+Create a service, see [specific documentation](new-service.md).
+
+### Value Object
+
+#### Context
+Context should always be injected (in controllers, commands, queries, services, etc.).
+
+A Context (value object) is available as an argument in controllers thanks to Symfony's ArgumentValueResolver.
+
+Anywhere else, you can use the ContextFactory to create a Context.
+
+A Context is a collection of values:
+- user (UserInterface)
+- createdAt (DateTime - a value object with specifics methods)
+
+
+#### DateTime
+
+A DateTime is a value object with specifics methods.
+
+Do not confuse with the PHP DateTime class.
+
+DateTime as a method toDateTime() to get the PHP DateTime object.
+
+#### Null
+
+Use the null object pattern to avoid null checks.
