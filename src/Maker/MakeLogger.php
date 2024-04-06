@@ -44,7 +44,7 @@ class MakeLogger extends AbstractMaker
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
     {
         $io->title('Creating new Logger');
-        $path = 'Contracts';
+        $path = 'Logger';
         $name = $input->getArgument('name');
 
         $this->loggerGenerator->generate($path, $name, MakerConfig::default());

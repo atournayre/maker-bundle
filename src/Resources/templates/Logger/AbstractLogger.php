@@ -16,7 +16,7 @@ abstract class AbstractLogger implements LoggerInterface
 	}
 
 
-	protected function setLoggerIdentifier(string $identifier): void
+	public function setLoggerIdentifier(string $identifier): void
 	{
 		$this->logIdentifier = $identifier;
 	}
