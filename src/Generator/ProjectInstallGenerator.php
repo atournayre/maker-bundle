@@ -10,7 +10,6 @@ use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Contracts\SecurityInter
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Contracts\TemplatingInterfaceBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Contracts\UserInterfaceBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Exception\FailFastExceptionBuilder;
-use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Factory\ContactFactoryBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\FromTemplateBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Logger\AbstractLoggerBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Logger\LoggerBuilder;
@@ -23,10 +22,6 @@ use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Service\TwigTemplatingS
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Trait\EntityIsTraitBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Trait\IdEntityTraitBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Trait\IsTraitBuilder;
-use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Type\Primitive\AbstractCollectionTypeBuilder;
-use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\VO\VOContextBuilder;
-use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\VO\VODateTimeBuilder;
-use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\VO\VONullUserBuilder;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 
 class ProjectInstallGenerator extends AbstractGenerator
@@ -53,9 +48,6 @@ class ProjectInstallGenerator extends AbstractGenerator
         $this->addFileDefinition(SymfonySecurityServiceBuilder::build($config));
         $this->addFileDefinition(FailFastExceptionBuilder::build($config));
         $this->addFileDefinition(CommandAndQueryServicesBuilder::filesDefinitions($config));
-        $this->addFileDefinition(VODateTimeBuilder::build($config));
-//        $this->addFileDefinition(VOContextBuilder::build($config));
-//        $this->addFileDefinition(ContactFactoryBuilder::build($config));
 
         foreach ($this->templates() as $type => $templates) {
             foreach ($templates as $template) {
@@ -64,15 +56,20 @@ class ProjectInstallGenerator extends AbstractGenerator
         }
 
         $this->generateFiles();
-        $this->clearFilesDefinitions();
-
-        $this->addFileDefinition(VONullUserBuilder::build($config));
-        $this->generateFiles();
     }
 
     private function templates(): array
     {
         return [
+            'ArgumentValueResolver' => [
+                'ArgumentValueResolver/ContextArgumentValueResolver.php',
+            ],
+            'Factory' => [
+                'Factory/ContextFactory.php',
+            ],
+            'Interface' => [
+                'Contracts/Type/Primitive/ScalarObjectInterface.php',
+            ],
             'Type' => [
                 'Type/Primitive/AbstractCollectionType.php',
                 'Type/Primitive/BooleanType.php',
@@ -83,11 +80,10 @@ class ProjectInstallGenerator extends AbstractGenerator
                 'Type/Primitive/MapType.php',
                 'Type/Primitive/StringType.php',
             ],
-            'Interface' => [
-                'Contracts/Type/Primitive/ScalarObjectInterface.php',
-            ],
-            'ArgumentValueResolver' => [
-                'ArgumentValueResolver/ContextArgumentValueResolver.php',
+            '' => [
+                'VO/Null/NullUser.php',
+                'VO/Context.php',
+                'VO/DateTime.php',
             ],
         ];
     }
