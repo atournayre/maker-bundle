@@ -12,7 +12,7 @@ Open a command console, enter your project directory and execute the
 following command to download the latest stable version of this bundle:
 
 ```console
-$ composer require atournayre/maker-bundle --dev
+composer require atournayre/maker-bundle --dev
 ```
 
 ### Step 2: Enable the Bundle
