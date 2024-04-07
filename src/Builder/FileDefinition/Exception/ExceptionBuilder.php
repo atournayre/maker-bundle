@@ -5,6 +5,7 @@ namespace Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Exception;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinitionBuilder;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 use Atournayre\Bundle\MakerBundle\Contracts\Builder\FileDefinitionBuilderInterface;
+use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\Method;
 use function Symfony\Component\String\u;
@@ -55,5 +56,10 @@ class ExceptionBuilder implements FileDefinitionBuilderInterface
         $method->setStatic()->setPublic()->setReturnType($fullName);
         $method->addBody("return new {$class->getName()}('Oops, an error occured.');");
         return $method;
+    }
+
+    public function generateSourceCode(FileDefinition $fileDefinition): string
+    {
+        throw new \LogicException('Not implemented');
     }
 }

@@ -5,6 +5,7 @@ namespace Atournayre\Bundle\MakerBundle\Builder\FileDefinition\VO;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinitionBuilder;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 use Atournayre\Bundle\MakerBundle\Contracts\Builder\FileDefinitionBuilderInterface;
+use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\Property;
@@ -192,5 +193,10 @@ class VOBuilder implements FileDefinitionBuilderInterface
             ->addBody('$clone->' . $property['fieldName'] . ' = $' . $property['fieldName'] . ';')
             ->addBody('return $clone;');
         return $method;
+    }
+
+    public function generateSourceCode(FileDefinition $fileDefinition): string
+    {
+        throw new \LogicException('Not implemented');
     }
 }

@@ -7,6 +7,7 @@ use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 use Atournayre\Bundle\MakerBundle\Contracts\Builder\FileDefinitionBuilderInterface;
 use App\Contracts\Logger\LoggerInterface;
 use App\Logger\AbstractLogger;
+use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
 use Nette\PhpGenerator\Method;
 
 class LoggerBuilder implements FileDefinitionBuilderInterface
@@ -104,5 +105,10 @@ PHP;
 
         $method->setBody($methodBody);
         return $method;
+    }
+
+    public function generateSourceCode(FileDefinition $fileDefinition): string
+    {
+        throw new \LogicException('Not implemented');
     }
 }

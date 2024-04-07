@@ -11,6 +11,7 @@ use App\Contracts\Service\PostConditionsChecksInterface;
 use App\Contracts\Service\PreConditionsChecksInterface;
 use App\Contracts\Service\TagQueryServiceInterface;
 use App\Exception\FailFast;
+use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
 use Nette\PhpGenerator\Attribute;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\InterfaceType;
@@ -102,5 +103,10 @@ class ServiceQueryBuilder implements FileDefinitionBuilderInterface
             ->addComment('@param '.$objectType.' $object')
             ->setReturnType($sourceMethod->getReturnType())
             ->setParameters($sourceMethod->getParameters());
+    }
+
+    public function generateSourceCode(FileDefinition $fileDefinition): string
+    {
+        throw new \LogicException('Not implemented');
     }
 }

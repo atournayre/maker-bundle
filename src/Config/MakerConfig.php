@@ -8,15 +8,19 @@ class MakerConfig
     public function __construct(
         private string $rootNamespace = 'App',
         private string $rootDir = '',
-        private readonly bool $enableApiPlatform = false,
-        private readonly bool $traitsCreateEntityId = false,
-        private readonly array $dtoProperties = [],
-        private readonly array $voProperties = [],
+        private readonly bool    $enableApiPlatform = false,
+        private readonly bool    $traitsCreateEntityId = false,
+        private readonly array   $dtoProperties = [],
+        private readonly array   $voProperties = [],
         private readonly ?string $voRelatedToAnEntity = null,
-        private readonly array $traitProperties = [],
-        private readonly bool $traitIsUsedByEntity = false,
-        private readonly bool $traitSeparateAccessors = false,
-        private array $extraProperties = [],
+        private readonly array   $traitProperties = [],
+        private readonly bool    $traitIsUsedByEntity = false,
+        private readonly bool    $traitSeparateAccessors = false,
+        private array            $extraProperties = [],
+        private readonly ?string $namespace = null, // TODO remove nullable after refactoring
+        private readonly ?string $classnameSuffix = null,
+        private readonly ?string $generator = null, // TODO remove nullable after refactoring
+        private readonly ?string $templatePath = null, // TODO remove nullable after refactoring
     )
     {
     }
@@ -104,5 +108,25 @@ class MakerConfig
     public function hasExtraProperty(string $name): bool
     {
         return null !== $this->getExtraProperty($name);
+    }
+
+    public function namespace(): ?string // TODO remove nullable after refactoring
+    {
+        return $this->namespace;
+    }
+
+    public function classnameSuffix(): ?string
+    {
+        return $this->classnameSuffix;
+    }
+
+    public function generator(): ?string // TODO remove nullable after refactoring
+    {
+        return $this->generator;
+    }
+
+    public function templatePath(): ?string
+    {
+        return $this->templatePath;
     }
 }

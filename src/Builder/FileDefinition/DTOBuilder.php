@@ -5,6 +5,7 @@ namespace Atournayre\Bundle\MakerBundle\Builder\FileDefinition;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinitionBuilder;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 use Atournayre\Bundle\MakerBundle\Contracts\Builder\FileDefinitionBuilderInterface;
+use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\Property;
@@ -157,5 +158,10 @@ return $errors;';
         }
 
         return $method;
+    }
+
+    public function generateSourceCode(FileDefinition $fileDefinition): string
+    {
+        throw new \LogicException('Not implemented');
     }
 }

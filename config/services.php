@@ -1,9 +1,20 @@
 <?php
 
+use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\DTOBuilder;
+use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Exception\ExceptionBuilder;
+use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\FromTemplateBuilder;
+use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\InterfaceBuilder;
+use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Logger\LoggerBuilder;
+use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Service\ServiceCommandBuilder;
+use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Service\ServiceQueryBuilder;
+use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\TraitBuilder;
+use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\VO\VOBuilder;
+use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\VO\VOForEntityBuilder;
 use Atournayre\Bundle\MakerBundle\Generator\AbstractGenerator;
 use Atournayre\Bundle\MakerBundle\Generator\DtoGenerator;
 use Atournayre\Bundle\MakerBundle\Generator\EntityTraitGenerator;
 use Atournayre\Bundle\MakerBundle\Generator\ExceptionGenerator;
+use Atournayre\Bundle\MakerBundle\Generator\FileGenerator;
 use Atournayre\Bundle\MakerBundle\Generator\InterfaceGenerator;
 use Atournayre\Bundle\MakerBundle\Generator\LoggerGenerator;
 use Atournayre\Bundle\MakerBundle\Generator\ProjectInstallGenerator;
@@ -56,4 +67,27 @@ return static function (ContainerConfigurator $container): void {
 
     $services
         ->alias(Generator::class, 'maker.generator');
+
+    $services
+        ->set(FileGenerator::class);
+
+    $builders = [
+        ExceptionBuilder::class,
+        LoggerBuilder::class,
+        ServiceCommandBuilder::class,
+        ServiceQueryBuilder::class,
+        VOBuilder::class,
+        VOForEntityBuilder::class,
+        DTOBuilder::class,
+        FromTemplateBuilder::class,
+        InterfaceBuilder::class,
+        TraitBuilder::class,
+    ];
+
+    foreach ($builders as $builder) {
+        $services
+            ->set($builder)->public()
+            ->tag('atournayre_maker.builder')
+        ;
+    }
 };

@@ -5,6 +5,7 @@ namespace Atournayre\Bundle\MakerBundle\Builder\FileDefinition\VO;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinitionBuilder;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 use Atournayre\Bundle\MakerBundle\Contracts\Builder\FileDefinitionBuilderInterface;
+use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
 use Nette\PhpGenerator\Method;
 use Webmozart\Assert\Assert;
 use function Symfony\Component\String\u;
@@ -72,5 +73,10 @@ class VOForEntityBuilder implements FileDefinitionBuilderInterface
 
         $method->addBody('return $self;');
         return $method;
+    }
+
+    public function generateSourceCode(FileDefinition $fileDefinition): string
+    {
+        throw new \LogicException('Not implemented');
     }
 }
