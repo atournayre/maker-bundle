@@ -25,7 +25,7 @@ return static function (ContainerConfigurator $container): void {
         ->set(MakeException::class)->autowire()->tag('maker.command')
         ->set(MakeInterface::class)->tag('maker.command')
         ->set(MakeInterface2::class)->autowire()->tag('maker.command')
-        ->set(MakeLogger::class)->tag('maker.command')
+        ->set(MakeLogger::class)->autowire()->tag('maker.command')
         ->set(MakeProjectInstall::class)->tag('maker.command')
         ->set(MakeService::class)->tag('maker.command')
         ->set(MakeTrait::class)->tag('maker.command')

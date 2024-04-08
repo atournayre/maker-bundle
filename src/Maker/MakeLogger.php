@@ -3,8 +3,11 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
+use Atournayre\Bundle\MakerBundle\Collection\FileDefinitionCollection;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
-use Atournayre\Bundle\MakerBundle\Generator\LoggerGenerator;
+use Atournayre\Bundle\MakerBundle\Generator\FileGenerator;
+use Atournayre\Bundle\MakerBundle\VO\Builder\LoggerBuilder;
+use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\Generator;
@@ -14,12 +17,17 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 #[AutoconfigureTag('maker.command')]
 class MakeLogger extends AbstractMaker
 {
     public function __construct(
-        private readonly LoggerGenerator $loggerGenerator,
+        #[Autowire('%kernel.project_dir%')]
+        private readonly string        $rootDir,
+        #[Autowire('%atournayre_maker.root_namespace%')]
+        private readonly string        $rootNamespace,
+        private readonly FileGenerator $fileGenerator,
     )
     {
     }
@@ -33,7 +41,7 @@ class MakeLogger extends AbstractMaker
     {
         $command
             ->setDescription('Creates a new logger')
-            ->addArgument('name', InputArgument::REQUIRED, 'The name of the logger');
+            ->addArgument('namespace', InputArgument::REQUIRED, 'The namespace of the interface <fg=yellow>(e.g. App\Logger\DummyLogger)</>');
     }
 
     public function configureDependencies(DependencyBuilder $dependencies): void
@@ -44,14 +52,26 @@ class MakeLogger extends AbstractMaker
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
     {
         $io->title('Creating new Logger');
-        $path = 'Logger';
-        $name = $input->getArgument('name');
+        $namespace = $input->getArgument('namespace');
 
-        $this->loggerGenerator->generate($path, $name, MakerConfig::default());
+        $configurations = [
+            new MakerConfig(
+                namespace: $namespace,
+                classnameSuffix: 'Logger',
+                generator: LoggerBuilder::class,
+            ),
+        ];
+
+        $this->fileGenerator->generate($configurations);
 
         $this->writeSuccessMessage($io);
 
-        foreach ($this->loggerGenerator->getGeneratedFiles() as $file) {
+        $fileDefinitionCollection = FileDefinitionCollection::fromConfigurations($configurations, $this->rootNamespace, $this->rootDir);
+        $files = array_map(
+            fn(FileDefinition $fileDefinition) => $fileDefinition->absolutePath(),
+            $fileDefinitionCollection->getFileDefinitions()
+        );
+        foreach ($files as $file) {
             $io->text(sprintf('Created: %s', $file));
         }
     }

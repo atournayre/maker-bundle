@@ -3,7 +3,6 @@
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\DTOBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\FromTemplateBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\InterfaceBuilder;
-use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Logger\LoggerBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Service\ServiceCommandBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Service\ServiceQueryBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\TraitBuilder;
@@ -14,7 +13,6 @@ use Atournayre\Bundle\MakerBundle\Generator\DtoGenerator;
 use Atournayre\Bundle\MakerBundle\Generator\EntityTraitGenerator;
 use Atournayre\Bundle\MakerBundle\Generator\FileGenerator;
 use Atournayre\Bundle\MakerBundle\Generator\InterfaceGenerator;
-use Atournayre\Bundle\MakerBundle\Generator\LoggerGenerator;
 use Atournayre\Bundle\MakerBundle\Generator\ProjectInstallGenerator;
 use Atournayre\Bundle\MakerBundle\Generator\ServiceCommandGenerator;
 use Atournayre\Bundle\MakerBundle\Generator\ServiceQueryGenerator;
@@ -48,7 +46,6 @@ return static function (ContainerConfigurator $container): void {
         DtoGenerator::class,
         EntityTraitGenerator::class,
         InterfaceGenerator::class,
-        LoggerGenerator::class,
         ProjectInstallGenerator::class,
         ServiceCommandGenerator::class,
         ServiceQueryGenerator::class,
@@ -69,7 +66,6 @@ return static function (ContainerConfigurator $container): void {
         ->set(FileGenerator::class);
 
     $builders = [
-        LoggerBuilder::class,
         ServiceCommandBuilder::class,
         ServiceQueryBuilder::class,
         VOBuilder::class,
