@@ -17,6 +17,7 @@ class FileDefinition
         private readonly string $classname,
         private readonly string $absolutePath,
         private readonly string $builder,
+        private readonly MakerConfig $configuration,
     )
     {
     }
@@ -48,6 +49,7 @@ class FileDefinition
             $classname->toString(),
             $absolutePath->toString(),
             $config->generator(),
+            $config,
         );
     }
 
@@ -76,6 +78,11 @@ class FileDefinition
         return $this->builder;
     }
 
+    public function configuration(): MakerConfig
+    {
+        return $this->configuration;
+    }
+
     public function uniqueIdentifier(): string
     {
         return $this->absolutePath;
@@ -93,5 +100,10 @@ class FileDefinition
         Assert::notEmpty($this->sourceCode, 'Source code must be set before converting to PhpFile');
 
         return PhpFile::fromCode($this->sourceCode);
+    }
+
+    public function fullName(): string
+    {
+        return $this->namespace() . '\\' . $this->classname();
     }
 }

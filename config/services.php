@@ -1,7 +1,6 @@
 <?php
 
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\DTOBuilder;
-use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Exception\ExceptionBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\FromTemplateBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\InterfaceBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Logger\LoggerBuilder;
@@ -13,7 +12,6 @@ use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\VO\VOForEntityBuilder;
 use Atournayre\Bundle\MakerBundle\Generator\AbstractGenerator;
 use Atournayre\Bundle\MakerBundle\Generator\DtoGenerator;
 use Atournayre\Bundle\MakerBundle\Generator\EntityTraitGenerator;
-use Atournayre\Bundle\MakerBundle\Generator\ExceptionGenerator;
 use Atournayre\Bundle\MakerBundle\Generator\FileGenerator;
 use Atournayre\Bundle\MakerBundle\Generator\InterfaceGenerator;
 use Atournayre\Bundle\MakerBundle\Generator\LoggerGenerator;
@@ -49,7 +47,6 @@ return static function (ContainerConfigurator $container): void {
         AbstractGenerator::class,
         DtoGenerator::class,
         EntityTraitGenerator::class,
-        ExceptionGenerator::class,
         InterfaceGenerator::class,
         LoggerGenerator::class,
         ProjectInstallGenerator::class,
@@ -72,7 +69,6 @@ return static function (ContainerConfigurator $container): void {
         ->set(FileGenerator::class);
 
     $builders = [
-        ExceptionBuilder::class,
         LoggerBuilder::class,
         ServiceCommandBuilder::class,
         ServiceQueryBuilder::class,
