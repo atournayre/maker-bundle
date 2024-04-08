@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Atournayre\Bundle\MakerBundle\VO\Builder;
 
 use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
+use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpFile;
 
 abstract class AbstractBuilder
@@ -29,5 +30,10 @@ abstract class AbstractBuilder
     public function generate(): string
     {
         return (string)$this->file;
+    }
+
+    public function getClass(): ClassType
+    {
+        return $this->file->getClasses()[$this->fileDefinition->fullName()];
     }
 }

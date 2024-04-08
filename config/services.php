@@ -1,6 +1,5 @@
 <?php
 
-use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\DTOBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\FromTemplateBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Service\ServiceCommandBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Service\ServiceQueryBuilder;
@@ -8,7 +7,6 @@ use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\TraitBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\VO\VOBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\VO\VOForEntityBuilder;
 use Atournayre\Bundle\MakerBundle\Generator\AbstractGenerator;
-use Atournayre\Bundle\MakerBundle\Generator\DtoGenerator;
 use Atournayre\Bundle\MakerBundle\Generator\EntityTraitGenerator;
 use Atournayre\Bundle\MakerBundle\Generator\FileGenerator;
 use Atournayre\Bundle\MakerBundle\Generator\ProjectInstallGenerator;
@@ -41,7 +39,6 @@ return static function (ContainerConfigurator $container): void {
 
     $generators = [
         AbstractGenerator::class,
-        DtoGenerator::class,
         EntityTraitGenerator::class,
         ProjectInstallGenerator::class,
         ServiceCommandGenerator::class,
@@ -67,7 +64,6 @@ return static function (ContainerConfigurator $container): void {
         ServiceQueryBuilder::class,
         VOBuilder::class,
         VOForEntityBuilder::class,
-        DTOBuilder::class,
         FromTemplateBuilder::class,
         TraitBuilder::class,
     ];
