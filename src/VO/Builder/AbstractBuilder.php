@@ -5,7 +5,10 @@ namespace Atournayre\Bundle\MakerBundle\VO\Builder;
 
 use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
 use Nette\PhpGenerator\ClassType;
+use Nette\PhpGenerator\EnumType;
+use Nette\PhpGenerator\InterfaceType;
 use Nette\PhpGenerator\PhpFile;
+use Nette\PhpGenerator\TraitType;
 
 abstract class AbstractBuilder
 {
@@ -32,7 +35,7 @@ abstract class AbstractBuilder
         return (string)$this->file;
     }
 
-    public function getClass(): ClassType
+    public function getClass(): ClassType|TraitType|InterfaceType|EnumType
     {
         return $this->file->getClasses()[$this->fileDefinition->fullName()];
     }
