@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Config;
 
+use function Symfony\Component\String\u;
+
 class MakerConfig
 {
     public function __construct(
@@ -20,7 +22,7 @@ class MakerConfig
         private readonly ?string $namespace = null, // TODO remove nullable after refactoring
         private readonly ?string $classnameSuffix = null,
         private readonly ?string $generator = null, // TODO remove nullable after refactoring
-        private readonly ?string $templatePath = null, // TODO remove nullable after refactoring
+        private ?string          $templatePath = null, // TODO remove nullable after refactoring
     )
     {
     }
@@ -128,5 +130,20 @@ class MakerConfig
     public function templatePath(): ?string
     {
         return $this->templatePath;
+    }
+
+    public function withTemplatePathFromNamespace(): self
+    {
+        $templatePath = u($this->rootDir)
+            ->append('/src/')
+            ->append($this->namespace)
+            ->append('.php')
+            ->replace('\\', '/')
+            ->toString();
+
+        $config = clone $this;
+        $config->templatePath = $templatePath;
+
+        return $config;
     }
 }

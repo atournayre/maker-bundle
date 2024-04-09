@@ -3,9 +3,17 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
+use App\Attribute\CommandService;
+use App\Attribute\QueryService;
+use Atournayre\Bundle\MakerBundle\Collection\FileDefinitionCollection;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
-use Atournayre\Bundle\MakerBundle\Generator\ServiceCommandGenerator;
-use Atournayre\Bundle\MakerBundle\Generator\ServiceQueryGenerator;
+use Atournayre\Bundle\MakerBundle\Generator\FileGenerator;
+use Atournayre\Bundle\MakerBundle\VO\Builder\AddAttributeBuilder;
+use Atournayre\Bundle\MakerBundle\VO\Builder\ServiceCommandBuilder;
+use Atournayre\Bundle\MakerBundle\VO\Builder\ServiceQueryBuilder;
+use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
+use Nette\PhpGenerator\Attribute;
+use Nette\PhpGenerator\Literal;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\Generator;
@@ -17,6 +25,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Finder\Finder;
 use function Symfony\Component\String\u;
 
@@ -30,8 +39,11 @@ class MakeService extends AbstractMaker
     private string $commandOrQuery;
 
     public function __construct(
-        private readonly ServiceCommandGenerator $serviceCommandGenerator,
-        private readonly ServiceQueryGenerator $serviceQueryGenerator,
+        #[Autowire('%kernel.project_dir%')]
+        private readonly string        $rootDir,
+        #[Autowire('%atournayre_maker.root_namespace%')]
+        private readonly string        $rootNamespace,
+        private readonly FileGenerator $fileGenerator,
     )
     {
     }
@@ -45,7 +57,7 @@ class MakeService extends AbstractMaker
     {
         $command
             ->setDescription('Creates a new Service')
-            ->addArgument('name', InputArgument::REQUIRED, 'The name of the Service')
+            ->addArgument('namespace', InputArgument::REQUIRED, 'The namespace of the Service <fg=yellow>(e.g. App\Service\Command\DummyCommandService, App\Service\Query\DummyQueryService)</>')
             ->addOption('command', null, InputOption::VALUE_OPTIONAL, 'Create a Command Service', 0)
             ->addOption('query', null, InputOption::VALUE_OPTIONAL, 'Create a Query Service', 1)
         ;
@@ -62,31 +74,53 @@ class MakeService extends AbstractMaker
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
     {
         $io->title('Creating new Service');
-        $name = $input->getArgument('name');
+        $namespace = $input->getArgument('namespace');
 
-        $config = new MakerConfig(
-            extraProperties: [
-                'vo' => $this->vo,
-            ],
-        );
-
-        $generator = match ($this->commandOrQuery) {
-            self::COMMAND => $this->serviceCommandGenerator,
-            self::QUERY => $this->serviceQueryGenerator,
+        $builder = match ($this->commandOrQuery) {
+            self::COMMAND => ServiceCommandBuilder::class,
+            self::QUERY => ServiceQueryBuilder::class,
             default => throw new \InvalidArgumentException('Invalid command or query'),
         };
 
-        $path = match ($this->commandOrQuery) {
-            self::COMMAND => 'Service\\Command',
-            self::QUERY => 'Service\\Query',
+        $attributeName = match ($this->commandOrQuery) {
+            self::COMMAND => CommandService::class,
+            self::QUERY => QueryService::class,
             default => throw new \InvalidArgumentException('Invalid command or query'),
         };
 
-        $generator->generate($path, $name, $config);
+        $configurations = [
+            (new MakerConfig(
+                namespace: $namespace,
+                classnameSuffix: '',
+                generator: $builder,
+            ))->withExtraProperty('vo', $this->vo),
+            (new MakerConfig(
+                extraProperties: [
+                    'serviceNamespace' => $namespace,
+                    'attributes' => [
+                        new Attribute($attributeName, [
+                            'serviceName' => new Literal(u($namespace)->afterLast('\\')->append('::class')->toString())
+                        ])
+                    ],
+                ],
+                namespace: $this->vo,
+                classnameSuffix: '',
+                generator: AddAttributeBuilder::class,
+            ))
+                ->withRoot($this->rootNamespace, $this->rootDir)
+                ->withTemplatePathFromNamespace(),
+        ];
+
+        $this->fileGenerator->generate($configurations);
 
         $this->writeSuccessMessage($io);
 
-        foreach ($generator->getGeneratedFiles() as $file) {
+        $fileDefinitionCollection = FileDefinitionCollection::fromConfigurations($configurations, $this->rootNamespace, $this->rootDir);
+        $files = array_map(
+            fn(FileDefinition $fileDefinition) => $fileDefinition->absolutePath(),
+            $fileDefinitionCollection->getFileDefinitions()
+        );
+        foreach ($files as $file) {
             $io->text(sprintf('Created: %s', $file));
         }
     }

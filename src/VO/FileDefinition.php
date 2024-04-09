@@ -27,7 +27,10 @@ class FileDefinition
         Assert::notEmpty($config->rootDir(), 'Root directory must be set in MakerConfig');
         Assert::notEmpty($config->namespace(), 'Namespace must be set in MakerConfig');
 
-        $namespace = u($config->namespace())->replace('/', '\\')->beforeLast('\\');
+        $namespace = u($config->namespace())
+            ->ensureStart($config->rootNamespace().'\\')
+            ->replace('/', '\\')
+            ->beforeLast('\\');
         $classnameSuffix = $config->classnameSuffix() ?? '';
 
         $classname = u($config->namespace())
@@ -97,9 +100,19 @@ class FileDefinition
 
     public function toPhpFile(): PhpFile
     {
-        Assert::notEmpty($this->sourceCode, 'Source code must be set before converting to PhpFile');
+        if (null !== $this->sourceCode) {
+            return PhpFile::fromCode($this->sourceCode);
+        }
 
-        return PhpFile::fromCode($this->sourceCode);
+        $absolutePath = u($this->fullName())
+            ->replace($this->configuration->rootNamespace(), $this->configuration->rootDir().'/src')
+            ->replace('\\', '/')
+            ->append('.php')
+            ->toString();
+
+        $sourceCode = file_get_contents($absolutePath);
+
+        return PhpFile::fromCode($sourceCode);
     }
 
     public function fullName(): string

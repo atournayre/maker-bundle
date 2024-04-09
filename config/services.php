@@ -1,8 +1,6 @@
 <?php
 
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\FromTemplateBuilder;
-use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Service\ServiceCommandBuilder;
-use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\Service\ServiceQueryBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\TraitBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\VO\VOBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\VO\VOForEntityBuilder;
@@ -10,8 +8,6 @@ use Atournayre\Bundle\MakerBundle\Generator\AbstractGenerator;
 use Atournayre\Bundle\MakerBundle\Generator\EntityTraitGenerator;
 use Atournayre\Bundle\MakerBundle\Generator\FileGenerator;
 use Atournayre\Bundle\MakerBundle\Generator\ProjectInstallGenerator;
-use Atournayre\Bundle\MakerBundle\Generator\ServiceCommandGenerator;
-use Atournayre\Bundle\MakerBundle\Generator\ServiceQueryGenerator;
 use Atournayre\Bundle\MakerBundle\Generator\TraitGenerator;
 use Atournayre\Bundle\MakerBundle\Generator\VoGenerator;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -41,8 +37,6 @@ return static function (ContainerConfigurator $container): void {
         AbstractGenerator::class,
         EntityTraitGenerator::class,
         ProjectInstallGenerator::class,
-        ServiceCommandGenerator::class,
-        ServiceQueryGenerator::class,
         TraitGenerator::class,
         VoGenerator::class,
     ];
@@ -60,8 +54,6 @@ return static function (ContainerConfigurator $container): void {
         ->set(FileGenerator::class);
 
     $builders = [
-        ServiceCommandBuilder::class,
-        ServiceQueryBuilder::class,
         VOBuilder::class,
         VOForEntityBuilder::class,
         FromTemplateBuilder::class,
