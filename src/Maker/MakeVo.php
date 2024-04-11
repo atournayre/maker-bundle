@@ -3,8 +3,12 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
+use Atournayre\Bundle\MakerBundle\Collection\FileDefinitionCollection;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
-use Atournayre\Bundle\MakerBundle\Generator\VoGenerator;
+use Atournayre\Bundle\MakerBundle\Generator\FileGenerator;
+use Atournayre\Bundle\MakerBundle\VO\Builder\VoForEntityBuilder;
+use Atournayre\Bundle\MakerBundle\VO\Builder\VoForObjectBuilder;
+use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\Generator;
@@ -17,6 +21,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use function Symfony\Component\String\u;
 
@@ -27,7 +33,11 @@ class MakeVo extends AbstractMaker
     private ?string $voRelatedEntity = null;
 
     public function __construct(
-        private readonly VoGenerator $voGenerator,
+        #[Autowire('%kernel.project_dir%')]
+        private readonly string        $rootDir,
+        #[Autowire('%atournayre_maker.root_namespace%')]
+        private readonly string        $rootNamespace,
+        private readonly FileGenerator $fileGenerator,
     )
     {
     }
@@ -41,7 +51,7 @@ class MakeVo extends AbstractMaker
     {
         $command
             ->setDescription('Creates a new VO')
-            ->addArgument('name', InputArgument::REQUIRED, 'The name of the VO');
+            ->addArgument('namespace', InputArgument::REQUIRED, 'The namespace of the trait <fg=yellow>(e.g. App\VO\Dummy)</>');
     }
 
     public function configureDependencies(DependencyBuilder $dependencies): void
@@ -52,19 +62,20 @@ class MakeVo extends AbstractMaker
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
     {
         $io->title('Creating new VO');
-        $path = 'VO';
-        $name = $input->getArgument('name');
+        $namespace = $input->getArgument('namespace');
 
-        $config = new MakerConfig(
-            voProperties: $this->voProperties,
-            voRelatedToAnEntity: $this->voRelatedEntity,
-        );
+        $configurations = $this->configurations($namespace);
 
-        $this->voGenerator->generate($path, $name, $config);
+        $this->fileGenerator->generate($configurations);
 
         $this->writeSuccessMessage($io);
 
-        foreach ($this->voGenerator->getGeneratedFiles() as $file) {
+        $fileDefinitionCollection = FileDefinitionCollection::fromConfigurations($configurations, $this->rootNamespace, $this->rootDir);
+        $files = array_map(
+            fn(FileDefinition $fileDefinition) => $fileDefinition->absolutePath(),
+            $fileDefinitionCollection->getFileDefinitions()
+        );
+        foreach ($files as $file) {
             $io->text(sprintf('Created: %s', $file));
         }
     }
@@ -135,6 +146,10 @@ class MakeVo extends AbstractMaker
         $voIsRelatedToEntity = $io->askQuestion($questionVoIsRelatedToEntity);
 
         if ('yes' === $voIsRelatedToEntity) {
+            if (empty($this->entities())) {
+                $io->error('No entity found in the src/Entity directory');
+                return;
+            }
             $questionVoRelatedEntity = new ChoiceQuestion('Choose the entity related to this VO', $this->entities());
             $this->voRelatedEntity = $io->askQuestion($questionVoRelatedEntity);
         }
@@ -191,6 +206,11 @@ class MakeVo extends AbstractMaker
 
     private function entities(): array
     {
+        $filesystem = new Filesystem();
+        if (!$filesystem->exists('src/Entity')) {
+            return [];
+        }
+
         $finder = (new Finder())
             ->files()
             ->in('src/Entity')
@@ -207,5 +227,25 @@ class MakeVo extends AbstractMaker
             $entities[] = $namespace;
         }
         return $entities;
+    }
+
+    private function configurations(string $namespace): array
+    {
+        if ($this->voRelatedEntity) {
+            $configurations[] = (new MakerConfig(
+                voProperties: $this->voProperties,
+                voRelatedToAnEntity: $this->voRelatedEntity,
+                namespace: $namespace,
+                generator: VoForEntityBuilder::class,
+            ))->withVoEntityNamespace();
+        } else {
+            $configurations[] = new MakerConfig(
+                voProperties: $this->voProperties,
+                namespace: $namespace,
+                generator: VoForObjectBuilder::class
+            );
+        }
+
+        return $configurations ?? [];
     }
 }

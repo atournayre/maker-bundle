@@ -1,13 +1,10 @@
 <?php
 
 use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\FromTemplateBuilder;
-use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\VO\VOBuilder;
-use Atournayre\Bundle\MakerBundle\Builder\FileDefinition\VO\VOForEntityBuilder;
 use Atournayre\Bundle\MakerBundle\Generator\AbstractGenerator;
 use Atournayre\Bundle\MakerBundle\Generator\EntityTraitGenerator;
 use Atournayre\Bundle\MakerBundle\Generator\FileGenerator;
 use Atournayre\Bundle\MakerBundle\Generator\ProjectInstallGenerator;
-use Atournayre\Bundle\MakerBundle\Generator\VoGenerator;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\param;
 
@@ -35,7 +32,6 @@ return static function (ContainerConfigurator $container): void {
         AbstractGenerator::class,
         EntityTraitGenerator::class,
         ProjectInstallGenerator::class,
-        VoGenerator::class,
     ];
 
     foreach ($generators as $generator) {
@@ -51,8 +47,6 @@ return static function (ContainerConfigurator $container): void {
         ->set(FileGenerator::class);
 
     $builders = [
-        VOBuilder::class,
-        VOForEntityBuilder::class,
         FromTemplateBuilder::class,
     ];
 

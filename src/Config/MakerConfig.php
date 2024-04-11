@@ -8,8 +8,8 @@ use function Symfony\Component\String\u;
 class MakerConfig
 {
     public function __construct(
-        private string $rootNamespace = 'App',
-        private string $rootDir = '',
+        private string           $rootNamespace = 'App',
+        private string           $rootDir = '',
         private readonly bool    $enableApiPlatform = false,
         private readonly bool    $traitsCreateEntityId = false,
         private readonly array   $dtoProperties = [],
@@ -19,7 +19,7 @@ class MakerConfig
         private readonly bool    $traitIsUsedByEntity = false,
         private readonly bool    $traitSeparateAccessors = false,
         private array            $extraProperties = [],
-        private readonly ?string $namespace = null, // TODO remove nullable after refactoring
+        private ?string          $namespace = null, // TODO remove nullable after refactoring
         private readonly ?string $classnameSuffix = null,
         private readonly ?string $generator = null, // TODO remove nullable after refactoring
         private ?string          $templatePath = null, // TODO remove nullable after refactoring
@@ -144,6 +144,17 @@ class MakerConfig
         $config = clone $this;
         $config->templatePath = $templatePath;
 
+        return $config;
+    }
+
+    public function withVoEntityNamespace(): self
+    {
+        $namespace = u($this->namespace)
+            ->replace('\\VO\\', '\\VO\\Entity\\')
+        ;
+
+        $config = clone $this;
+        $config->namespace = $namespace->toString();
         return $config;
     }
 }
