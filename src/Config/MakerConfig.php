@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Config;
 
+use Webmozart\Assert\Assert;
 use function Symfony\Component\String\u;
 
 class MakerConfig
@@ -132,6 +133,11 @@ class MakerConfig
         return $this->templatePath;
     }
 
+    public function hasTemplatePath(): bool
+    {
+        return null !== $this->templatePath;
+    }
+
     public function withTemplatePathFromNamespace(): self
     {
         $templatePath = u($this->rootDir)
@@ -155,6 +161,28 @@ class MakerConfig
 
         $config = clone $this;
         $config->namespace = $namespace->toString();
+        return $config;
+    }
+
+    public function withTemplatePath(string $templatePath): self
+    {
+        $absoluteTemplatePath = u($templatePath)
+            ->prepend(__DIR__.'/../Resources/templates/')
+            ->toString()
+        ;
+
+        Assert::fileExists($absoluteTemplatePath, 'Template file does not exist: '.$absoluteTemplatePath);
+
+        $namespace = u($templatePath)
+            ->beforeLast('.php')
+            ->prepend($this->rootNamespace().'\\')
+            ->replace('/', '\\\\')
+            ->replace('\\\\', '\\')
+            ->toString();
+
+        $config = clone $this;
+        $config->templatePath = $absoluteTemplatePath;
+        $config->namespace = $namespace;
         return $config;
     }
 }

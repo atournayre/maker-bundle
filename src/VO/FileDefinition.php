@@ -22,7 +22,29 @@ class FileDefinition
     {
     }
 
-    public static function fromConfig(MakerConfig $config): self
+    public static function create(MakerConfig $config): self
+    {
+        $fileDefinition = self::fromConfig($config);
+
+        if (!$config->hasTemplatePath()) {
+            return $fileDefinition;
+        }
+
+        return $fileDefinition->fromTemplatePath();
+    }
+
+    private function fromTemplatePath(): self
+    {
+        $content = file_get_contents($this->configuration->templatePath());
+        $phpFile = PhpFile::fromCode($content)
+            ->addComment('This file has been auto-generated')
+        ;
+        return $this
+            ->withSourceCode((string)$phpFile)
+            ;
+    }
+
+    private static function fromConfig(MakerConfig $config): self
     {
         Assert::notEmpty($config->rootDir(), 'Root directory must be set in MakerConfig');
         Assert::notEmpty($config->namespace(), 'Namespace must be set in MakerConfig');

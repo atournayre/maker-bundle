@@ -45,7 +45,7 @@ class FileDefinitionCollection
 
         $fileDefinitions = [];
         foreach ($configurations as $configuration) {
-            $fileDefinition = FileDefinition::fromConfig($configuration);
+            $fileDefinition = FileDefinition::create($configuration);
             $fileDefinitions[$fileDefinition->uniqueIdentifier()] = $fileDefinition;
         }
 
