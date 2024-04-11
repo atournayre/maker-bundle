@@ -3,17 +3,11 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
-use Atournayre\Bundle\MakerBundle\Collection\FileDefinitionCollection;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
-use Atournayre\Bundle\MakerBundle\Generator\FileGenerator;
 use Atournayre\Bundle\MakerBundle\VO\Builder\TraitForEntityBuilder;
 use Atournayre\Bundle\MakerBundle\VO\Builder\TraitForObjectBuilder;
-use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
-use Symfony\Bundle\MakerBundle\DependencyBuilder;
-use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
-use Symfony\Bundle\MakerBundle\Maker\AbstractMaker;
 use Symfony\Bundle\MakerBundle\Str;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -21,26 +15,15 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use function Symfony\Component\String\u;
 
 #[AutoconfigureTag('maker.command')]
 class MakeTrait extends AbstractMaker
 {
-    private MakerConfig $config;
     private bool $enableApiPlatform = false;
     private array $traitProperties = [];
     private bool $traitIsUsedByEntity = false;
 
-    public function __construct(
-        #[Autowire('%kernel.project_dir%')]
-        private readonly string        $rootDir,
-        #[Autowire('%atournayre_maker.root_namespace%')]
-        private readonly string        $rootNamespace,
-        private readonly FileGenerator $fileGenerator,
-    )
-    {
-    }
 
     public static function getCommandName(): string
     {
@@ -61,33 +44,7 @@ class MakeTrait extends AbstractMaker
         ;
     }
 
-    public function configureDependencies(DependencyBuilder $dependencies): void
-    {
-        // no-op
-    }
-
-    public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
-    {
-        $io->title('Creating new Trait');
-        $namespace = $input->getArgument('namespace');
-
-        $configurations = $this->configurations($namespace);
-
-        $this->fileGenerator->generate($configurations);
-
-        $this->writeSuccessMessage($io);
-
-        $fileDefinitionCollection = FileDefinitionCollection::fromConfigurations($configurations, $this->rootNamespace, $this->rootDir);
-        $files = array_map(
-            fn(FileDefinition $fileDefinition) => $fileDefinition->absolutePath(),
-            $fileDefinitionCollection->getFileDefinitions()
-        );
-        foreach ($files as $file) {
-            $io->text(sprintf('Created: %s', $file));
-        }
-    }
-
-    private function configurations(string $namespace): array
+    protected function configurations(string $namespace): array
     {
         $namespace = u($namespace)->trimEnd('Trait');
 

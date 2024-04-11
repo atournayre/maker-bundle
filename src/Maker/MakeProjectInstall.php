@@ -3,36 +3,17 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
-use Atournayre\Bundle\MakerBundle\Collection\FileDefinitionCollection;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
-use Atournayre\Bundle\MakerBundle\Generator\FileGenerator;
 use Atournayre\Bundle\MakerBundle\VO\Builder\FromTemplateBuilder;
-use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
-use Symfony\Bundle\MakerBundle\ConsoleStyle;
-use Symfony\Bundle\MakerBundle\DependencyBuilder;
-use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
-use Symfony\Bundle\MakerBundle\Maker\AbstractMaker;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 #[AutoconfigureTag('maker.command')]
 class MakeProjectInstall extends AbstractMaker
 {
     private bool $enableApiPlatform = false;
-
-    public function __construct(
-        #[Autowire('%kernel.project_dir%')]
-        private readonly string        $rootDir,
-        #[Autowire('%atournayre_maker.root_namespace%')]
-        private readonly string        $rootNamespace,
-        private readonly FileGenerator $fileGenerator,
-    )
-    {
-    }
 
     public static function getCommandName(): string
     {
@@ -46,43 +27,12 @@ class MakeProjectInstall extends AbstractMaker
             ->addOption('enable-api-platform', null, InputOption::VALUE_OPTIONAL, 'Enable ApiPlatform', false);
     }
 
-    public function configureDependencies(DependencyBuilder $dependencies): void
-    {
-        // no-op
-    }
-
-    public function interact(InputInterface $input, ConsoleStyle $io, Command $command): void
-    {
-        parent::interact($input, $io, $command);
-    }
-
-    public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
-    {
-        $io->title('Creating project files');
-
-        $configurations = $this->configurations('');
-
-        $this->fileGenerator->generate($configurations);
-
-        $this->writeSuccessMessage($io);
-
-        $fileDefinitionCollection = FileDefinitionCollection::fromConfigurations($configurations, $this->rootNamespace, $this->rootDir);
-
-        $files = array_map(
-            fn(FileDefinition $fileDefinition) => $fileDefinition->absolutePath(),
-            $fileDefinitionCollection->getFileDefinitions()
-        );
-        foreach ($files as $file) {
-            $io->text(sprintf('Created: %s', $file));
-        }
-    }
-
     public static function getCommandDescription(): string
     {
         return 'Create multiple files to get started with a new project';
     }
 
-    private function configurations(string $namespace): array
+    protected function configurations(string $namespace): array
     {
         $templates = $this->getTemplates();
         $configurations = [];

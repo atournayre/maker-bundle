@@ -3,38 +3,21 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
-use Atournayre\Bundle\MakerBundle\Collection\FileDefinitionCollection;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
-use Atournayre\Bundle\MakerBundle\Generator\FileGenerator;
 use Atournayre\Bundle\MakerBundle\VO\Builder\DtoBuilder;
-use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
-use Symfony\Bundle\MakerBundle\DependencyBuilder;
-use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
-use Symfony\Bundle\MakerBundle\Maker\AbstractMaker;
 use Symfony\Bundle\MakerBundle\Str;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 #[AutoconfigureTag('maker.command')]
 class MakeDto extends AbstractMaker
 {
     private array $dtoProperties = [];
-
-    public function __construct(
-        #[Autowire('%kernel.project_dir%')]
-        private readonly string        $rootDir,
-        #[Autowire('%atournayre_maker.root_namespace%')]
-        private readonly string        $rootNamespace,
-        private readonly FileGenerator $fileGenerator,
-    )
-    {
-    }
 
     public static function getCommandName(): string
     {
@@ -46,39 +29,6 @@ class MakeDto extends AbstractMaker
         $command
             ->setDescription('Creates a new DTO')
             ->addArgument('namespace', InputArgument::REQUIRED, 'The namespace of the DTO <fg=yellow>(e.g. App\DTO\Dummy)</>');
-    }
-
-    public function configureDependencies(DependencyBuilder $dependencies): void
-    {
-        // no-op
-    }
-
-    public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
-    {
-        $io->title('Creating new DTO');
-        $namespace = $input->getArgument('namespace');
-
-        $configurations = [
-            new MakerConfig(
-                dtoProperties: $this->dtoProperties,
-                namespace: $namespace,
-                classnameSuffix: '',
-                generator: DtoBuilder::class
-            ),
-        ];
-
-        $this->fileGenerator->generate($configurations);
-
-        $this->writeSuccessMessage($io);
-
-        $fileDefinitionCollection = FileDefinitionCollection::fromConfigurations($configurations, $this->rootNamespace, $this->rootDir);
-        $files = array_map(
-            fn(FileDefinition $fileDefinition) => $fileDefinition->absolutePath(),
-            $fileDefinitionCollection->getFileDefinitions()
-        );
-        foreach ($files as $file) {
-            $io->text(sprintf('Created: %s', $file));
-        }
     }
 
     public static function getCommandDescription(): string
@@ -201,6 +151,18 @@ class MakeDto extends AbstractMaker
             'float',
             'boolean',
             'datetime',
+        ];
+    }
+
+    protected function configurations(string $namespace): array
+    {
+        return [
+            new MakerConfig(
+                dtoProperties: $this->dtoProperties,
+                namespace: $namespace,
+                classnameSuffix: '',
+                generator: DtoBuilder::class
+            ),
         ];
     }
 }
