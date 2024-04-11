@@ -7,6 +7,7 @@ use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 use Atournayre\Bundle\MakerBundle\VO\Builder\TraitForEntityBuilder;
 use Atournayre\Bundle\MakerBundle\VO\Builder\TraitForObjectBuilder;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
+use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Bundle\MakerBundle\Str;
 use Symfony\Component\Console\Command\Command;
@@ -193,5 +194,18 @@ class MakeTrait extends AbstractMaker
             'boolean',
             'datetime',
         ];
+    }
+
+    public function configureDependencies(DependencyBuilder $dependencies): void
+    {
+        $deps = [
+            \Doctrine\ORM\Mapping::class => 'orm',
+            \Webmozart\Assert\Assert::class => 'webmozart/assert',
+            \Doctrine\DBAL\Types\Types::class => 'doctrine/dbal',
+        ];
+
+        foreach ($deps as $class => $package) {
+            $dependencies->addClassDependency($class, $package);
+        }
     }
 }

@@ -7,6 +7,7 @@ use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 use Atournayre\Bundle\MakerBundle\VO\Builder\VoForEntityBuilder;
 use Atournayre\Bundle\MakerBundle\VO\Builder\VoForObjectBuilder;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
+use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Bundle\MakerBundle\Str;
 use Symfony\Component\Console\Command\Command;
@@ -204,5 +205,16 @@ class MakeVo extends AbstractMaker
         }
 
         return $configurations ?? [];
+    }
+
+    public function configureDependencies(DependencyBuilder $dependencies): void
+    {
+        $deps = [
+            \Webmozart\Assert\Assert::class => 'webmozart/assert',
+        ];
+
+        foreach ($deps as $class => $package) {
+            $dependencies->addClassDependency($class, $package);
+        }
     }
 }

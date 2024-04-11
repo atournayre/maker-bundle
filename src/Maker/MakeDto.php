@@ -6,6 +6,7 @@ namespace Atournayre\Bundle\MakerBundle\Maker;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 use Atournayre\Bundle\MakerBundle\VO\Builder\DtoBuilder;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
+use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Bundle\MakerBundle\Str;
 use Symfony\Component\Console\Command\Command;
@@ -164,5 +165,16 @@ class MakeDto extends AbstractMaker
                 generator: DtoBuilder::class
             ),
         ];
+    }
+
+    public function configureDependencies(DependencyBuilder $dependencies): void
+    {
+        $deps = [
+            \Webmozart\Assert\Assert::class => 'webmozart/assert',
+        ];
+
+        foreach ($deps as $class => $package) {
+            $dependencies->addClassDependency($class, $package);
+        }
     }
 }

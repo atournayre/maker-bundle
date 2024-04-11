@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\VO\Builder;
 
-use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpFile;

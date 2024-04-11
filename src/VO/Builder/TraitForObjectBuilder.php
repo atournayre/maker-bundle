@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\VO\Builder;
 
-use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpFile;
@@ -87,13 +86,13 @@ class TraitForObjectBuilder extends AbstractBuilder
         $properties = $clone->fileDefinition->configuration()->traitProperties();
 
         foreach ($properties as $property) {
-            $class->addMember($this->defineProperty($property, $clone->fileDefinition->configuration()));
+            $class->addMember($this->defineProperty($property));
         }
 
         return $clone;
     }
 
-    private function defineProperty(array $propertyDatas, MakerConfig $config): Property
+    private function defineProperty(array $propertyDatas): Property
     {
         $type = $propertyDatas['type'];
         $fieldNameRaw = $propertyDatas['fieldName'];

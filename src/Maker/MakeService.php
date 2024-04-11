@@ -12,6 +12,7 @@ use Atournayre\Bundle\MakerBundle\VO\Builder\ServiceQueryBuilder;
 use Nette\PhpGenerator\Attribute;
 use Nette\PhpGenerator\Literal;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
+use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -132,5 +133,16 @@ class MakeService extends AbstractMaker
                 ->withRoot($this->rootNamespace, $this->rootDir)
                 ->withTemplatePathFromNamespace(),
         ];
+    }
+
+    public function configureDependencies(DependencyBuilder $dependencies): void
+    {
+        $deps = [
+            \Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag::class => 'symfony/dependency-injection',
+        ];
+
+        foreach ($deps as $class => $package) {
+            $dependencies->addClassDependency($class, $package);
+        }
     }
 }
