@@ -199,7 +199,7 @@ class MakeTrait extends AbstractMaker
     public function configureDependencies(DependencyBuilder $dependencies): void
     {
         $deps = [
-            \Doctrine\ORM\Mapping::class => 'orm',
+            \Doctrine\ORM\Mapping\Id::class => 'orm',
             \Webmozart\Assert\Assert::class => 'webmozart/assert',
             \Doctrine\DBAL\Types\Types::class => 'doctrine/dbal',
         ];
