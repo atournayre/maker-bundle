@@ -67,8 +67,8 @@ class MakeException extends AbstractMaker
         return [
             (new MakerConfig(
                 namespace: $namespace,
-                classnameSuffix: '',
                 builder: ExceptionBuilder::class,
+                classnameSuffix: '',
             ))
                 ->withExtraProperty('exceptionType', $this->exceptionType)
                 ->withExtraProperty('exceptionNamedConstructor', $this->exceptionNamedConstructor),

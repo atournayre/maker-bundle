@@ -39,9 +39,9 @@ class MakeProjectInstall extends AbstractMaker
         $configurations = [];
         foreach ($templates as $template) {
             $configurations[] = (new MakerConfig(
-                enableApiPlatform: $this->enableApiPlatform,
                 namespace: $namespace,
                 builder: FromTemplateBuilder::class,
+                enableApiPlatform: $this->enableApiPlatform,
             ))->withTemplatePath($template);
         }
         return $configurations;

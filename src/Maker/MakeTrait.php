@@ -52,21 +52,21 @@ class MakeTrait extends AbstractMaker
         if ($this->traitIsUsedByEntity) {
             $suffix = 'EntityTrait';
             $configurations[] = new MakerConfig(
+                namespace: $namespace->ensureEnd($suffix)->toString(),
+                builder: TraitForEntityBuilder::class,
                 enableApiPlatform: $this->enableApiPlatform,
                 traitProperties: $this->traitProperties,
                 traitIsUsedByEntity: true,
-                namespace: $namespace->ensureEnd($suffix)->toString(),
                 classnameSuffix: $suffix,
-                builder: TraitForEntityBuilder::class,
             );
         } else {
             $suffix = 'Trait';
             $configurations[] = new MakerConfig(
+                namespace: $namespace->ensureEnd($suffix)->toString(),
+                builder: TraitForObjectBuilder::class,
                 enableApiPlatform: $this->enableApiPlatform,
                 traitProperties: $this->traitProperties,
-                namespace: $namespace->ensureEnd($suffix)->toString(),
                 classnameSuffix: $suffix,
-                builder: TraitForObjectBuilder::class,
             );
         }
 

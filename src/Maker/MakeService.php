@@ -114,10 +114,12 @@ class MakeService extends AbstractMaker
         return [
             (new MakerConfig(
                 namespace: $namespace,
-                classnameSuffix: '',
                 builder: $this->builder,
+                classnameSuffix: '',
             ))->withExtraProperty('vo', $this->vo),
             (new MakerConfig(
+                namespace: $this->vo,
+                builder: AddAttributeBuilder::class,
                 extraProperties: [
                     'serviceNamespace' => $namespace,
                     'attributes' => [
@@ -126,9 +128,7 @@ class MakeService extends AbstractMaker
                         ])
                     ],
                 ],
-                namespace: $this->vo,
                 classnameSuffix: '',
-                builder: AddAttributeBuilder::class,
             ))
                 ->withRoot($this->rootNamespace, $this->rootDir)
                 ->withTemplatePathFromNamespace(),

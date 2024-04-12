@@ -191,16 +191,16 @@ class MakeVo extends AbstractMaker
     {
         if ($this->voRelatedEntity) {
             $configurations[] = (new MakerConfig(
-                voProperties: $this->voProperties,
-                voRelatedToAnEntity: $this->voRelatedEntity,
                 namespace: $namespace,
                 builder: VoForEntityBuilder::class,
+                voProperties: $this->voProperties,
+                voRelatedToAnEntity: $this->voRelatedEntity,
             ))->withVoEntityNamespace();
         } else {
             $configurations[] = new MakerConfig(
-                voProperties: $this->voProperties,
                 namespace: $namespace,
-                builder: VoForObjectBuilder::class
+                builder: VoForObjectBuilder::class,
+                voProperties: $this->voProperties
             );
         }
 

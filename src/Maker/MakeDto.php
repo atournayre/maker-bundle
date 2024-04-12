@@ -159,10 +159,10 @@ class MakeDto extends AbstractMaker
     {
         return [
             new MakerConfig(
-                dtoProperties: $this->dtoProperties,
                 namespace: $namespace,
-                classnameSuffix: '',
-                builder: DtoBuilder::class
+                builder: DtoBuilder::class,
+                dtoProperties: $this->dtoProperties,
+                classnameSuffix: ''
             ),
         ];
     }

@@ -9,6 +9,8 @@ use function Symfony\Component\String\u;
 class MakerConfig
 {
     public function __construct(
+        private string           $namespace,
+        private readonly string  $builder,
         private string           $rootNamespace = 'App',
         private string           $rootDir = '',
         private readonly bool    $enableApiPlatform = false,
@@ -20,17 +22,10 @@ class MakerConfig
         private readonly bool    $traitIsUsedByEntity = false,
         private readonly bool    $traitSeparateAccessors = false,
         private array            $extraProperties = [],
-        private ?string          $namespace = null, // TODO remove nullable after refactoring
         private readonly ?string $classnameSuffix = null,
-        private readonly ?string $builder = null, // TODO remove nullable after refactoring
-        private ?string          $templatePath = null, // TODO remove nullable after refactoring
+        private ?string          $templatePath = null,
     )
     {
-    }
-
-    public static function default(): self
-    {
-        return new self();
     }
 
     public function rootNamespace(): string
@@ -113,7 +108,7 @@ class MakerConfig
         return null !== $this->getExtraProperty($name);
     }
 
-    public function namespace(): ?string // TODO remove nullable after refactoring
+    public function namespace(): string
     {
         return $this->namespace;
     }
@@ -123,7 +118,7 @@ class MakerConfig
         return $this->classnameSuffix;
     }
 
-    public function generator(): ?string // TODO remove nullable after refactoring
+    public function generator(): string
     {
         return $this->builder;
     }
