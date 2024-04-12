@@ -23,7 +23,6 @@ return static function (ContainerConfigurator $container): void {
         ->set(MakeDto::class)->tag('maker.command')
         ->set(MakeException::class)->tag('maker.command')
         ->set(MakeInterface::class)->tag('maker.command')
-        ->set(MakeInterface::class)->tag('maker.command')
         ->set(MakeLogger::class)->tag('maker.command')
         ->set(MakeProjectInstall::class)->tag('maker.command')
         ->set(MakeService::class)->tag('maker.command')
