@@ -20,14 +20,14 @@ return static function (ContainerConfigurator $container): void {
         ->autowire();
 
     $services
-        ->set(MakeDto::class)->autowire()->tag('maker.command')
-        ->set(MakeException::class)->autowire()->tag('maker.command')
+        ->set(MakeDto::class)->tag('maker.command')
+        ->set(MakeException::class)->tag('maker.command')
         ->set(MakeInterface::class)->tag('maker.command')
-        ->set(MakeInterface::class)->autowire()->tag('maker.command')
-        ->set(MakeLogger::class)->autowire()->tag('maker.command')
+        ->set(MakeInterface::class)->tag('maker.command')
+        ->set(MakeLogger::class)->tag('maker.command')
         ->set(MakeProjectInstall::class)->tag('maker.command')
-        ->set(MakeService::class)->autowire()->tag('maker.command')
-        ->set(MakeTrait::class)->autowire()->tag('maker.command')
+        ->set(MakeService::class)->tag('maker.command')
+        ->set(MakeTrait::class)->tag('maker.command')
         ->set(MakeVo::class)->tag('maker.command')
     ;
 };
