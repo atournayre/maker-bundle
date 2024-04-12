@@ -57,7 +57,7 @@ class MakeTrait extends AbstractMaker
                 traitIsUsedByEntity: true,
                 namespace: $namespace->ensureEnd($suffix)->toString(),
                 classnameSuffix: $suffix,
-                generator: TraitForEntityBuilder::class,
+                builder: TraitForEntityBuilder::class,
             );
         } else {
             $suffix = 'Trait';
@@ -66,7 +66,7 @@ class MakeTrait extends AbstractMaker
                 traitProperties: $this->traitProperties,
                 namespace: $namespace->ensureEnd($suffix)->toString(),
                 classnameSuffix: $suffix,
-                generator: TraitForObjectBuilder::class,
+                builder: TraitForObjectBuilder::class,
             );
         }
 

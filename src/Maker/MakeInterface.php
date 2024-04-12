@@ -36,7 +36,7 @@ class MakeInterface extends AbstractMaker
             new MakerConfig(
                 namespace: $namespace,
                 classnameSuffix: 'Interface',
-                generator: InterfaceBuilder::class,
+                builder: InterfaceBuilder::class,
             ),
         ];
     }

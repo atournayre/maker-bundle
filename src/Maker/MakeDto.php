@@ -162,7 +162,7 @@ class MakeDto extends AbstractMaker
                 dtoProperties: $this->dtoProperties,
                 namespace: $namespace,
                 classnameSuffix: '',
-                generator: DtoBuilder::class
+                builder: DtoBuilder::class
             ),
         ];
     }

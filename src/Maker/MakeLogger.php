@@ -36,7 +36,7 @@ class MakeLogger extends AbstractMaker
             new MakerConfig(
                 namespace: $namespace,
                 classnameSuffix: 'Logger',
-                generator: LoggerBuilder::class,
+                builder: LoggerBuilder::class,
             ),
         ];
     }

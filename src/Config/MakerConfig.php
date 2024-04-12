@@ -22,7 +22,7 @@ class MakerConfig
         private array            $extraProperties = [],
         private ?string          $namespace = null, // TODO remove nullable after refactoring
         private readonly ?string $classnameSuffix = null,
-        private readonly ?string $generator = null, // TODO remove nullable after refactoring
+        private readonly ?string $builder = null, // TODO remove nullable after refactoring
         private ?string          $templatePath = null, // TODO remove nullable after refactoring
     )
     {
@@ -125,7 +125,7 @@ class MakerConfig
 
     public function generator(): ?string // TODO remove nullable after refactoring
     {
-        return $this->generator;
+        return $this->builder;
     }
 
     public function templatePath(): ?string
