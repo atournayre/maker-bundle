@@ -32,17 +32,6 @@ class VoForObjectBuilder extends AbstractBuilder
         ;
     }
 
-    private function withUse(string $classname): self
-    {
-        $clone = clone $this;
-        $class = $clone->getClass();
-
-        $namespace = $class->getNamespace();
-        $namespace->addUse($classname);
-
-        return $clone;
-    }
-
     private function withConstructor(): self
     {
         $clone = clone $this;

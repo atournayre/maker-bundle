@@ -42,17 +42,6 @@ class TraitForEntityBuilder extends AbstractBuilder
             ->withPropertySettersForEntity();
     }
 
-    private function withUse(string $classname, ?string $alias = null): self
-    {
-        $clone = clone $this;
-        $class = $clone->getClass();
-
-        $namespace = $class->getNamespace();
-        $namespace->addUse($classname, $alias);
-
-        return $clone;
-    }
-
     private function withPropertySettersForEntity(): self
     {
         $clone = clone $this;

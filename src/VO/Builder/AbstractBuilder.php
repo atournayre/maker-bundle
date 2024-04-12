@@ -39,4 +39,15 @@ abstract class AbstractBuilder
     {
         return $this->file->getClasses()[$this->fileDefinition->fullName()];
     }
+
+    protected function withUse(string $classname, ?string $alias = null): self
+    {
+        $clone = clone $this;
+        $class = $clone->getClass();
+
+        $namespace = $class->getNamespace();
+        $namespace->addUse($classname, $alias);
+
+        return $clone;
+    }
 }

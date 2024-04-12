@@ -46,17 +46,6 @@ class ServiceCommandBuilder extends AbstractBuilder
         ;
     }
 
-    private function withUse(string $classname): self
-    {
-        $clone = clone $this;
-        $class = $clone->getClass();
-
-        $namespace = $class->getNamespace();
-        $namespace->addUse($classname);
-
-        return $clone;
-    }
-
     private function withAttributes(): self
     {
         $clone = clone $this;
