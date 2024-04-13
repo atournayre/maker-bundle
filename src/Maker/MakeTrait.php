@@ -40,7 +40,7 @@ class MakeTrait extends AbstractMaker
     {
         $command
             ->setDescription('Creates a new trait')
-            ->addArgument('namespace', InputArgument::REQUIRED, 'The namespace of the trait <fg=yellow>(e.g. App\Trait\DummyTrait)</>')
+            ->addArgument('namespace', InputArgument::REQUIRED, 'The namespace of the trait <fg=yellow>(e.g. App\\Trait\\DummyTrait)</>')
             ->addOption('enable-api-platform', null, InputOption::VALUE_OPTIONAL, 'Enable ApiPlatform', false)
         ;
     }

@@ -35,7 +35,7 @@ class MakeVo extends AbstractMaker
     {
         $command
             ->setDescription('Creates a new VO')
-            ->addArgument('namespace', InputArgument::REQUIRED, 'The namespace of the VO <fg=yellow>(e.g. App\VO\Dummy)</>');
+            ->addArgument('namespace', InputArgument::REQUIRED, 'The namespace of the VO <fg=yellow>(e.g. App\\VO\\Dummy)</>');
     }
 
     public static function getCommandDescription(): string

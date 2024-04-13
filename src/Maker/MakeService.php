@@ -42,7 +42,7 @@ class MakeService extends AbstractMaker
     {
         $command
             ->setDescription('Creates a new Service')
-            ->addArgument('namespace', InputArgument::REQUIRED, 'The namespace of the Service <fg=yellow>(e.g. App\Service\Command\DummyCommandService, App\Service\Query\DummyQueryService)</>')
+            ->addArgument('namespace', InputArgument::REQUIRED, 'The namespace of the Service <fg=yellow>(e.g. App\\Service\\Command\\DummyCommandService, App\\Service\\Query\\DummyQueryService)</>')
             ->addOption('command', null, InputOption::VALUE_OPTIONAL, 'Create a Command Service', 0)
             ->addOption('query', null, InputOption::VALUE_OPTIONAL, 'Create a Query Service', 1)
         ;
