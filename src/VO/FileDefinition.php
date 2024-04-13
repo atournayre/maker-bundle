@@ -66,17 +66,13 @@ class FileDefinition
         Assert::notEmpty($config->namespace(), 'Namespace must be set in MakerConfig');
 
         $namespace = u($config->namespace());
-        $namespaceWithoutClassName = $namespace->beforeLast('\\');
+        $namespaceWithoutClassName = Str::namespaceWithoutClassname($config->namespace());
         $classname = $namespace->afterLast('\\');
 
-        $absolutePath = Str::absolutePathFromNamespace(
-            $config->namespace(),
-            $config->rootNamespace(),
-            $config->rootDir()
-        );
+        $absolutePath = Str::absolutePathFromNamespace($config->namespace(), $config->rootNamespace(), $config->rootDir());
 
         return new self(
-            $namespaceWithoutClassName->toString(),
+            $namespaceWithoutClassName,
             $classname->toString(),
             $absolutePath,
             $config->generator(),
@@ -132,12 +128,7 @@ class FileDefinition
             return PhpFile::fromCode($this->sourceCode);
         }
 
-        $absolutePath = u($this->fullName())
-            ->replace($this->configuration->rootNamespace(), $this->configuration->rootDir().'/src')
-            ->replace('\\', '/')
-            ->append('.php')
-            ->toString();
-
+        $absolutePath = Str::absolutePathFromNamespace($this->namespace(), $this->configuration->rootNamespace(), $this->configuration->rootDir());
         $sourceCode = file_get_contents($absolutePath);
 
         return PhpFile::fromCode($sourceCode);
