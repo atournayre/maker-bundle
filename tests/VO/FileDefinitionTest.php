@@ -134,7 +134,7 @@ class FileDefinitionTest extends TestCase
      * @param string $expectedBuilder
      * @return void
      */
-    public function testAvecProvider(
+    public function testFileDefinition(
         MakerConfig $config,
         string $expectedNamespace,
         string $expectedClassname,
