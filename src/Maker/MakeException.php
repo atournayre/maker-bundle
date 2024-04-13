@@ -4,13 +4,11 @@ declare(strict_types=1);
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
-use Atournayre\Bundle\MakerBundle\Generator\ExceptionGenerator;
+use Atournayre\Bundle\MakerBundle\VO\Builder\ExceptionBuilder;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
-use Symfony\Bundle\MakerBundle\DependencyBuilder;
-use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
-use Symfony\Bundle\MakerBundle\Maker\AbstractMaker;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
@@ -19,15 +17,8 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 #[AutoconfigureTag('maker.command')]
 class MakeException extends AbstractMaker
 {
-    private string $exceptionName;
     private string $exceptionType;
     private ?string $exceptionNamedConstructor = null;
-
-    public function __construct(
-        private readonly ExceptionGenerator $exceptionGenerator,
-    )
-    {
-    }
 
     public static function getCommandName(): string
     {
@@ -37,30 +28,8 @@ class MakeException extends AbstractMaker
     public function configureCommand(Command $command, InputConfiguration $inputConfig): void
     {
         $command
-            ->setDescription('Creates a new exception');
-    }
-
-    public function configureDependencies(DependencyBuilder $dependencies): void
-    {
-        // no-op
-    }
-
-    public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
-    {
-        $io->title('Creating new Exception');
-        $path = 'Exception';
-
-        $config = MakerConfig::default()
-            ->withExtraProperty('exceptionType', $this->exceptionType)
-            ->withExtraProperty('exceptionNamedConstructor', $this->exceptionNamedConstructor);
-
-        $this->exceptionGenerator->generate($path, $this->exceptionName, $config);
-
-        $this->writeSuccessMessage($io);
-
-        foreach ($this->exceptionGenerator->getGeneratedFiles() as $file) {
-            $io->text(sprintf('Created: %s', $file));
-        }
+            ->setDescription('Creates a new exception')
+            ->addArgument('namespace', InputArgument::REQUIRED, 'The namespace of the exception <fg=yellow>(e.g. App\\\\Exception\\\\Dummy)</>');
     }
 
     public static function getCommandDescription(): string
@@ -71,11 +40,6 @@ class MakeException extends AbstractMaker
     public function interact(InputInterface $input, ConsoleStyle $io, Command $command): void
     {
         parent::interact($input, $io, $command);
-
-        $questionName = new Question('Choose the exception name');
-        $exceptionName = $io->askQuestion($questionName);
-
-        $this->exceptionName = $exceptionName;
 
         $questionExceptionType = new ChoiceQuestion('Choose the exception type', [
             \Exception::class,
@@ -96,5 +60,17 @@ class MakeException extends AbstractMaker
         }
 
         $this->exceptionNamedConstructor = $namedConstructor;
+    }
+
+    protected function configurations(string $namespace): array
+    {
+        return [
+            (new MakerConfig(
+                namespace: $namespace,
+                builder: ExceptionBuilder::class,
+            ))
+                ->withExtraProperty('exceptionType', $this->exceptionType)
+                ->withExtraProperty('exceptionNamedConstructor', $this->exceptionNamedConstructor),
+        ];
     }
 }

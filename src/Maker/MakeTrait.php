@@ -4,13 +4,12 @@ declare(strict_types=1);
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
-use Atournayre\Bundle\MakerBundle\Generator\EntityTraitGenerator;
-use Atournayre\Bundle\MakerBundle\Generator\TraitGenerator;
+use Atournayre\Bundle\MakerBundle\Helper\UStr;
+use Atournayre\Bundle\MakerBundle\VO\Builder\TraitForEntityBuilder;
+use Atournayre\Bundle\MakerBundle\VO\Builder\TraitForObjectBuilder;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
-use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
-use Symfony\Bundle\MakerBundle\Maker\AbstractMaker;
 use Symfony\Bundle\MakerBundle\Str;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -22,56 +21,84 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 #[AutoconfigureTag('maker.command')]
 class MakeTrait extends AbstractMaker
 {
-    private MakerConfig $config;
+    private bool $enableApiPlatform = false;
+    private array $traitProperties = [];
+    private bool $traitIsUsedByEntity = false;
 
-    public function __construct(
-        private readonly TraitGenerator $traitGenerator,
-        private readonly EntityTraitGenerator $entityTraitGenerator,
-    )
-    {
-    }
 
     public static function getCommandName(): string
     {
         return 'make:new:trait';
     }
 
+    public static function getCommandDescription(): string
+    {
+        return 'Create a new Trait';
+    }
+
     public function configureCommand(Command $command, InputConfiguration $inputConfig): void
     {
         $command
             ->setDescription('Creates a new trait')
-            ->addArgument('name', InputArgument::REQUIRED, 'The name of the trait')
+            ->addArgument('namespace', InputArgument::REQUIRED, 'The namespace of the trait <fg=yellow>(e.g. App\\\\Trait\\\\DummyTrait)</>')
             ->addOption('enable-api-platform', null, InputOption::VALUE_OPTIONAL, 'Enable ApiPlatform', false)
-            ->addOption('create-entity-id', null, InputOption::VALUE_OPTIONAL, 'Create entity id trait', false)
-            ->addOption('separate-accessors', null, InputOption::VALUE_OPTIONAL, 'Separate accessors in specific trait', false)
         ;
     }
 
-    public function configureDependencies(DependencyBuilder $dependencies): void
+    protected function configurations(string $namespace): array
     {
-        // no-op
-    }
+        $namespace = UStr::trimNamespaceEnd($namespace, 'Trait');
 
-    public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
-    {
-        $io->title('Creating new Trait');
-        $path = 'Trait';
-        $name = $input->getArgument('name');
-
-        $this->traitGenerator->generate($path, $name, $this->config);
-
-        $this->writeSuccessMessage($io);
-
-        foreach ($this->traitGenerator->getGeneratedFiles() as $file) {
-            $io->text(sprintf('Created: %s', $file));
+        if ($this->traitIsUsedByEntity) {
+            $suffix = 'EntityTrait';
+            $configurations[] = new MakerConfig(
+                namespace: $namespace->ensureEnd($suffix)->toString(),
+                builder: TraitForEntityBuilder::class,
+                enableApiPlatform: $this->enableApiPlatform,
+                traitProperties: $this->traitProperties,
+                traitIsUsedByEntity: true,
+                classnameSuffix: $suffix,
+            );
+        } else {
+            $suffix = 'Trait';
+            $configurations[] = new MakerConfig(
+                namespace: $namespace->ensureEnd($suffix)->toString(),
+                builder: TraitForObjectBuilder::class,
+                enableApiPlatform: $this->enableApiPlatform,
+                traitProperties: $this->traitProperties,
+                classnameSuffix: $suffix,
+            );
         }
 
-        $this->createEntityTrait($io, $this->config);
+        return $configurations ?? [];
     }
 
-    public static function getCommandDescription(): string
+    public function interact(InputInterface $input, ConsoleStyle $io, Command $command): void
     {
-        return 'Create a new Trait';
+        parent::interact($input, $io, $command);
+
+        $question = new Question('Do this trait will be used in an entity ? (yes/no)', 'no');
+        $isUsedByEntity = $io->askQuestion($question) === 'yes';
+
+        $currentFields = [];
+
+        $isFirstField = true;
+
+        while (true) {
+            $newField = $this->askForNextField($io, $currentFields, $isFirstField);
+
+            $isFirstField = false;
+
+            if (null === $newField) {
+                break;
+            }
+
+            $currentFields[$newField['fieldName']] = $newField;
+        }
+
+        $this->enableApiPlatform = (bool)$input->getOption('enable-api-platform');
+        $this->traitProperties = $currentFields;
+        $this->traitIsUsedByEntity = $isUsedByEntity;
     }
 
     private function askForNextField(ConsoleStyle $io, array $fields, bool $isFirstField): ?array
@@ -138,38 +165,6 @@ class MakeTrait extends AbstractMaker
         return $data;
     }
 
-    public function interact(InputInterface $input, ConsoleStyle $io, Command $command): void
-    {
-        parent::interact($input, $io, $command);
-
-        $question = new Question('Do this trait will be used in an entity ? (yes/no)', 'no');
-        $isUsedByEntity = $io->askQuestion($question) === 'yes';
-
-        $currentFields = [];
-
-        $isFirstField = true;
-
-        while (true) {
-            $newField = $this->askForNextField($io, $currentFields, $isFirstField);
-
-            $isFirstField = false;
-
-            if (null === $newField) {
-                break;
-            }
-
-            $currentFields[$newField['fieldName']] = $newField;
-        }
-
-        $this->config = new MakerConfig(
-            enableApiPlatform: (bool)$input->getOption('enable-api-platform'),
-            traitsCreateEntityId: (bool)$input->getOption('create-entity-id'),
-            traitProperties: $currentFields,
-            traitIsUsedByEntity: $isUsedByEntity,
-            traitSeparateAccessors: (bool)$input->getOption('separate-accessors'),
-        );
-    }
-
     private function fieldDefaultType(string $fieldName): string
     {
         $defaultType = 'string';
@@ -201,20 +196,16 @@ class MakeTrait extends AbstractMaker
         ];
     }
 
-    private function createEntityTrait(ConsoleStyle $io, MakerConfig $config): void
+    public function configureDependencies(DependencyBuilder $dependencies): void
     {
-        if (! $config->isTraitsCreateEntityId()) {
-            return;
-        }
+        $deps = [
+            \Doctrine\ORM\Mapping\Id::class => 'orm',
+            \Webmozart\Assert\Assert::class => 'webmozart/assert',
+            \Doctrine\DBAL\Types\Types::class => 'doctrine/dbal',
+        ];
 
-        $io->title('Creating new Entity Trait');
-
-        $this->entityTraitGenerator->generate('', '', $config);
-
-        $this->writeSuccessMessage($io);
-
-        foreach ($this->traitGenerator->getGeneratedFiles() as $file) {
-            $io->text(sprintf('Created: %s', $file));
+        foreach ($deps as $class => $package) {
+            $dependencies->addClassDependency($class, $package);
         }
     }
 }

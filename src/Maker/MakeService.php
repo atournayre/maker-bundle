@@ -3,14 +3,18 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
+use App\Attribute\CommandService;
+use App\Attribute\QueryService;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
-use Atournayre\Bundle\MakerBundle\Generator\ServiceCommandGenerator;
-use Atournayre\Bundle\MakerBundle\Generator\ServiceQueryGenerator;
+use Atournayre\Bundle\MakerBundle\Helper\Str;
+use Atournayre\Bundle\MakerBundle\VO\Builder\AddAttributeBuilder;
+use Atournayre\Bundle\MakerBundle\VO\Builder\ServiceCommandBuilder;
+use Atournayre\Bundle\MakerBundle\VO\Builder\ServiceQueryBuilder;
+use Nette\PhpGenerator\Attribute;
+use Nette\PhpGenerator\Literal;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
-use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
-use Symfony\Bundle\MakerBundle\Maker\AbstractMaker;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -18,7 +22,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\Finder\Finder;
-use function Symfony\Component\String\u;
 
 #[AutoconfigureTag('maker.command')]
 class MakeService extends AbstractMaker
@@ -27,14 +30,8 @@ class MakeService extends AbstractMaker
     private const QUERY = 'Query';
 
     private string $vo;
-    private string $commandOrQuery;
-
-    public function __construct(
-        private readonly ServiceCommandGenerator $serviceCommandGenerator,
-        private readonly ServiceQueryGenerator $serviceQueryGenerator,
-    )
-    {
-    }
+    private string $builder;
+    private string $attributeName;
 
     public static function getCommandName(): string
     {
@@ -45,50 +42,10 @@ class MakeService extends AbstractMaker
     {
         $command
             ->setDescription('Creates a new Service')
-            ->addArgument('name', InputArgument::REQUIRED, 'The name of the Service')
+            ->addArgument('namespace', InputArgument::REQUIRED, 'The namespace of the Service <fg=yellow>(e.g. App\\\\Service\\\\Command\\\\DummyCommandService, App\\\\Service\\\\Query\\\\DummyQueryService)</>')
             ->addOption('command', null, InputOption::VALUE_OPTIONAL, 'Create a Command Service', 0)
             ->addOption('query', null, InputOption::VALUE_OPTIONAL, 'Create a Query Service', 1)
         ;
-    }
-
-    public function configureDependencies(DependencyBuilder $dependencies): void
-    {
-        // no-op
-    }
-
-    /**
-     * @throws \Exception
-     */
-    public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
-    {
-        $io->title('Creating new Service');
-        $name = $input->getArgument('name');
-
-        $config = new MakerConfig(
-            extraProperties: [
-                'vo' => $this->vo,
-            ],
-        );
-
-        $generator = match ($this->commandOrQuery) {
-            self::COMMAND => $this->serviceCommandGenerator,
-            self::QUERY => $this->serviceQueryGenerator,
-            default => throw new \InvalidArgumentException('Invalid command or query'),
-        };
-
-        $path = match ($this->commandOrQuery) {
-            self::COMMAND => 'Service\\Command',
-            self::QUERY => 'Service\\Query',
-            default => throw new \InvalidArgumentException('Invalid command or query'),
-        };
-
-        $generator->generate($path, $name, $config);
-
-        $this->writeSuccessMessage($io);
-
-        foreach ($generator->getGeneratedFiles() as $file) {
-            $io->text(sprintf('Created: %s', $file));
-        }
     }
 
     public static function getCommandDescription(): string
@@ -113,31 +70,74 @@ class MakeService extends AbstractMaker
         ], $input->getOption('command') ?? $input->getOption('query'));
         $commandOrQuery = $io->askQuestion($questionCommandOrQuery);
 
-        $this->commandOrQuery = $commandOrQuery;
-
         $vo = new ChoiceQuestion('Choose the VO', $availableVOs);
         $voName = $io->askQuestion($vo);
 
         $this->vo = $voName;
+
+        $this->builder = match ($commandOrQuery) {
+            self::COMMAND => ServiceCommandBuilder::class,
+            self::QUERY => ServiceQueryBuilder::class,
+            default => throw new \InvalidArgumentException('Invalid command or query'),
+        };
+
+        $this->attributeName = match ($commandOrQuery) {
+            self::COMMAND => CommandService::class,
+            self::QUERY => QueryService::class,
+            default => throw new \InvalidArgumentException('Invalid command or query'),
+        };
+
     }
 
     private function availableVOs(): array
     {
         $finder = (new Finder())
             ->files()
-            ->in('src/VO')
+            ->in(Str::sprintf('%s/VO', $this->rootDir))
             ->name('*.php')
             ->sortByName();
 
         $vos = [];
         foreach ($finder as $file) {
-            $namespace = u($file->getPathname())
-                ->replace('src/', '')
-                ->replace('/', '\\')
-                ->replace('.php', '')
-                ->toString();
-            $vos[] = $namespace;
+            $vos[] = Str::namespaceFromPath($file->getPathname(), $this->rootDir);
         }
         return $vos;
+    }
+
+    protected function configurations(string $namespace): array
+    {
+        $vo = Str::prefixByRootNamespace($this->vo, $this->rootNamespace);
+
+        return [
+            (new MakerConfig(
+                namespace: $namespace,
+                builder: $this->builder,
+            ))->withExtraProperty('vo', $vo),
+            (new MakerConfig(
+                namespace: $vo,
+                builder: AddAttributeBuilder::class,
+                extraProperties: [
+                    'serviceNamespace' => $namespace,
+                    'attributes' => [
+                        new Attribute($this->attributeName, [
+                            'serviceName' => new Literal(Str::classNameSemiColonFromNamespace($namespace))
+                        ])
+                    ],
+                ],
+            ))
+                ->withRoot($this->rootNamespace, $this->rootDir)
+                ->withTemplatePathFromNamespace(),
+        ];
+    }
+
+    public function configureDependencies(DependencyBuilder $dependencies): void
+    {
+        $deps = [
+            \Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag::class => 'symfony/dependency-injection',
+        ];
+
+        foreach ($deps as $class => $package) {
+            $dependencies->addClassDependency($class, $package);
+        }
     }
 }

@@ -3,27 +3,29 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Config;
 
+use Atournayre\Bundle\MakerBundle\Helper\Str;
+use Webmozart\Assert\Assert;
+
 class MakerConfig
 {
     public function __construct(
-        private string $rootNamespace = 'App',
-        private string $rootDir = '',
-        private readonly bool $enableApiPlatform = false,
-        private readonly bool $traitsCreateEntityId = false,
-        private readonly array $dtoProperties = [],
-        private readonly array $voProperties = [],
+        private string           $namespace,
+        private readonly string  $builder,
+        private string           $rootNamespace = 'App',
+        private string           $rootDir = '',
+        private readonly bool    $enableApiPlatform = false,
+        private readonly bool    $traitsCreateEntityId = false,
+        private readonly array   $dtoProperties = [],
+        private readonly array   $voProperties = [],
         private readonly ?string $voRelatedToAnEntity = null,
-        private readonly array $traitProperties = [],
-        private readonly bool $traitIsUsedByEntity = false,
-        private readonly bool $traitSeparateAccessors = false,
-        private array $extraProperties = [],
+        private readonly array   $traitProperties = [],
+        private readonly bool    $traitIsUsedByEntity = false,
+        private readonly bool    $traitSeparateAccessors = false,
+        private array            $extraProperties = [],
+        private readonly ?string $classnameSuffix = null,
+        private ?string          $templatePath = null,
     )
     {
-    }
-
-    public static function default(): self
-    {
-        return new self();
     }
 
     public function rootNamespace(): string
@@ -104,5 +106,60 @@ class MakerConfig
     public function hasExtraProperty(string $name): bool
     {
         return null !== $this->getExtraProperty($name);
+    }
+
+    public function namespace(): string
+    {
+        return $this->namespace;
+    }
+
+    public function classnameSuffix(): ?string
+    {
+        return $this->classnameSuffix;
+    }
+
+    public function generator(): string
+    {
+        return $this->builder;
+    }
+
+    public function templatePath(): ?string
+    {
+        return $this->templatePath;
+    }
+
+    public function hasTemplatePath(): bool
+    {
+        return null !== $this->templatePath;
+    }
+
+    public function withTemplatePathFromNamespace(): self
+    {
+        $config = clone $this;
+        $config->templatePath = Str::absolutePathFromNamespace($this->namespace, $this->rootNamespace, $this->rootDir);
+        return $config;
+    }
+
+    public function withVoEntityNamespace(): self
+    {
+        $namespace = Str::replace($this->namespace, '\\VO\\', '\\VO\\Entity\\');
+        $namespace = Str::replace($namespace, '\\Entity\\Entity\\', '\\Entity\\');
+
+        $config = clone $this;
+        $config->namespace = $namespace;
+        return $config;
+    }
+
+    public function withTemplatePath(string $templatePath): self
+    {
+        $absoluteTemplatePath = __DIR__.'/../Resources/templates/'.$templatePath;
+        Assert::fileExists($absoluteTemplatePath, 'Template file does not exist: '.$absoluteTemplatePath);
+
+        $config = clone $this;
+        $namespace = Str::prefixByRootNamespace(Str::namespaceFromPath($templatePath, $config->rootDir()), $config->rootNamespace());
+
+        $config->templatePath = $absoluteTemplatePath;
+        $config->namespace = $namespace;
+        return $config;
     }
 }

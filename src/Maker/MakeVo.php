@@ -4,33 +4,26 @@ declare(strict_types=1);
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
-use Atournayre\Bundle\MakerBundle\Generator\VoGenerator;
+use Atournayre\Bundle\MakerBundle\Helper\Str;
+use Atournayre\Bundle\MakerBundle\VO\Builder\VoForEntityBuilder;
+use Atournayre\Bundle\MakerBundle\VO\Builder\VoForObjectBuilder;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
-use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
-use Symfony\Bundle\MakerBundle\Maker\AbstractMaker;
-use Symfony\Bundle\MakerBundle\Str;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
-use function Symfony\Component\String\u;
 
 #[AutoconfigureTag('maker.command')]
 class MakeVo extends AbstractMaker
 {
     private array $voProperties = [];
     private ?string $voRelatedEntity = null;
-
-    public function __construct(
-        private readonly VoGenerator $voGenerator,
-    )
-    {
-    }
 
     public static function getCommandName(): string
     {
@@ -41,32 +34,7 @@ class MakeVo extends AbstractMaker
     {
         $command
             ->setDescription('Creates a new VO')
-            ->addArgument('name', InputArgument::REQUIRED, 'The name of the VO');
-    }
-
-    public function configureDependencies(DependencyBuilder $dependencies): void
-    {
-        // no-op
-    }
-
-    public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
-    {
-        $io->title('Creating new VO');
-        $path = 'VO';
-        $name = $input->getArgument('name');
-
-        $config = new MakerConfig(
-            voProperties: $this->voProperties,
-            voRelatedToAnEntity: $this->voRelatedEntity,
-        );
-
-        $this->voGenerator->generate($path, $name, $config);
-
-        $this->writeSuccessMessage($io);
-
-        foreach ($this->voGenerator->getGeneratedFiles() as $file) {
-            $io->text(sprintf('Created: %s', $file));
-        }
+            ->addArgument('namespace', InputArgument::REQUIRED, 'The namespace of the VO <fg=yellow>(e.g. App\\\\VO\\\\Dummy)</>');
     }
 
     public static function getCommandDescription(): string
@@ -135,6 +103,10 @@ class MakeVo extends AbstractMaker
         $voIsRelatedToEntity = $io->askQuestion($questionVoIsRelatedToEntity);
 
         if ('yes' === $voIsRelatedToEntity) {
+            if (empty($this->entities())) {
+                $io->error('No entity found in the Entity directory');
+                return;
+            }
             $questionVoRelatedEntity = new ChoiceQuestion('Choose the entity related to this VO', $this->entities());
             $this->voRelatedEntity = $io->askQuestion($questionVoRelatedEntity);
         }
@@ -191,21 +163,54 @@ class MakeVo extends AbstractMaker
 
     private function entities(): array
     {
+        $entityDirectory = Str::sprintf('%s/Entity', $this->rootDir);
+
+        $filesystem = new Filesystem();
+        if (!$filesystem->exists($entityDirectory)) {
+            return [];
+        }
+
         $finder = (new Finder())
             ->files()
-            ->in('src/Entity')
+            ->in($entityDirectory)
             ->name('*.php')
             ->sortByName();
 
         $entities = [];
         foreach ($finder as $file) {
-            $namespace = u($file->getPathname())
-                ->replace('src/', '')
-                ->replace('/', '\\')
-                ->replace('.php', '')
-                ->toString();
-            $entities[] = $namespace;
+            $entities[] = Str::namespaceFromPath($file->getPathname(), $this->rootDir);
         }
         return $entities;
+    }
+
+    protected function configurations(string $namespace): array
+    {
+        if ($this->voRelatedEntity) {
+            $configurations[] = (new MakerConfig(
+                namespace: $namespace,
+                builder: VoForEntityBuilder::class,
+                voProperties: $this->voProperties,
+                voRelatedToAnEntity: $this->voRelatedEntity,
+            ))->withVoEntityNamespace();
+        } else {
+            $configurations[] = new MakerConfig(
+                namespace: $namespace,
+                builder: VoForObjectBuilder::class,
+                voProperties: $this->voProperties
+            );
+        }
+
+        return $configurations ?? [];
+    }
+
+    public function configureDependencies(DependencyBuilder $dependencies): void
+    {
+        $deps = [
+            \Webmozart\Assert\Assert::class => 'webmozart/assert',
+        ];
+
+        foreach ($deps as $class => $package) {
+            $dependencies->addClassDependency($class, $package);
+        }
     }
 }

@@ -4,12 +4,10 @@ declare(strict_types=1);
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
-use Atournayre\Bundle\MakerBundle\Generator\DtoGenerator;
+use Atournayre\Bundle\MakerBundle\VO\Builder\DtoBuilder;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
-use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
-use Symfony\Bundle\MakerBundle\Maker\AbstractMaker;
 use Symfony\Bundle\MakerBundle\Str;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -22,12 +20,6 @@ class MakeDto extends AbstractMaker
 {
     private array $dtoProperties = [];
 
-    public function __construct(
-        private readonly DtoGenerator $dtoGenerator,
-    )
-    {
-    }
-
     public static function getCommandName(): string
     {
         return 'make:new:dto';
@@ -37,31 +29,7 @@ class MakeDto extends AbstractMaker
     {
         $command
             ->setDescription('Creates a new DTO')
-            ->addArgument('name', InputArgument::REQUIRED, 'The name of the DTO');
-    }
-
-    public function configureDependencies(DependencyBuilder $dependencies): void
-    {
-        // no-op
-    }
-
-    public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
-    {
-        $io->title('Creating new DTO');
-        $path = 'DTO';
-        $name = $input->getArgument('name');
-
-        $config = new MakerConfig(
-            dtoProperties: $this->dtoProperties
-        );
-
-        $this->dtoGenerator->generate($path, $name, $config);
-
-        $this->writeSuccessMessage($io);
-
-        foreach ($this->dtoGenerator->getGeneratedFiles() as $file) {
-            $io->text(sprintf('Created: %s', $file));
-        }
+            ->addArgument('namespace', InputArgument::REQUIRED, 'The namespace of the DTO <fg=yellow>(e.g. App\\\\DTO\\\\Dummy)</>');
     }
 
     public static function getCommandDescription(): string
@@ -185,5 +153,27 @@ class MakeDto extends AbstractMaker
             'boolean',
             'datetime',
         ];
+    }
+
+    protected function configurations(string $namespace): array
+    {
+        return [
+            new MakerConfig(
+                namespace: $namespace,
+                builder: DtoBuilder::class,
+                dtoProperties: $this->dtoProperties,
+            ),
+        ];
+    }
+
+    public function configureDependencies(DependencyBuilder $dependencies): void
+    {
+        $deps = [
+            \Webmozart\Assert\Assert::class => 'webmozart/assert',
+        ];
+
+        foreach ($deps as $class => $package) {
+            $dependencies->addClassDependency($class, $package);
+        }
     }
 }
