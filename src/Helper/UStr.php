@@ -98,4 +98,9 @@ class UStr
     {
         return u($string)->beforeLast('\\');
     }
+
+    public static function cleanNamespace(string $namespace): UnicodeString
+    {
+        return u($namespace)->replace('\\\\', '\\');
+    }
 }

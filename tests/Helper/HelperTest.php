@@ -379,4 +379,25 @@ class HelperTest extends TestCase
     {
         self::assertEquals($expected, Str::namespaceWithoutClassname($string));
     }
+
+    public static function dataProviderCleanNamespace(): array
+    {
+        return [
+            ['App\\DTO\\Dummy', 'App\DTO\Dummy'],
+            ['App\\DTO\\Sub\\Dummy', 'App\DTO\Sub\Dummy'],
+        ];
+    }
+
+    /**
+     * @dataProvider dataProviderCleanNamespace
+     * @covers       \Atournayre\Bundle\MakerBundle\Helper\Str::cleanNamespace
+     * @covers       \Atournayre\Bundle\MakerBundle\Helper\UStr::cleanNamespace
+     * @param string $namespace
+     * @param string $expected
+     * @return void
+     */
+    public function testCleanNamespace(string $namespace, string $expected): void
+    {
+        self::assertEquals($expected, Str::cleanNamespace($namespace));
+    }
 }

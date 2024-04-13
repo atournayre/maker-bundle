@@ -84,4 +84,9 @@ class Str
     {
         return UStr::namespaceWithoutClassname($string)->toString();
     }
+
+    public static function cleanNamespace(string $namespace): string
+    {
+        return UStr::cleanNamespace($namespace)->toString();
+    }
 }
