@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Config;
 
+use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Webmozart\Assert\Assert;
-use function Symfony\Component\String\u;
 
 class MakerConfig
 {
@@ -135,47 +135,29 @@ class MakerConfig
 
     public function withTemplatePathFromNamespace(): self
     {
-        $templatePath = u($this->rootDir)
-            ->append('/src/')
-            ->append($this->namespace)
-            ->append('.php')
-            ->replace('\\', '/')
-            ->toString();
-
         $config = clone $this;
-        $config->templatePath = $templatePath;
-
+        $config->templatePath = Str::absolutePathFromNamespace($this->namespace, $this->rootNamespace, $this->rootDir);
         return $config;
     }
 
     public function withVoEntityNamespace(): self
     {
-        $namespace = u($this->namespace)
-            ->replace('\\VO\\', '\\VO\\Entity\\')
-        ;
+        $namespace = Str::replace($this->namespace, '\\VO\\', '\\VO\\Entity\\');
+        $namespace = Str::replace($namespace, '\\Entity\\Entity\\', '\\Entity\\');
 
         $config = clone $this;
-        $config->namespace = $namespace->toString();
+        $config->namespace = $namespace;
         return $config;
     }
 
     public function withTemplatePath(string $templatePath): self
     {
-        $absoluteTemplatePath = u($templatePath)
-            ->prepend(__DIR__.'/../Resources/templates/')
-            ->toString()
-        ;
-
+        $absoluteTemplatePath = __DIR__.'/../Resources/templates/'.$templatePath;
         Assert::fileExists($absoluteTemplatePath, 'Template file does not exist: '.$absoluteTemplatePath);
 
-        $namespace = u($templatePath)
-            ->beforeLast('.php')
-            ->prepend($this->rootNamespace().'\\')
-            ->replace('/', '\\\\')
-            ->replace('\\\\', '\\')
-            ->toString();
-
         $config = clone $this;
+        $namespace = Str::prefixByRootNamespace(Str::namespaceFromPath($templatePath, $config->rootDir()), $config->rootNamespace());
+
         $config->templatePath = $absoluteTemplatePath;
         $config->namespace = $namespace;
         return $config;
