@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\VO\Builder;
 
+use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\Property;
 use Webmozart\Assert\Assert;
-use function Symfony\Component\String\u;
 
 class TraitForEntityBuilder extends AbstractBuilder
 {
@@ -50,10 +50,7 @@ class TraitForEntityBuilder extends AbstractBuilder
         $traitProperties = $clone->fileDefinition->configuration()->traitProperties();
 
         foreach ($traitProperties as $property) {
-            $fieldName = u($property['fieldName'])->camel()->toString();
-            $set = u($fieldName)->title()->prepend('set')->camel()->toString();
-
-            $method = new Method($set);
+            $method = new Method(Str::setter($property['fieldName']));
             $method->setPublic()
                 ->setReturnType('self')
                 ->addParameter($property['fieldName'])
@@ -80,7 +77,7 @@ class TraitForEntityBuilder extends AbstractBuilder
 
         foreach ($traitProperties as $property) {
             if (!$property['nullable']) {
-                $fieldName = u($property['fieldName'])->camel()->toString();
+                $fieldName = Str::property($property['fieldName']);
                 $method = new Method($fieldName);
                 $method->setPublic()
                     ->setReturnType($property['type'])
@@ -95,8 +92,7 @@ class TraitForEntityBuilder extends AbstractBuilder
                 $class->addMember($method);
             }
 
-            $fieldName = u($property['fieldName'])->camel()->title()->prepend('get')->toString();
-            $method = new Method($fieldName);
+            $method = new Method(Str::getter($property['fieldName']));
             $method->setPublic()
                 ->setReturnType($property['type'])
                 ->setReturnNullable()
@@ -129,12 +125,12 @@ class TraitForEntityBuilder extends AbstractBuilder
         Assert::inArray(
             $type,
             array_keys($this->correspondingTypes()),
-            sprintf('Property "%s" should be of type %s; %s given', $fieldNameRaw, implode(', ', array_keys($this->correspondingTypes())), $type)
+            Str::sprintf('Property "%s" should be of type %s; %s given', $fieldNameRaw, Str::implode(', ', array_keys($this->correspondingTypes())), $type)
         );
 
         $propertyType = $this->correspondingTypes()[$type];
 
-        $fieldName = u($fieldNameRaw)->camel()->toString();
+        $fieldName = Str::property($fieldNameRaw);
 
         $property = new Property($fieldName);
         $property->setPrivate()

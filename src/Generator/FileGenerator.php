@@ -12,7 +12,7 @@ use Webmozart\Assert\Assert;
 class FileGenerator
 {
     public function __construct(
-        #[Autowire('%kernel.project_dir%')]
+        #[Autowire('%kernel.project_dir%/src')]
         private readonly string   $rootDir,
         #[Autowire('%atournayre_maker.root_namespace%')]
         private readonly string   $rootNamespace,

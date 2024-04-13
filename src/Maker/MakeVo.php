@@ -4,12 +4,12 @@ declare(strict_types=1);
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
+use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\Builder\VoForEntityBuilder;
 use Atournayre\Bundle\MakerBundle\VO\Builder\VoForObjectBuilder;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
-use Symfony\Bundle\MakerBundle\Str;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -18,7 +18,6 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
-use function Symfony\Component\String\u;
 
 #[AutoconfigureTag('maker.command')]
 class MakeVo extends AbstractMaker
@@ -105,7 +104,7 @@ class MakeVo extends AbstractMaker
 
         if ('yes' === $voIsRelatedToEntity) {
             if (empty($this->entities())) {
-                $io->error('No entity found in the src/Entity directory');
+                $io->error('No entity found in the Entity directory');
                 return;
             }
             $questionVoRelatedEntity = new ChoiceQuestion('Choose the entity related to this VO', $this->entities());
@@ -164,25 +163,22 @@ class MakeVo extends AbstractMaker
 
     private function entities(): array
     {
+        $entityDirectory = Str::sprintf('%s/Entity', $this->rootDir);
+
         $filesystem = new Filesystem();
-        if (!$filesystem->exists('src/Entity')) {
+        if (!$filesystem->exists($entityDirectory)) {
             return [];
         }
 
         $finder = (new Finder())
             ->files()
-            ->in('src/Entity')
+            ->in($entityDirectory)
             ->name('*.php')
             ->sortByName();
 
         $entities = [];
         foreach ($finder as $file) {
-            $namespace = u($file->getPathname())
-                ->replace('src/', '')
-                ->replace('/', '\\')
-                ->replace('.php', '')
-                ->toString();
-            $entities[] = $namespace;
+            $entities[] = Str::namespaceFromPath($file->getPathname(), $this->rootDir);
         }
         return $entities;
     }

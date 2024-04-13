@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\VO\Builder;
 
+use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\Property;
 use Webmozart\Assert\Assert;
-use function Symfony\Component\String\u;
 
 class DtoBuilder extends AbstractBuilder
 {
@@ -47,7 +47,7 @@ class DtoBuilder extends AbstractBuilder
         Assert::inArray(
             $propertyDatas['type'],
             array_keys(self::correspondingTypes()),
-            sprintf('Property "%s" should be of type %s; %s given', $propertyDatas['fieldName'], implode(', ', array_keys(self::correspondingTypes())), $propertyDatas['type'])
+            Str::sprintf('Property "%s" should be of type %s; %s given', $propertyDatas['fieldName'], Str::implode(', ', array_keys(self::correspondingTypes())), $propertyDatas['type'])
         );
 
         $property = new Property($propertyDatas['fieldName']);
@@ -94,7 +94,7 @@ class DtoBuilder extends AbstractBuilder
         $bodyParts = [];
         $bodyParts[] = '$dto = new self();';
         foreach ($properties as $property) {
-            $bodyParts[] = sprintf('$dto->%s = $data[\'%s\'];', $property['fieldName'], $property['fieldName']);
+            $bodyParts[] = Str::sprintf('$dto->%s = $data[\'%s\'];', $property['fieldName'], $property['fieldName']);
         }
         $bodyParts[] = '';
         $bodyParts[] = 'return $dto;';
@@ -125,10 +125,10 @@ class DtoBuilder extends AbstractBuilder
                 'datetime' => "null === \$this->{$property['fieldName']}",
                 default => "'' == \$this->{$property['fieldName']}",
             };
-            $fieldName = u($property['fieldName'])->camel()->toString();
-            $dtoName = u($class->getName())->camel()->toString();
+            $fieldName = Str::property($property['fieldName']);
+            $dtoName = Str::asCamelCase($class->getName());
 
-            $validationErrors[] = sprintf($if, $ifTest, $fieldName, $dtoName, $fieldName);
+            $validationErrors[] = Str::sprintf($if, $ifTest, $fieldName, $dtoName, $fieldName);
         }
 
         $errors = '$errors = [];
@@ -139,10 +139,12 @@ class DtoBuilder extends AbstractBuilder
 
 return $errors;';
 
+        $body = Str::sprintf($errors, Str::implode("\n", $validationErrors));
+
         $method = (new Method('validate'))
             ->setPublic()
             ->setReturnType('array')
-            ->setBody(sprintf($errors, implode("\n", $validationErrors)));
+            ->setBody($body);
 
         $class->addMember($method);
 

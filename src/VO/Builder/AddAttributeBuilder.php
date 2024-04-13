@@ -8,15 +8,12 @@ use Nette\PhpGenerator\Attribute;
 
 class AddAttributeBuilder extends AbstractBuilder
 {
-    public static function build(FileDefinition $fileDefinition): self
+    public static function build(FileDefinition $fileDefinition): self|FromTemplateBuilder
     {
-        $config = $fileDefinition->configuration();
-        $file = $fileDefinition->toPhpFile();
-
-        $self = (new self($fileDefinition))
-            ->withFile($file);
+        $self = FromTemplateBuilder::build($fileDefinition);
         $class = $self->getClass();
 
+        $config = $fileDefinition->configuration();
         $serviceNamespace = $config->getExtraProperty('serviceNamespace');
         $attributes = $config->getExtraProperty('attributes');
 

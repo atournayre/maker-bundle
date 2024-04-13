@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\VO\Builder;
 
+use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\Property;
 use Webmozart\Assert\Assert;
-use function Symfony\Component\String\u;
 
 class VoForObjectBuilder extends AbstractBuilder
 {
@@ -119,12 +119,12 @@ class VoForObjectBuilder extends AbstractBuilder
         Assert::inArray(
             $type,
             array_keys($this->correspondingTypes()),
-            sprintf('Property "%s" should be of type %s; %s given', $fieldNameRaw, implode(', ', array_keys($this->correspondingTypes())), $type)
+            Str::sprintf('Property "%s" should be of type %s; %s given', $fieldNameRaw, Str::implode(', ', array_keys($this->correspondingTypes())), $type)
         );
 
         $propertyType = $this->correspondingTypes()[$type];
 
-        $fieldName = u($fieldNameRaw)->camel()->toString();
+        $fieldName = Str::property($fieldNameRaw);
 
         $property = new Property($fieldName);
         $property->setPrivate()->setType($propertyType);
@@ -149,9 +149,7 @@ class VoForObjectBuilder extends AbstractBuilder
     {
         $propertyType = $this->correspondingTypes()[$property['type']];
 
-        $fieldName = u($property['fieldName'])->camel()->toString();
-
-        return (new Method(u($fieldName)->camel()->toString()))
+        return (new Method(Str::property($property['fieldName'])))
             ->setPublic()
             ->setReturnType($propertyType)
             ->setBody('return $this->' . $property['fieldName'] . ';');
@@ -175,11 +173,9 @@ class VoForObjectBuilder extends AbstractBuilder
     {
         $propertyType = $this->correspondingTypes()[$property['type']];
 
-        $fieldName = u($property['fieldName'])->camel()->toString();
+        $fieldName = Str::property($property['fieldName']);
 
-        $with = u($fieldName)->title()->prepend('with')->camel()->toString();
-
-        $method = new Method($with);
+        $method = new Method(Str::wither($fieldName));
         $method
             ->setPublic()
             ->setReturnType('self')

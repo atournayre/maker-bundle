@@ -8,6 +8,7 @@ use App\Contracts\Service\PostConditionsChecksInterface;
 use App\Contracts\Service\PreConditionsChecksInterface;
 use App\Contracts\Service\TagCommandServiceInterface;
 use App\Exception\FailFast;
+use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
 use Nette\PhpGenerator\Attribute;
 use Nette\PhpGenerator\ClassType;
@@ -21,7 +22,7 @@ class ServiceCommandBuilder extends AbstractBuilder
     public static function build(FileDefinition $fileDefinition): self
     {
         $config = $fileDefinition->configuration();
-        $voParameter = $config->rootNamespace() . '\\' . $config->getExtraProperty('vo');
+        $voParameter = Str::prefixByRootNamespace($config->getExtraProperty('vo'), $config->rootNamespace());
 
         $file = new PhpFile;
         $file->addComment('This file has been auto-generated');
@@ -37,11 +38,16 @@ class ServiceCommandBuilder extends AbstractBuilder
             ->withUse(\Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag::class)
             ->withUse(\App\Contracts\Service\TagCommandServiceInterface::class)
             ->withUse($voParameter)
+            ->withUse(PreConditionsChecksInterface::class)
+            ->withUse(FailFastInterface::class)
+            ->withUse(TagCommandServiceInterface::class)
+            ->withUse(PostConditionsChecksInterface::class)
+            ->withUse(\App\VO\Context::class)
             ->withAttributes()
-            ->withImplementationOfInterface(PreConditionsChecksInterface::class)
-            ->withImplementationOfInterface(FailFastInterface::class)
-            ->withImplementationOfInterface(TagCommandServiceInterface::class)
-            ->withImplementationOfInterface(PostConditionsChecksInterface::class)
+            ->withImplementationOfInterface(PreConditionsChecksInterface::class, $voParameter)
+            ->withImplementationOfInterface(FailFastInterface::class, $voParameter)
+            ->withImplementationOfInterface(TagCommandServiceInterface::class, $voParameter)
+            ->withImplementationOfInterface(PostConditionsChecksInterface::class, $voParameter)
             ->withInvoke()
         ;
     }
@@ -76,11 +82,10 @@ class ServiceCommandBuilder extends AbstractBuilder
         return $clone;
     }
 
-    private function withImplementationOfInterface(string $interface): self
+    private function withImplementationOfInterface(string $interface, string $objectType): self
     {
         $clone = clone $this;
         $class = $clone->getClass();
-        $objectType = $clone->fileDefinition->classname();
 
         $class->addImplement($interface);
 
@@ -100,7 +105,7 @@ class ServiceCommandBuilder extends AbstractBuilder
         return (new Method($sourceMethod->getName()))
             ->setPublic()
             ->addComment($sourceMethod->getComment())
-            ->addComment('@param '.$objectType.' $object')
+            ->addComment('@param '.Str::classNameFromNamespace($objectType, '').' $object')
             ->setReturnType($sourceMethod->getReturnType())
             ->setParameters($sourceMethod->getParameters());
     }

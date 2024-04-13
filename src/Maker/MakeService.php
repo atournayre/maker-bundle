@@ -6,6 +6,7 @@ namespace Atournayre\Bundle\MakerBundle\Maker;
 use App\Attribute\CommandService;
 use App\Attribute\QueryService;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
+use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\Builder\AddAttributeBuilder;
 use Atournayre\Bundle\MakerBundle\VO\Builder\ServiceCommandBuilder;
 use Atournayre\Bundle\MakerBundle\VO\Builder\ServiceQueryBuilder;
@@ -21,7 +22,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\Finder\Finder;
-use function Symfony\Component\String\u;
 
 #[AutoconfigureTag('maker.command')]
 class MakeService extends AbstractMaker
@@ -93,37 +93,34 @@ class MakeService extends AbstractMaker
     {
         $finder = (new Finder())
             ->files()
-            ->in('src/VO')
+            ->in(Str::sprintf('%s/VO', $this->rootDir))
             ->name('*.php')
             ->sortByName();
 
         $vos = [];
         foreach ($finder as $file) {
-            $namespace = u($file->getPathname())
-                ->replace('src/', '')
-                ->replace('/', '\\')
-                ->replace('.php', '')
-                ->toString();
-            $vos[] = $namespace;
+            $vos[] = Str::namespaceFromPath($file->getPathname(), $this->rootDir);
         }
         return $vos;
     }
 
     protected function configurations(string $namespace): array
     {
+        $vo = Str::prefixByRootNamespace($this->vo, $this->rootNamespace);
+
         return [
             (new MakerConfig(
                 namespace: $namespace,
                 builder: $this->builder,
-            ))->withExtraProperty('vo', $this->vo),
+            ))->withExtraProperty('vo', $vo),
             (new MakerConfig(
-                namespace: $this->vo,
+                namespace: $vo,
                 builder: AddAttributeBuilder::class,
                 extraProperties: [
                     'serviceNamespace' => $namespace,
                     'attributes' => [
                         new Attribute($this->attributeName, [
-                            'serviceName' => new Literal(u($namespace)->afterLast('\\')->append('::class')->toString())
+                            'serviceName' => new Literal(Str::classNameSemiColonFromNamespace($namespace))
                         ])
                     ],
                 ],

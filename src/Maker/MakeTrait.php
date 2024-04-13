@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
+use Atournayre\Bundle\MakerBundle\Helper\UStr;
 use Atournayre\Bundle\MakerBundle\VO\Builder\TraitForEntityBuilder;
 use Atournayre\Bundle\MakerBundle\VO\Builder\TraitForObjectBuilder;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
@@ -16,7 +17,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
-use function Symfony\Component\String\u;
 
 #[AutoconfigureTag('maker.command')]
 class MakeTrait extends AbstractMaker
@@ -47,7 +47,7 @@ class MakeTrait extends AbstractMaker
 
     protected function configurations(string $namespace): array
     {
-        $namespace = u($namespace)->trimEnd('Trait');
+        $namespace = UStr::trimNamespaceEnd($namespace, 'Trait');
 
         if ($this->traitIsUsedByEntity) {
             $suffix = 'EntityTrait';

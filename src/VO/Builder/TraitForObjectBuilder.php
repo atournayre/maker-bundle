@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\VO\Builder;
 
+use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\Property;
 use Webmozart\Assert\Assert;
-use function Symfony\Component\String\u;
 
 class TraitForObjectBuilder extends AbstractBuilder
 {
@@ -33,7 +33,7 @@ class TraitForObjectBuilder extends AbstractBuilder
         $traitProperties = $clone->fileDefinition->configuration()->traitProperties();
 
         foreach ($traitProperties as $property) {
-            $fieldName = u($property['fieldName'])->camel()->toString();
+            $fieldName = Str::property($property['fieldName']);
             $propertyType = $this->correspondingTypes()[$property['type']];
 
             $method = new Method($fieldName);
@@ -56,11 +56,10 @@ class TraitForObjectBuilder extends AbstractBuilder
         $traitProperties = $clone->fileDefinition->configuration()->traitProperties();
 
         foreach ($traitProperties as $property) {
-            $fieldName = u($property['fieldName'])->camel()->toString();
-            $with = u($fieldName)->title()->prepend('with')->camel()->toString();
+            $fieldName = Str::property($property['fieldName']);
             $propertyType = $this->correspondingTypes()[$property['type']];
 
-            $method = new Method($with);
+            $method = new Method(Str::wither($fieldName));
             $method->setPublic()
                 ->setReturnType('self')
                 ->addParameter($property['fieldName'])
@@ -101,14 +100,12 @@ class TraitForObjectBuilder extends AbstractBuilder
         Assert::inArray(
             $type,
             array_keys($this->correspondingTypes()),
-            sprintf('Property "%s" should be of type %s; %s given', $fieldNameRaw, implode(', ', array_keys($this->correspondingTypes())), $type)
+            Str::sprintf('Property "%s" should be of type %s; %s given', $fieldNameRaw, Str::implode(', ', array_keys($this->correspondingTypes())), $type)
         );
 
         $propertyType = $this->correspondingTypes()[$type];
 
-        $fieldName = u($fieldNameRaw)->camel()->toString();
-
-        $property = new Property($fieldName);
+        $property = new Property(Str::property($fieldNameRaw));
         $property->setPrivate()->setType($propertyType)->setNullable($nullable);
 
         if ($nullable) {

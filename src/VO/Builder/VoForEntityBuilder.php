@@ -3,13 +3,14 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\VO\Builder;
 
+use Atournayre\Bundle\MakerBundle\Helper\Str;
+use Atournayre\Bundle\MakerBundle\Helper\UStr;
 use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\Property;
 use Symfony\Component\String\UnicodeString;
 use Webmozart\Assert\Assert;
-use function Symfony\Component\String\u;
 
 class VoForEntityBuilder extends AbstractBuilder
 {
@@ -36,9 +37,7 @@ class VoForEntityBuilder extends AbstractBuilder
     private static function entityNamespace(FileDefinition $fileDefinition): UnicodeString
     {
         $config = $fileDefinition->configuration();
-        return u($config->voRelatedToAnEntity())
-            ->ensureStart($config->rootNamespace() . '\\')
-            ->prepend('\\');
+        return UStr::prefixByRootNamespace($config->voRelatedToAnEntity(), $config->rootNamespace());
     }
 
     private function withGetters(): self
@@ -58,9 +57,7 @@ class VoForEntityBuilder extends AbstractBuilder
     {
         $propertyType = $this->correspondingTypes()[$property['type']];
 
-        $fieldName = u($property['fieldName'])->camel()->toString();
-
-        return (new Method(u($fieldName)->camel()->toString()))
+        return (new Method(Str::property($property['fieldName'])))
             ->setPublic()
             ->setReturnType($propertyType)
             ->setBody('return $this->' . $property['fieldName'] . ';');
@@ -98,14 +95,12 @@ class VoForEntityBuilder extends AbstractBuilder
         Assert::inArray(
             $type,
             array_keys($this->correspondingTypes()),
-            sprintf('Property "%s" should be of type %s; %s given', $fieldNameRaw, implode(', ', array_keys($this->correspondingTypes())), $type)
+            Str::sprintf('Property "%s" should be of type %s; %s given', $fieldNameRaw, Str::implode(', ', array_keys($this->correspondingTypes())), $type)
         );
 
         $propertyType = $this->correspondingTypes()[$type];
 
-        $fieldName = u($fieldNameRaw)->camel()->toString();
-
-        $property = new Property($fieldName);
+        $property = new Property(Str::property($fieldNameRaw));
         $property->setPrivate()->setType($propertyType);
 
         return $property;
@@ -131,15 +126,8 @@ class VoForEntityBuilder extends AbstractBuilder
         $method->addBody('$self = new self();');
 
         foreach ($properties as $property) {
-            $line = u($property['fieldName'])
-                ->title()
-                ->prepend('->get')
-                ->prepend(' = $' . $entityName)
-                ->prepend($property['fieldName'])
-                ->prepend('// $self->')
-                ->append('();')
-                ->toString();
-
+            $linePattern = '// $self->%s = $%s->%s();';
+            $line = Str::sprintf($linePattern, $property['fieldName'], $entityName, Str::getter($property['fieldName']));
             $method->addBody($line);
         }
 
