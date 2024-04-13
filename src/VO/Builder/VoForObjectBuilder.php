@@ -86,10 +86,7 @@ class VoForObjectBuilder extends AbstractBuilder
 
         $selfContent = implode(', $', array_column($properties, 'fieldName'));
 
-        foreach ($properties as $property) {
-            $method->addBody('Assert::' . $property['type'] . '($' . $property['fieldName'] . ');');
-        }
-
+        $method->addBody('// Add assertions');
         $method->addBody('');
         $method->addBody('return new self(' . ($selfContent ? '$'.$selfContent : '') . ');');
 
