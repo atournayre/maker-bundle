@@ -29,7 +29,7 @@ class MakeDto extends AbstractMaker
     {
         $command
             ->setDescription('Creates a new DTO')
-            ->addArgument('namespace', InputArgument::REQUIRED, 'The namespace of the DTO <fg=yellow>(e.g. App\\DTO\\Dummy)</>');
+            ->addArgument('namespace', InputArgument::REQUIRED, 'The namespace of the DTO <fg=yellow>(e.g. App\\\\DTO\\\\Dummy)</>');
     }
 
     public static function getCommandDescription(): string
