@@ -358,4 +358,25 @@ class HelperTest extends TestCase
     {
         self::assertEquals($expected, Str::replace($string, $from, $to));
     }
+
+    public static function dataProviderNamespaceWithoutClassname(): array
+    {
+        return [
+            ['App\DTO\Dummy', 'App\DTO'],
+            ['App\DTO\Sub\Dummy', 'App\DTO\Sub'],
+        ];
+    }
+
+    /**
+     * @dataProvider dataProviderNamespaceWithoutClassname
+     * @covers       \Atournayre\Bundle\MakerBundle\Helper\Str::namespaceWithoutClassname
+     * @covers       \Atournayre\Bundle\MakerBundle\Helper\UStr::namespaceWithoutClassname
+     * @param string $string
+     * @param string $expected
+     * @return void
+     */
+    public function testNamespaceWithoutClassname(string $string, string $expected): void
+    {
+        self::assertEquals($expected, Str::namespaceWithoutClassname($string));
+    }
 }

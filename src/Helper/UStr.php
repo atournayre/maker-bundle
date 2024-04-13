@@ -93,4 +93,9 @@ class UStr
     {
         return u($string)->replace($from, $to);
     }
+
+    public static function namespaceWithoutClassname(string $string): UnicodeString
+    {
+        return u($string)->beforeLast('\\');
+    }
 }

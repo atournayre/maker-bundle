@@ -79,4 +79,9 @@ class Str
     {
         return UStr::replace($search, $replace, $subject)->toString();
     }
+
+    public static function namespaceWithoutClassname(string $string): string
+    {
+        return UStr::namespaceWithoutClassname($string)->toString();
+    }
 }
