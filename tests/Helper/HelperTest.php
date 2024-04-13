@@ -6,6 +6,12 @@ namespace Atournayre\Bundle\MakerBundle\Tests\Helper;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @coversDefaultClass \Atournayre\Bundle\MakerBundle\Helper\Str
+ * @coversDefaultClass \Atournayre\Bundle\MakerBundle\Helper\UStr
+ * @group Unit
+ * @group Helper
+ */
 class HelperTest extends TestCase
 {
     public static function dataProviderClassNameFromNamespace(): array
@@ -13,6 +19,7 @@ class HelperTest extends TestCase
         return [
             ['App\DTO\Dummy', '', 'Dummy'],
             ['App\DTO\Sub\Dummy', '', 'Dummy'],
+            ['App\DTO\Sub\Dummy', null, 'Dummy'],
         ];
     }
 
@@ -25,7 +32,7 @@ class HelperTest extends TestCase
      * @param string $expected
      * @return void
      */
-    public function testClassNameFromNamespace(string $namespace, string $suffix, string $expected): void
+    public function testClassNameFromNamespace(string $namespace, ?string $suffix, string $expected): void
     {
         self::assertEquals($expected, Str::classNameFromNamespace($namespace, $suffix));
     }

@@ -12,7 +12,7 @@ class UStr
     {
         return u($namespace)
             ->afterLast('\\')
-            ->ensureEnd($suffix);
+            ->ensureEnd($suffix ?? '');
     }
 
     public static function absolutePathFromNamespace(string $namespace, string $rootNamespace, string $rootDirectory, ?string $extension = null): UnicodeString
