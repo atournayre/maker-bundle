@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Atournayre\Bundle\MakerBundle\VO;
 
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
+use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Nette\PhpGenerator\PhpFile;
 use Webmozart\Assert\Assert;
 use function Symfony\Component\String\u;
@@ -33,15 +34,30 @@ class FileDefinition
         return $fileDefinition->fromTemplatePath();
     }
 
+    private function generateEmptyClassFromTemplatePath(string $templatePath): string
+    {
+        $classname = Str::namespaceFromPath($this->configuration->templatePath(), $this->configuration->rootDir());
+        $namespace = Str::prefixByRootNamespace($classname, $this->configuration->rootNamespace());
+        $phpFile = new PhpFile;
+        $phpFile->addComment('This file has been auto-generated');
+        $phpFile->addComment(Str::sprintf('Template "%s" not found, creating an empty file', $templatePath));
+        $phpFile->addClass($namespace);
+
+        return (string)$phpFile;
+    }
+
     private function fromTemplatePath(): self
     {
-        $content = file_get_contents($this->configuration->templatePath());
+        $templateExists = file_exists($this->configuration->templatePath());
+
+        $content = $templateExists
+            ? file_get_contents($this->configuration->templatePath())
+            : $this->generateEmptyClassFromTemplatePath($this->configuration->templatePath());
+
         $phpFile = PhpFile::fromCode($content)
-            ->addComment('This file has been auto-generated')
-        ;
-        return $this
-            ->withSourceCode((string)$phpFile)
-            ;
+            ->addComment('This file has been auto-generated');
+
+        return $this->withSourceCode((string)$phpFile);
     }
 
     private static function fromConfig(MakerConfig $config): self
@@ -49,30 +65,20 @@ class FileDefinition
         Assert::notEmpty($config->rootDir(), 'Root directory must be set in MakerConfig');
         Assert::notEmpty($config->namespace(), 'Namespace must be set in MakerConfig');
 
-        $namespace = u($config->namespace())
-            ->ensureStart($config->rootNamespace().'\\')
-            ->replace('/', '\\')
-            ->beforeLast('\\');
-        $classnameSuffix = $config->classnameSuffix() ?? '';
+        $namespace = u($config->namespace());
+        $namespaceWithoutClassName = $namespace->beforeLast('\\');
+        $classname = $namespace->afterLast('\\');
 
-        $classname = u($config->namespace())
-            ->afterLast('\\')
-            ->ensureEnd($classnameSuffix)
-        ;
-
-        $rootDir = u($config->rootDir())->ensureEnd('/src/');
-
-        $absolutePath = u($config->namespace())
-            ->replace($config->rootNamespace(), $rootDir->toString())
-            ->replace('\\', '/')
-            ->replace('//', '/')
-            ->append('.php')
-        ;
+        $absolutePath = Str::absolutePathFromNamespace(
+            $config->namespace(),
+            $config->rootNamespace(),
+            $config->rootDir()
+        );
 
         return new self(
-            $namespace->toString(),
+            $namespaceWithoutClassName->toString(),
             $classname->toString(),
-            $absolutePath->toString(),
+            $absolutePath,
             $config->generator(),
             $config,
         );

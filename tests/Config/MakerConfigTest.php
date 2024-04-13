@@ -237,9 +237,9 @@ class MakerConfigTest extends TestCase
         self::assertTrue($config->hasTemplatePath());
     }
 
-    public function testTraitConfiguration(): void
+    public function testEntityTraitConfiguration(): void
     {
-        $config = MakerConfigTestHelper::trait();
+        $config = MakerConfigTestHelper::entityTrait();
 
         self::assertSame('App', $config->rootNamespace());
         self::assertSame('/srv/app/src', $config->rootDir());
@@ -265,9 +265,9 @@ class MakerConfigTest extends TestCase
         self::assertFalse($config->hasTemplatePath());
     }
 
-    public function testEntityTraitConfiguration(): void
+    public function testTraitConfiguration(): void
     {
-        $config = MakerConfigTestHelper::entityTrait();
+        $config = MakerConfigTestHelper::trait();
 
         self::assertSame('App', $config->rootNamespace());
         self::assertSame('/srv/app/src', $config->rootDir());

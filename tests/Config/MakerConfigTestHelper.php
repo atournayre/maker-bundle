@@ -131,7 +131,7 @@ class MakerConfigTestHelper
             ->withTemplatePathFromNamespace();
     }
 
-    public static function trait(): MakerConfig
+    public static function entityTrait(): MakerConfig
     {
         return new MakerConfig(
             namespace: 'App\Trait\DummyEntityTrait',
@@ -149,7 +149,7 @@ class MakerConfigTestHelper
         );
     }
 
-    public static function entityTrait(): MakerConfig
+    public static function trait(): MakerConfig
     {
         return new MakerConfig(
             namespace: 'App\Trait\DummyTrait',
