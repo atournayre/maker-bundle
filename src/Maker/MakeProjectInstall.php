@@ -71,6 +71,7 @@ class MakeProjectInstall extends AbstractMaker
             'Contracts/Session/FlashBagInterface.php',
             'Contracts/Templating/TemplatingInterface.php',
             'Contracts/Type/Primitive/ScalarObjectInterface.php',
+            'Controller/AbstractControllerWithForm.php',
             'Logger/AbstractLogger.php',
             'Logger/DefaultLogger.php',
             'Logger/NullLogger.php',
