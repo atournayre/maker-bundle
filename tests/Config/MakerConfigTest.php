@@ -5,6 +5,7 @@ namespace Atournayre\Bundle\MakerBundle\Tests\Config;
 
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 use Atournayre\Bundle\MakerBundle\VO\Builder\AddAttributeBuilder;
+use Atournayre\Bundle\MakerBundle\VO\Builder\ControllerBuilder;
 use Atournayre\Bundle\MakerBundle\VO\Builder\DtoBuilder;
 use Atournayre\Bundle\MakerBundle\VO\Builder\ExceptionBuilder;
 use Atournayre\Bundle\MakerBundle\VO\Builder\InterfaceBuilder;
@@ -347,5 +348,34 @@ class MakerConfigTest extends TestCase
         self::assertSame(VoForObjectBuilder::class, $config->generator());
         self::assertNull($config->templatePath());
         self::assertFalse($config->hasTemplatePath());
+    }
+
+    public function testControllerConfiguration()
+    {
+        $config = MakerConfigTestHelper::controller();
+
+        self::assertSame('App', $config->rootNamespace());
+        self::assertSame('/srv/app/src', $config->rootDir());
+        self::assertFalse($config->isEnableApiPlatform());
+        self::assertFalse($config->isTraitsCreateEntityId());
+        self::assertSame([], $config->dtoProperties());
+        self::assertSame([], $config->voProperties());
+        self::assertNull($config->voRelatedToAnEntity());
+        self::assertSame([], $config->traitProperties());
+        self::assertFalse($config->traitIsUsedByEntity());
+        self::assertFalse($config->traitSeparateAccessors());
+        self::assertSame([
+            'entity' => 'App\Entity\Dummy',
+            'formType' => 'App\Form\DummyType',
+            'vo' => 'App\VO\Dummy',
+        ], $config->extraProperties());
+        self::assertTrue($config->hasExtraProperty('entity'));
+        self::assertTrue($config->hasExtraProperty('formType'));
+        self::assertTrue($config->hasExtraProperty('vo'));
+        self::assertSame('App\Controller\DummyController', $config->namespace());
+        self::assertNull($config->classnameSuffix());
+        self::assertSame(ControllerBuilder::class, $config->generator());
+        self::assertSame('Controller/WithFormController.php', $config->templatePath());
+        self::assertTrue($config->hasTemplatePath());
     }
 }

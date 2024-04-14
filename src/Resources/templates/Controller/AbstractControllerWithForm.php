@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Atournayre\Bundle\MakerBundle\Resources\templates\Controller;
+namespace App\Controller;
 
 use App\Contracts\Logger\LoggerInterface;
 use App\Contracts\Response\ResponseInterface;
@@ -47,7 +47,7 @@ abstract class AbstractControllerWithForm
         }
     }
 
-    abstract protected function createVo($entity, Context $context): mixed;
+    abstract protected function createVo($entity, Context $context);
 
     abstract protected function createForm($data = null): FormInterface;
 

@@ -15,7 +15,7 @@ abstract class AbstractBuilder
     protected PhpFile $file;
 
     protected function __construct(
-        protected readonly FileDefinition $fileDefinition,
+        protected FileDefinition $fileDefinition,
     )
     {
     }
@@ -47,6 +47,14 @@ abstract class AbstractBuilder
 
         $namespace = $class->getNamespace();
         $namespace->addUse($classname, $alias);
+
+        return $clone;
+    }
+
+    protected function withFileDefinition(FileDefinition $fileDefinition): self
+    {
+        $clone = clone $this;
+        $clone->fileDefinition = $fileDefinition;
 
         return $clone;
     }

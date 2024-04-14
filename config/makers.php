@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 
+use Atournayre\Bundle\MakerBundle\Maker\MakeController;
 use Atournayre\Bundle\MakerBundle\Maker\MakeDto;
 use Atournayre\Bundle\MakerBundle\Maker\MakeException;
 use Atournayre\Bundle\MakerBundle\Maker\MakeInterface;
@@ -17,9 +18,8 @@ return static function (ContainerConfigurator $container): void {
     $services
         ->defaults()
         ->private()
-        ->autowire();
-
-    $services
+        ->autowire()
+        ->set(MakeController::class)->tag('maker.command')
         ->set(MakeDto::class)->tag('maker.command')
         ->set(MakeException::class)->tag('maker.command')
         ->set(MakeInterface::class)->tag('maker.command')

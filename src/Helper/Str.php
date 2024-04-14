@@ -75,9 +75,9 @@ class Str
         return UStr::implode($glue, $pieces)->toString();
     }
 
-    public static function replace(string $search, string $replace, string $subject): string
+    public static function replace(string $string, string $from, string $to): string
     {
-        return UStr::replace($search, $replace, $subject)->toString();
+        return UStr::replace($string, $from, $to)->toString();
     }
 
     public static function namespaceWithoutClassname(string $string): string

@@ -162,4 +162,13 @@ class MakerConfig
         $config->namespace = $namespace;
         return $config;
     }
+
+    public function withTemplatePathKeepingNamespace(string $templatePath): self
+    {
+        $config = clone $this;
+        $namespace = $config->namespace;
+        $config = $config->withTemplatePath($templatePath);
+        $config->namespace = $namespace;
+        return $config;
+    }
 }

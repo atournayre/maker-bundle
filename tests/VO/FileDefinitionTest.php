@@ -6,6 +6,7 @@ namespace Atournayre\Bundle\MakerBundle\Tests\VO;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 use Atournayre\Bundle\MakerBundle\Tests\Config\MakerConfigTestHelper;
 use Atournayre\Bundle\MakerBundle\VO\Builder\AddAttributeBuilder;
+use Atournayre\Bundle\MakerBundle\VO\Builder\ControllerBuilder;
 use Atournayre\Bundle\MakerBundle\VO\Builder\DtoBuilder;
 use Atournayre\Bundle\MakerBundle\VO\Builder\ExceptionBuilder;
 use Atournayre\Bundle\MakerBundle\VO\Builder\InterfaceBuilder;
@@ -122,6 +123,14 @@ class FileDefinitionTest extends TestCase
             'Dummy',
             '/srv/app/src/VO/Entity/Dummy.php',
             VoForEntityBuilder::class,
+        ];
+
+        yield 'Controller' => [
+            MakerConfigTestHelper::controller(),
+            'App\Controller',
+            'DummyController',
+            '/srv/app/src/Controller/DummyController.php',
+            ControllerBuilder::class,
         ];
     }
 

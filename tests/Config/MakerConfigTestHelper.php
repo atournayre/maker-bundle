@@ -7,6 +7,7 @@ use App\Attribute\QueryService;
 use App\Service\CommandService;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 use Atournayre\Bundle\MakerBundle\VO\Builder\AddAttributeBuilder;
+use Atournayre\Bundle\MakerBundle\VO\Builder\ControllerBuilder;
 use Atournayre\Bundle\MakerBundle\VO\Builder\DtoBuilder;
 use Atournayre\Bundle\MakerBundle\VO\Builder\ExceptionBuilder;
 use Atournayre\Bundle\MakerBundle\VO\Builder\InterfaceBuilder;
@@ -195,6 +196,22 @@ class MakerConfigTestHelper
                 'type' => 'string',
                 'nullable' => false,
             ],
+        );
+    }
+
+    public static function controller(): MakerConfig
+    {
+        return new MakerConfig(
+            namespace: 'App\Controller\DummyController',
+            builder: ControllerBuilder::class,
+            rootNamespace: 'App',
+            rootDir: '/srv/app/src',
+            extraProperties: [
+                'entity' => 'App\Entity\Dummy',
+                'formType' => 'App\Form\DummyType',
+                'vo' => 'App\VO\Dummy',
+            ],
+            templatePath: 'Controller/WithFormController.php',
         );
     }
 }
