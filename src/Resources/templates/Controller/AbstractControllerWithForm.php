@@ -6,7 +6,7 @@ namespace App\Controller;
 use App\Contracts\Logger\LoggerInterface;
 use App\Contracts\Response\ResponseInterface;
 use App\Contracts\Service\CommandServiceInterface;
-use App\Contracts\Service\Session\FlashBagInterface;
+use App\Contracts\Session\FlashBagInterface;
 use App\VO\Context;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;

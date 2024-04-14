@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Contracts\Service\Session;
+namespace App\Contracts\Session;
 
 interface FlashBagInterface
 {

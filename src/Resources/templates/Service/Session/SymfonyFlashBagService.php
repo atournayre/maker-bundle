@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Service\Session;
 
-use App\Contracts\Service\Session\FlashBagInterface;
+use App\Contracts\Session\FlashBagInterface;
 use \Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface as SymfonyFlashBagInterface;
 
 /**
