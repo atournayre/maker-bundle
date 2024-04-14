@@ -55,6 +55,7 @@ services:
             - '../src/Kernel.php'
                 
     App\Contracts\Logger\LoggerInterface: '@App\Logger\DefaultLogger'
+    App\Contracts\Service\Session\FlashBagInterface: '@App\Service\Session\SymfonyFlashBagService'
 ```
 
 ## Documentation

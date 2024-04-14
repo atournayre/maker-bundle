@@ -4,12 +4,19 @@ declare(strict_types=1);
 namespace App\Service\Session;
 
 use App\Contracts\Service\Session\FlashBagInterface;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
+use \Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface as SymfonyFlashBagInterface;
 
+/**
+ * Update config/services.yaml:
+ * services:
+ *     Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface:
+ *         class: Symfony\Component\HttpFoundation\Session\Flash\FlashBag
+ *         public: true
+ */
 final class SymfonyFlashBagService implements FlashBagInterface
 {
     public function __construct(
-        private readonly FlashBag $flashBag,
+        private readonly SymfonyFlashBagInterface $flashBag,
     )
     {
     }
