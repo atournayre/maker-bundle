@@ -10,6 +10,9 @@ use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
+use function Symfony\Component\String\u;
 
 #[AutoconfigureTag('maker.command')]
 class MakeProjectInstall extends AbstractMaker
@@ -49,59 +52,31 @@ class MakeProjectInstall extends AbstractMaker
 
     private function getTemplates(): array
     {
-        return [
-            'Attribute/CommandService.php',
-            'Attribute/QueryService.php',
-            'ArgumentValueResolver/ContextArgumentValueResolver.php',
-            'Exception/FailFast.php',
-            'Factory/ContextFactory.php',
-            'Helper/AttributeHelper.php',
-            'Contracts/Logger/LoggerInterface.php',
-            'Contracts/Response/ResponseInterface.php',
-            'Contracts/Routing/RoutingInterface.php',
-            'Contracts/Security/SecurityInterface.php',
-            'Contracts/Security/UserInterface.php',
-            'Contracts/Service/CommandServiceInterface.php',
-            'Contracts/Service/FailFastInterface.php',
-            'Contracts/Service/PostConditionsChecksInterface.php',
-            'Contracts/Service/PreConditionsChecksInterface.php',
-            'Contracts/Service/QueryServiceInterface.php',
-            'Contracts/Service/TagCommandServiceInterface.php',
-            'Contracts/Service/TagQueryServiceInterface.php',
-            'Contracts/Session/FlashBagInterface.php',
-            'Contracts/Templating/TemplatingInterface.php',
-            'Contracts/Type/Primitive/ScalarObjectInterface.php',
-            'Controller/AbstractControllerWithForm.php',
-            'Logger/AbstractLogger.php',
-            'Logger/DefaultLogger.php',
-            'Logger/NullLogger.php',
-            'Service/Response/SymfonyResponseService.php',
-            'Service/Routing/SymfonyRoutingService.php',
-            'Service/Security/SymfonySecurityService.php',
-            'Service/Session/SymfonyFlashBagService.php',
-            'Service/Templating/TwigTemplatingService.php',
-            'Service/CommandService.php',
-            'Service/QueryService.php',
-            'Trait/EntityIsTrait.php',
-            'Trait/IdEntityTrait.php',
-            'Trait/IsTrait.php',
-            'Type/Primitive/AbstractCollectionType.php',
-            'Type/Primitive/BooleanType.php',
-            'Type/Primitive/IntegerType.php',
-            'Type/Primitive/ListImmutableType.php',
-            'Type/Primitive/ListType.php',
-            'Type/Primitive/MapImmutableType.php',
-            'Type/Primitive/MapType.php',
-            'Type/Primitive/StringType.php',
-            'VO/Context.php',
-            'VO/DateTime.php',
-            'VO/Null/NullUser.php',
-        ];
+        $templateDirectory = __DIR__.'/../Resources/templates';
+
+        $filesystem = new Filesystem();
+        if (!$filesystem->exists($templateDirectory)) {
+            return [];
+        }
+
+        $finder = (new Finder())
+            ->files()
+            ->in($templateDirectory)
+            ->name('*.php')
+            ->sortByName();
+
+        $templates = [];
+        foreach ($finder as $file) {
+            $path = u($file->getPathname())->afterLast('Resources/templates/');
+            $templates[] = $path->toString();
+        }
+        return $templates;
     }
 
     public function configureDependencies(DependencyBuilder $dependencies): void
     {
         $deps = [
+            \Atournayre\Collection\TypedCollection::class => 'atournayre/collection',
             \Doctrine\Common\Collections\ArrayCollection::class => 'doctrine/collections',
             \Doctrine\ORM\Mapping\Id::class => 'doctrine/orm',
             \Psr\Clock\ClockInterface::class => 'psr/clock',
