@@ -70,7 +70,7 @@ Legend:
 | Status | Command                   | Description and documentation                                           |
 |--------|---------------------------|-------------------------------------------------------------------------|
 | ⚠️     | `make:new:controller`     | [Create a new Controller](docs/new-default.md)                          |
-| 🚧️     | `make:new:collection`     | [Create a new Collection](docs/new-default.md)                          |
+| ✅️     | `make:new:collection`     | [Create a new Collection](docs/new-default.md)                          |
 | ✅      | `make:new:dto`            | [Create a new DTO](docs/new-default.md)                                 |
 | ✅      | `make:new:exception`      | [Create a new Exception](docs/new-default.md)                           |
 | ✅      | `make:new:interface`      | [Create a new Interface](docs/new-default.md)                           |
