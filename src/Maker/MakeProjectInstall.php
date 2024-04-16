@@ -4,7 +4,9 @@ declare(strict_types=1);
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
+use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\Builder\FromTemplateBuilder;
+use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Component\Console\Command\Command;
@@ -12,6 +14,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Yaml\Yaml;
 use function Symfony\Component\String\u;
 
 #[AutoconfigureTag('maker.command')]
@@ -104,5 +107,42 @@ class MakeProjectInstall extends AbstractMaker
         foreach ($deps as $class => $package) {
             $dependencies->addClassDependency($class, $package);
         }
+    }
+
+    protected function updateConfig(ConsoleStyle $io): void
+    {
+        $fileServices = $this->rootDir . '/../config/services.yaml';
+
+        $filesystem = new Filesystem();
+        if (!$filesystem->exists($fileServices)) {
+            $io->error(Str::sprintf('The file %s does not exist', $fileServices));
+            return;
+        }
+
+        $services = Yaml::parseFile($fileServices);
+
+        $services['services']['App\\']['exclude'][] = '../src/Attribute/';
+        $services['services']['App\\']['exclude'][] = '../src/Exception/';
+        $appExclude = array_unique($services['services']['App\\']['exclude']);
+        $services['services']['App\\']['exclude'] = $appExclude;
+
+        $services['services']['app.logger.toto'] = [
+            'class' => 'App\\Logger\\DefaultLogger',
+            'calls' => [
+                ['setLoggerIdentifier', ['toto']]
+            ]
+        ];
+
+        $services['services']['App\Contracts\Logger\LoggerInterface'] = '@App\Logger\DefaultLogger';
+        $services['services']['App\Contracts\Session\FlashBagInterface'] = '@App\Service\Session\SymfonyFlashBagService';
+        $services['services'][\Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface::class] = [
+            'class' => \Symfony\Component\HttpFoundation\Session\Flash\FlashBag::class,
+            'public' => true
+        ];
+
+        $yaml = Yaml::dump($services, 4);
+        file_put_contents($fileServices, $yaml);
+
+        $io->success('The file services.yaml has been updated');
     }
 }

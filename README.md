@@ -38,26 +38,6 @@ atournayre_maker:
     root_namespace: 'App'
 ```
 
-### Step 4: Extra configuration
-
-Needed if you use the `project:getting-started` command.
-```yaml
-# config/services.yaml
-
-services:
-    App\:
-        resource: '../src/'
-        exclude:
-            - '../src/Attribute/'
-            - '../src/DependencyInjection/'
-            - '../src/Entity/'
-            - '../src/Exception/'
-            - '../src/Kernel.php'
-                
-    App\Contracts\Logger\LoggerInterface: '@App\Logger\DefaultLogger'
-    App\Contracts\Session\FlashBagInterface: '@App\Service\Session\SymfonyFlashBagService'
-```
-
 ## Documentation
 
 ### Commands
