@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\ArgumentValueResolver;
 
-use App\VO\Context;
+use App\Contracts\VO\ContextInterface;
 use App\Factory\ContextFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
@@ -22,7 +22,7 @@ class ContextArgumentValueResolver implements ValueResolverInterface
      */
     #[\Override] public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
-        if ($argument->getType() !== Context::class) {
+        if ($argument->getType() !== ContextInterface::class) {
             return;
         }
 

@@ -10,8 +10,8 @@ use App\Contracts\Service\PostConditionsChecksInterface;
 use App\Contracts\Service\PreConditionsChecksInterface;
 use App\Contracts\Service\QueryServiceInterface;
 use App\Contracts\Service\TagQueryServiceInterface;
+use App\Contracts\VO\ContextInterface;
 use App\Helper\AttributeHelper;
-use App\VO\Context;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 use Webmozart\Assert\Assert;
 
@@ -28,7 +28,7 @@ final class QueryService implements QueryServiceInterface
 	/**
 	 * @throws \Exception
 	 */
-	function fetch($object, Context $context, ?string $service = null)
+	function fetch($object, ContextInterface $context, ?string $service = null)
 	{
 		if (!$this->supports($object, $service)) {
 		    return;
@@ -50,7 +50,7 @@ final class QueryService implements QueryServiceInterface
 	/**
 	 * @throws \Exception
 	 */
-	private function doQuery(string $service, $object, Context $context)
+	private function doQuery(string $service, $object, ContextInterface $context)
 	{
 		$serviceClass = $this->getServices()[$service];
 		Assert::methodExists($serviceClass, 'fetch');

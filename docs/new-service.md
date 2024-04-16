@@ -103,9 +103,9 @@ use App\Contracts\Service\FailFastInterface;
 use App\Contracts\Service\PostConditionsChecksInterface;
 use App\Contracts\Service\PreConditionsChecksInterface;
 use App\Contracts\Service\TagCommandServiceInterface;
+use App\Contracts\VO\ContextInterface;
 use App\Exception\FailFast;
 use App\VO\SampleForCommand;
-use App\VO\Context;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag(TagCommandServiceInterface::class)]
@@ -116,7 +116,7 @@ final readonly class SampleCommandService implements PreConditionsChecksInterfac
 	 * @throws \Exception
 	 * @param SampleForCommand $object
 	 */
-	public function preConditionsChecks($object, Context $context): void
+	public function preConditionsChecks($object, ContextInterface $context): void
 	{
 	}
 
@@ -126,7 +126,7 @@ final readonly class SampleCommandService implements PreConditionsChecksInterfac
 	 * @throws FailFast
 	 * @param SampleForCommand $object
 	 */
-	public function failFast($object, Context $context): void
+	public function failFast($object, ContextInterface $context): void
 	{
 	}
 
@@ -135,7 +135,7 @@ final readonly class SampleCommandService implements PreConditionsChecksInterfac
 	 * @throws \Exception
 	 * @param SampleForCommand $object
 	 */
-	public function execute($object, Context $context): void
+	public function execute($object, ContextInterface $context): void
 	{
 	}
 
@@ -145,7 +145,7 @@ final readonly class SampleCommandService implements PreConditionsChecksInterfac
 	 * @throws \Exception
 	 * @param SampleForCommand $object
 	 */
-	public function postConditionsChecks($object, Context $context): void
+	public function postConditionsChecks($object, ContextInterface $context): void
 	{
 	}
 }
@@ -176,6 +176,7 @@ use App\Contracts\Service\FailFastInterface;
 use App\Contracts\Service\PostConditionsChecksInterface;
 use App\Contracts\Service\PreConditionsChecksInterface;
 use App\Contracts\Service\TagQueryServiceInterface;
+use App\Contracts\VO\ContextInterface;
 use App\Exception\FailFast;
 use App\VO\SampleForQuery;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
@@ -188,7 +189,7 @@ final readonly class SampleQueryService implements PreConditionsChecksInterface,
 	 * @throws \Exception
 	 * @param SampleForQuery $object
 	 */
-	public function preConditionsChecks($object, \App\VO\Context $context): void
+	public function preConditionsChecks($object, ContextInterface $context): void
 	{
 	}
 
@@ -198,7 +199,7 @@ final readonly class SampleQueryService implements PreConditionsChecksInterface,
 	 * @throws FailFast
 	 * @param SampleForQuery $object
 	 */
-	public function failFast($object, \App\VO\Context $context): void
+	public function failFast($object, ContextInterface $context): void
 	{
 	}
 
@@ -207,7 +208,7 @@ final readonly class SampleQueryService implements PreConditionsChecksInterface,
 	 * @throws \Exception
 	 * @param SampleForQuery $object
 	 */
-	public function fetch($object, \App\VO\Context $context)
+	public function fetch($object, ContextInterface $context)
 	{
 	}
 
@@ -217,7 +218,7 @@ final readonly class SampleQueryService implements PreConditionsChecksInterface,
 	 * @throws \Exception
 	 * @param SampleForQuery $object
 	 */
-	public function postConditionsChecks($object, \App\VO\Context $context): void
+	public function postConditionsChecks($object, ContextInterface $context): void
 	{
 	}
 }

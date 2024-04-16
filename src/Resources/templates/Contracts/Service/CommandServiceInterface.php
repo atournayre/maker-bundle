@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace App\Contracts\Service;
 
-use App\VO\Context;
+use App\Contracts\VO\ContextInterface;
 
 interface CommandServiceInterface
 {
-	public function execute($object, Context $context, ?string $service = null): void;
+	public function execute($object, ContextInterface $context, ?string $service = null): void;
 }

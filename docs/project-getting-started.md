@@ -75,13 +75,13 @@ A type hinted argument can be used to get the context.
 <?php
 namespace App\Controller;
 
-use App\VO\Context;
+use App\Contracts\VO\ContextInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
 class AcmeController extends AbstractController
 {
-    public function index(Context $context, AcmeService $acme): Response
+    public function index(ContextInterface $context, AcmeService $acme): Response
     {
         // ...
         $user = $context->user();

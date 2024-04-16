@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\VO\Context;
+use App\Contracts\VO\ContextInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,7 +22,7 @@ use Symfony\Component\Routing\Annotation\Route;
 )]
 final class WithFormController extends AbstractControllerWithForm
 {
-    protected function redirectOnSuccess($data, Context $context): Response
+    protected function redirectOnSuccess($data, ContextInterface $context): Response
     {
         throw new \RuntimeException('You must implement the method redirectOnSuccess');
         // return $this->response->redirectToRoute('', [
@@ -32,10 +32,10 @@ final class WithFormController extends AbstractControllerWithForm
 
     /**
      * @param EntityNamespace $entity
-     * @param Context $context
+     * @param ContextInterface $context
      * @return mixed
      */
-    protected function createVo($entity, Context $context)
+    protected function createVo($entity, ContextInterface $context)
     {
         return VoNamespace::create($entity);
     }

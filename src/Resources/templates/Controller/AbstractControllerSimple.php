@@ -7,7 +7,7 @@ use App\Contracts\Logger\LoggerInterface;
 use App\Contracts\Response\ResponseInterface;
 use App\Contracts\Service\QueryServiceInterface;
 use App\Contracts\Session\FlashBagInterface;
-use App\VO\Context;
+use App\Contracts\VO\ContextInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -22,7 +22,7 @@ abstract class AbstractControllerSimple
     {
     }
 
-    public function __invoke(Request $request, Context $context, $entity): Response
+    public function __invoke(Request $request, ContextInterface $context, $entity): Response
     {
         try {
             $data = $this->queryService->fetch($entity, $context);
@@ -37,7 +37,7 @@ abstract class AbstractControllerSimple
 
     abstract protected function errorTemplate(): string;
 
-    protected function responseSuccess($data, Context $context): Response
+    protected function responseSuccess($data, ContextInterface $context): Response
     {
         return $this->response->render($this->successTemplate(), [
             'context' => $context,
@@ -45,7 +45,7 @@ abstract class AbstractControllerSimple
         ]);
     }
 
-    protected function onException(\Exception $e, Context $context, ?string $message = null): Response
+    protected function onException(\Exception $e, ContextInterface $context, ?string $message = null): Response
     {
         $this->logger->exception($e);
         $errorMessage = $message ?? 'Oops! An error occurred.';
@@ -53,7 +53,7 @@ abstract class AbstractControllerSimple
         return $this->responseError($errorMessage, $context);
     }
 
-    protected function responseError(string $message, Context $context): Response
+    protected function responseError(string $message, ContextInterface $context): Response
     {
         return $this->response->error($this->errorTemplate(), [
             'message' => $message,

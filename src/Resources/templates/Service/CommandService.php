@@ -10,8 +10,8 @@ use App\Contracts\Service\FailFastInterface;
 use App\Contracts\Service\PostConditionsChecksInterface;
 use App\Contracts\Service\PreConditionsChecksInterface;
 use App\Contracts\Service\TagCommandServiceInterface;
+use App\Contracts\VO\ContextInterface;
 use App\Helper\AttributeHelper;
-use App\VO\Context;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 use Webmozart\Assert\Assert;
 
@@ -28,7 +28,7 @@ final class CommandService implements CommandServiceInterface
 	/**
 	 * @throws \Exception
 	 */
-	public function execute($object, Context $context, ?string $service = null): void
+	public function execute($object, ContextInterface $context, ?string $service = null): void
 	{
 		if (!$this->supports($object, $service)) {
 		    return;
@@ -47,7 +47,7 @@ final class CommandService implements CommandServiceInterface
 	/**
 	 * @throws \Exception
 	 */
-	private function doExecute(string $service, $object, Context $context): void
+	private function doExecute(string $service, $object, ContextInterface $context): void
 	{
 		$serviceClass = $this->getServices()[$service];
 		Assert::methodExists($serviceClass, 'execute');

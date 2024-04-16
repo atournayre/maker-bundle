@@ -7,7 +7,7 @@ use App\Contracts\Logger\LoggerInterface;
 use App\Contracts\Response\ResponseInterface;
 use App\Contracts\Service\CommandServiceInterface;
 use App\Contracts\Session\FlashBagInterface;
-use App\VO\Context;
+use App\Contracts\VO\ContextInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,7 +25,7 @@ abstract class AbstractControllerWithForm
     {
     }
 
-    public function __invoke(Request $request, Context $context, $entity): Response
+    public function __invoke(Request $request, ContextInterface $context, $entity): Response
     {
         try {
             $data = $this->createVo($entity, $context);
@@ -47,11 +47,11 @@ abstract class AbstractControllerWithForm
         }
     }
 
-    abstract protected function createVo($entity, Context $context);
+    abstract protected function createVo($entity, ContextInterface $context);
 
     abstract protected function createForm($data = null): FormInterface;
 
-    protected function whenFormIsInvalid(FormInterface $form, $data, Context $context): void
+    protected function whenFormIsInvalid(FormInterface $form, $data, ContextInterface $context): void
     {
         $this->flashBag->warning('Some fields are invalid. Please check the form.');
         $this->logger->warning('Some fields are invalid. Please check the form.', [
@@ -61,7 +61,7 @@ abstract class AbstractControllerWithForm
         ]);
     }
 
-    protected function whenFormIsValid(FormInterface $form, $data, Context $context): Response
+    protected function whenFormIsValid(FormInterface $form, $data, ContextInterface $context): Response
     {
         try {
             $this->commandService->execute($data, $context);
@@ -75,13 +75,13 @@ abstract class AbstractControllerWithForm
         }
     }
 
-    abstract protected function redirectOnSuccess($data, Context $context): Response;
+    abstract protected function redirectOnSuccess($data, ContextInterface $context): Response;
 
     abstract protected function successTemplate(): string;
 
     abstract protected function errorTemplate(): string;
 
-    protected function responseError(string $message, Context $context): Response
+    protected function responseError(string $message, ContextInterface $context): Response
     {
         return $this->response->error($this->errorTemplate(), [
             'message' => $message,
@@ -89,7 +89,7 @@ abstract class AbstractControllerWithForm
         ]);
     }
 
-    protected function responseSuccess(FormInterface $form, $data, Context $context): Response
+    protected function responseSuccess(FormInterface $form, $data, ContextInterface $context): Response
     {
         return $this->response->render($this->successTemplate(), [
             'form' => $form,
@@ -98,7 +98,7 @@ abstract class AbstractControllerWithForm
         ]);
     }
 
-    protected function onException(\Exception $e, Context $context, ?string $message = null): Response
+    protected function onException(\Exception $e, ContextInterface $context, ?string $message = null): Response
     {
         $this->logger->exception($e);
         $errorMessage = $message ?? 'Oops! An error occurred.';

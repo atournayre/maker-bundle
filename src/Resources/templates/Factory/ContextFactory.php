@@ -5,6 +5,7 @@ namespace App\Factory;
 
 use App\Contracts\Security\SecurityInterface;
 use App\Contracts\Security\UserInterface;
+use App\Contracts\VO\ContextInterface;
 use App\VO\Context;
 use App\VO\Null\NullUser;
 use Psr\Clock\ClockInterface;
@@ -21,7 +22,7 @@ final class ContextFactory
 	/**
 	 * @throws \Exception
 	 */
-	public function create(UserInterface $user = null, \DateTimeInterface $dateTime = null): Context
+	public function create(UserInterface $user = null, \DateTimeInterface $dateTime = null): ContextInterface
 	{
 		return Context::create(
 		    $user ?? $this->security->getUser() ?? NullUser::create(),
