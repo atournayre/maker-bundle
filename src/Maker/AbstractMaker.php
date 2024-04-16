@@ -49,7 +49,14 @@ abstract class AbstractMaker extends \Symfony\Bundle\MakerBundle\Maker\AbstractM
         foreach ($files as $file) {
             $io->text(sprintf('Created: %s', $file));
         }
+
+        $this->updateConfig($io);
     }
 
     abstract protected function configurations(string $namespace): array;
+
+    protected function updateConfig(ConsoleStyle $io): void
+    {
+        // no-op
+    }
 }
