@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 #[AsController]
 #[Route(
-    path: '/',
+    path: '/template/{id}',
     name: 'template',
     requirements: [
         'id' => '\d+',
@@ -43,5 +43,14 @@ final class WithFormController extends AbstractControllerWithForm
     protected function createForm($data = null): FormInterface
     {
         return $this->formFactory->create(FormType::class, $data, []);
+    }
+    protected function successTemplate(): string
+    {
+        return 'template/success.html.twig';
+    }
+
+    protected function errorTemplate(): string
+    {
+        return 'template/error.html.twig';
     }
 }

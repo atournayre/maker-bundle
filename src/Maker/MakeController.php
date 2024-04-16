@@ -13,6 +13,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
+use Symfony\Component\Console\Question\Question;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
@@ -23,6 +24,7 @@ class MakeController extends AbstractMaker
     private ?string $controllerRelatedEntity = null;
     private ?string $controllerRelatedFormType = null;
     private ?string $controllerRelatedVO = null;
+    private bool $useAForm = false;
 
     public static function getCommandName(): string
     {
@@ -43,11 +45,29 @@ class MakeController extends AbstractMaker
 
     public function interact(InputInterface $input, ConsoleStyle $io, Command $command): void
     {
+        parent::interact($input, $io, $command);
+
+        $questionWithForm = new Question('Create a controller with a form? (yes/no)', 'yes');
+        $this->useAForm = $io->askQuestion($questionWithForm) === 'yes';
+
         if (empty($this->entities())) {
             $io->error('No entity found in the Entity directory');
             return;
         }
 
+        $questionControllerRelatedEntity = new ChoiceQuestion('Choose the entity related to this Controller', $this->entities());
+        $this->controllerRelatedEntity = $io->askQuestion($questionControllerRelatedEntity);
+
+        if ($this->useAForm) {
+            $this->interactWithForm($input, $io, $command);
+            return;
+        }
+
+        $this->interactSimple($input, $io, $command);
+    }
+
+    public function interactWithForm(InputInterface $input, ConsoleStyle $io, Command $command): void
+    {
         if (empty($this->formTypes())) {
             $io->error('No form types found in the FormType directory');
             return;
@@ -58,16 +78,15 @@ class MakeController extends AbstractMaker
             return;
         }
 
-        parent::interact($input, $io, $command);
-
-        $questionControllerRelatedEntity = new ChoiceQuestion('Choose the entity related to this Controller', $this->entities());
-        $this->controllerRelatedEntity = $io->askQuestion($questionControllerRelatedEntity);
-
         $questionControllerRelatedFormType = new ChoiceQuestion('Choose the form type related to this Controller', $this->formTypes());
         $this->controllerRelatedFormType = $io->askQuestion($questionControllerRelatedFormType);
 
         $questionControllerRelatedVO = new ChoiceQuestion('Choose the VO related to this Controller', $this->vos());
         $this->controllerRelatedVO = $io->askQuestion($questionControllerRelatedVO);
+    }
+
+    public function interactSimple(InputInterface $input, ConsoleStyle $io, Command $command): void
+    {
     }
 
     private function entities(): array
@@ -111,14 +130,23 @@ class MakeController extends AbstractMaker
 
     protected function configurations(string $namespace): array
     {
-        $configurations[] = (new MakerConfig(
-            namespace: $namespace,
-            builder: ControllerBuilder::class,
-        ))
-            ->withTemplatePathKeepingNamespace('Controller/WithFormController.php')
-            ->withExtraProperty('entity', Str::prefixByRootNamespace($this->controllerRelatedEntity, $this->rootNamespace))
-            ->withExtraProperty('formType', Str::prefixByRootNamespace($this->controllerRelatedFormType, $this->rootNamespace))
-            ->withExtraProperty('vo', Str::prefixByRootNamespace($this->controllerRelatedVO, $this->rootNamespace));
+        if ($this->useAForm) {
+            $configurations[] = (new MakerConfig(
+                namespace: $namespace,
+                builder: ControllerBuilder::class,
+            ))
+                ->withTemplatePathKeepingNamespace('Controller/WithFormController.php')
+                ->withExtraProperty('entity', Str::prefixByRootNamespace($this->controllerRelatedEntity, $this->rootNamespace))
+                ->withExtraProperty('formType', Str::prefixByRootNamespace($this->controllerRelatedFormType, $this->rootNamespace))
+                ->withExtraProperty('vo', Str::prefixByRootNamespace($this->controllerRelatedVO, $this->rootNamespace));
+        } else {
+            $configurations[] = (new MakerConfig(
+                namespace: $namespace,
+                builder: ControllerBuilder::class,
+            ))
+                ->withTemplatePathKeepingNamespace('Controller/SimpleController.php')
+                ->withExtraProperty('entity', Str::prefixByRootNamespace($this->controllerRelatedEntity, $this->rootNamespace));
+        }
 
         return $configurations ?? [];
     }

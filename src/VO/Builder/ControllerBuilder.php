@@ -11,6 +11,17 @@ class ControllerBuilder extends AbstractBuilder
 {
     public static function build(FileDefinition $fileDefinition): self|FromTemplateBuilder
     {
+        $hasForm = $fileDefinition->configuration()->hasExtraProperty('formType');
+
+        if ($hasForm) {
+            return self::buildWithForm($fileDefinition);
+        }
+
+        return self::buildSimple($fileDefinition);
+    }
+
+    private static function buildWithForm(FileDefinition $fileDefinition): self|FromTemplateBuilder
+    {
         $self = FromTemplateBuilder::build($fileDefinition);
 
         // Get the namespace of the new file from file definition
@@ -71,5 +82,29 @@ class ControllerBuilder extends AbstractBuilder
             ->withUse($formTypeNamespace)
             ->withUse($voNamespace)
             ;
+    }
+
+    private static function buildSimple(FileDefinition $fileDefinition): self|FromTemplateBuilder
+    {
+        $self = FromTemplateBuilder::build($fileDefinition);
+
+        // Get the namespace of the new file from file definition
+        $newNamespace = $fileDefinition->fullName();
+
+        $namespace = $self->file->getNamespaces()[$fileDefinition->namespace()];
+
+        $classes = $namespace->getClasses();
+        $classesKeys = array_keys($classes);
+        $identifierForTemplateClass = current($classesKeys);
+
+        /** @var ClassType $newClass */
+        $newClass = clone $classes[$identifierForTemplateClass];
+        $newClass->setName(Str::classNameFromNamespace($newNamespace, ''));
+
+        $namespace->add($newClass);
+        $namespace->removeClass($identifierForTemplateClass);
+
+        return $self
+            ->withFileDefinition($self->fileDefinition->withSourceCode((string)$self->file));
     }
 }

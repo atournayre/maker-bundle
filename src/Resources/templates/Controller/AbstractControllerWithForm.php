@@ -77,9 +77,13 @@ abstract class AbstractControllerWithForm
 
     abstract protected function redirectOnSuccess($data, Context $context): Response;
 
+    abstract protected function successTemplate(): string;
+
+    abstract protected function errorTemplate(): string;
+
     protected function responseError(string $message, Context $context): Response
     {
-        return $this->response->error('error.html.twig', [
+        return $this->response->error($this->errorTemplate(), [
             'message' => $message,
             'context' => $context,
         ]);
@@ -87,7 +91,7 @@ abstract class AbstractControllerWithForm
 
     protected function responseSuccess(FormInterface $form, $data, Context $context): Response
     {
-        return $this->response->render('template.html.twig', [
+        return $this->response->render($this->successTemplate(), [
             'form' => $form,
             'context' => $context,
             'data' => $data,
