@@ -33,21 +33,12 @@ final class EntityEventDispatcher implements EntityEventDispatcherInterface
     ): void
     {
         $context = $this->context($context);
-
         $events = $eventCollection->events($type);
-
         Assert::allIsInstanceOf($events, HasContextInterface::class);
 
         foreach ($events as $event) {
-            $eventName = get_class($event);
-
-            $this->logger->info(sprintf('Adding context to %s event', $eventName));
-            $event = $event->withContext($context);
-
-            $this->logger->info(sprintf('Dispatching %s event', $eventName));
-            $this->eventDispatcher->dispatch($event);
-
-            $this->logger->info(sprintf('Event %s dispatched', $eventName));
+            $event = $this->addContext($event, $context);
+            $this->dispatchEvent($event);
         }
     }
 
@@ -65,5 +56,23 @@ final class EntityEventDispatcher implements EntityEventDispatcherInterface
         }
 
         return $context;
+    }
+
+    private function addContext($event, ContextInterface $context)
+    {
+        if ($event->hasContext()) {
+            $this->logger->info(sprintf('Event %s already has context', get_class($event)));
+            return $event;
+        }
+
+        $this->logger->info(sprintf('Adding context to %s event', get_class($event)));
+        return $event->withContext($context);
+    }
+
+    private function dispatchEvent($event): void
+    {
+        $this->logger->info(sprintf('Dispatching %s event', get_class($event)));
+        $this->eventDispatcher->dispatch($event);
+        $this->logger->info(sprintf('Event %s dispatched', get_class($event)));
     }
 }

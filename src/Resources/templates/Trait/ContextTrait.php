@@ -25,4 +25,10 @@ trait ContextTrait
 
         return $new;
     }
+
+    public function hasContext(): bool
+    {
+        return null !== $this->context
+            && !$this->context instanceof NullContext;
+    }
 }

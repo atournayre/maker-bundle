@@ -5,5 +5,5 @@ namespace App\Contracts;
 
 interface HasContextInterface
 {
-
+    public function hasContext(): bool;
 }
