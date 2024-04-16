@@ -3,18 +3,22 @@ declare(strict_types=1);
 
 namespace App\Trait;
 
-use App\VO\Context;
+use App\Contracts\VO\ContextInterface;
+use App\VO\Null\NullContext;
 
 trait ContextTrait
 {
-    private Context $context;
+    private ?ContextInterface $context = null;
 
-    public function getContext(): Context
+    /**
+     * @throws \Exception
+     */
+    public function getContext(): ContextInterface
     {
-        return $this->context;
+        return $this->context ?? NullContext::create();
     }
 
-    public function withContext(Context $context): self
+    public function withContext(ContextInterface $context): self
     {
         $new = clone $this;
         $new->context = $context;

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\VO;
+namespace App\VO\Null;
 
 use App\Contracts\VO\DateTimeInterface;
 
@@ -24,56 +24,56 @@ use App\Contracts\VO\DateTimeInterface;
  *
  * @object-type VO
  */
-class DateTime implements DateTimeInterface
+final class NullDateTime implements DateTimeInterface
 {
-	private function __construct(
-		private readonly \DateTimeInterface $datetime,
-	) {
-	}
+    private function __construct(
+        private readonly \DateTimeInterface $datetime,
+    ) {
+    }
 
 
-	/**
+    /**
 	 * @throws \Exception
 	 */
-	public static function fromInterface(\DateTimeInterface $datetime): self
+	public static function create(): self
 	{
-		return new self($datetime);
+        return new self(new \DateTime('1970-01-01 00:00:00'));
 	}
 
 
 	public function isBefore(\DateTimeInterface $datetime): bool
 	{
-		return $this->datetime < $datetime;
+		return false;
 	}
 
 
 	public function isAfter(\DateTimeInterface $datetime): bool
 	{
-		return $this->datetime > $datetime;
+		return false;
 	}
 
 
 	public function isBetween(\DateTimeInterface $datetime1, \DateTimeInterface $datetime2): bool
 	{
-		return $this->datetime > $datetime1 && $this->datetime < $datetime2;
+		return false;
 	}
 
 
 	public function isBeforeOrEqual(\DateTimeInterface $datetime): bool
 	{
-		return $this->datetime <= $datetime;
+		return false;
 	}
 
 
 	public function isAfterOrEqual(\DateTimeInterface $datetime): bool
 	{
-		return $this->datetime >= $datetime;
+		return false;
 	}
 
 
 	public function isBetweenOrEqual(\DateTimeInterface $datetime1, \DateTimeInterface $datetime2): bool
 	{
-		return $this->datetime >= $datetime1 && $this->datetime <= $datetime2;
+		return false;
 	}
 
 

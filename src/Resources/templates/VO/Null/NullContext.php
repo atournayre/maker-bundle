@@ -1,11 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace App\VO;
+namespace App\VO\Null;
 
 use App\Contracts\Security\UserInterface;
 use App\Contracts\VO\ContextInterface;
 use App\Contracts\VO\DateTimeInterface;
+use App\VO\DateTime;
 
 /**
  * ONLY
@@ -26,7 +27,7 @@ use App\Contracts\VO\DateTimeInterface;
  *
  * @object-type VO
  */
-final class Context implements ContextInterface
+final class NullContext implements ContextInterface
 {
 	private function __construct(
 		private readonly UserInterface $user,
@@ -38,9 +39,9 @@ final class Context implements ContextInterface
 	/**
 	 * @throws \Exception
 	 */
-	public static function create(UserInterface $user, \DateTimeInterface $createdAt): self
+	public static function create(): self
 	{
-		return new self($user, DateTime::fromInterface($createdAt));
+		return new self(NullUser::create(), DateTime::fromInterface(new \DateTime('1970-01-01 00:00:00')));
 	}
 
 
@@ -50,7 +51,10 @@ final class Context implements ContextInterface
 	}
 
 
-	public function createdAt(): DateTimeInterface
+    /**
+     * @throws \Exception
+     */
+    public function createdAt(): DateTimeInterface
 	{
 		return $this->createdAt;
 	}
