@@ -5,7 +5,6 @@ namespace Atournayre\Bundle\MakerBundle\VO\Builder;
 
 use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
 use Nette\PhpGenerator\Method;
-use Nette\PhpGenerator\PhpFile;
 
 class ExceptionBuilder extends AbstractBuilder
 {
@@ -14,40 +13,30 @@ class ExceptionBuilder extends AbstractBuilder
         $config = $fileDefinition->configuration();
         $exceptionType = $config->getExtraProperty('exceptionType');
 
-        $file = new PhpFile;
-        $file->addComment('This file has been auto-generated');
-        $file->setStrictTypes();
-        $file->addClass($fileDefinition->fullName())
-            ->setFinal()
-            ->setExtends($exceptionType);
-
         return (new self($fileDefinition))
-            ->withFile($file)
-            ->withNamedConstructor();
+            ->createFile()
+            ->extends($exceptionType)
+            ->addMember(self::namedConstructor($fileDefinition))
+            ;
     }
 
-    private function withNamedConstructor(): self
+    private static function namedConstructor(FileDefinition $fileDefinition): ?Method
     {
-        $clone = clone $this;
-        $config = $clone->fileDefinition->configuration();
+        $config = $fileDefinition->configuration();
 
         if (!$config->hasExtraProperty('exceptionNamedConstructor')) {
-            return $clone;
+            return null;
         }
 
-        $fullName = $clone->fileDefinition->fullName();
-
-        $classes = $clone->file->getClasses();
-        $class = $classes[$fullName];
+        $fullName = $fileDefinition->fullName();
+        $className = $fileDefinition->classname();
 
         $methodName = $config->getExtraProperty('exceptionNamedConstructor');
 
-        $method = new Method($methodName);
-        $method->setStatic()->setPublic()->setReturnType($fullName);
-        $method->addBody("return new {$class->getName()}('Oops, an error occured.');");
-
-        $class->addMember($method);
-
-        return $clone;
+        return (new Method($methodName))
+            ->setStatic()
+            ->setPublic()
+            ->setReturnType($fullName)
+            ->addBody("return new {$className}('Oops, an error occured.');");
     }
 }

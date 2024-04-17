@@ -15,7 +15,6 @@ use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\InterfaceType;
 use Nette\PhpGenerator\Literal;
 use Nette\PhpGenerator\Method;
-use Nette\PhpGenerator\PhpFile;
 
 class ServiceCommandBuilder extends AbstractBuilder
 {
@@ -24,16 +23,15 @@ class ServiceCommandBuilder extends AbstractBuilder
         $config = $fileDefinition->configuration();
         $voParameter = Str::prefixByRootNamespace($config->getExtraProperty('vo'), $config->rootNamespace());
 
-        $file = new PhpFile;
-        $file->addComment('This file has been auto-generated');
-        $file->setStrictTypes();
-        $file->addClass($fileDefinition->fullName())
-            ->setFinal()
-            ->setReadOnly()
-        ;
+        $attributes = [
+            new Attribute(\Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag::class, [
+                new Literal('TagCommandServiceInterface::class'),
+            ]),
+        ];
 
         return (new self($fileDefinition))
-            ->withFile($file)
+            ->createFile()
+            ->isReadOnly()
             ->withUse(FailFast::class)
             ->withUse(\Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag::class)
             ->withUse(\App\Contracts\Service\TagCommandServiceInterface::class)
@@ -43,63 +41,39 @@ class ServiceCommandBuilder extends AbstractBuilder
             ->withUse(TagCommandServiceInterface::class)
             ->withUse(PostConditionsChecksInterface::class)
             ->withUse(\App\VO\Context::class)
-            ->withAttributes()
-            ->withImplementationOfInterface(PreConditionsChecksInterface::class, $voParameter)
-            ->withImplementationOfInterface(FailFastInterface::class, $voParameter)
-            ->withImplementationOfInterface(TagCommandServiceInterface::class, $voParameter)
-            ->withImplementationOfInterface(PostConditionsChecksInterface::class, $voParameter)
-            ->withInvoke()
+            ->setAttributes($attributes)
+            ->addImplement(PreConditionsChecksInterface::class)
+            ->addImplement(FailFastInterface::class)
+            ->addImplement(TagCommandServiceInterface::class)
+            ->addImplement(PostConditionsChecksInterface::class)
+            ->addMember(self::implementationOfInterface(PreConditionsChecksInterface::class, $voParameter))
+            ->addMember(self::implementationOfInterface(FailFastInterface::class, $voParameter))
+            ->addMember(self::implementationOfInterface(TagCommandServiceInterface::class, $voParameter))
+            ->addMember(self::implementationOfInterface(PostConditionsChecksInterface::class, $voParameter))
+            ->addMember(self::invoke())
         ;
     }
 
-    private function withAttributes(): self
+    private static function invoke(): Method
     {
-        $clone = clone $this;
-        $class = $clone->getClass();
-
-        $attributes = [
-            new Attribute(\Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag::class, [
-                new Literal('TagCommandServiceInterface::class'),
-            ]),
-        ];
-
-        $class->setAttributes($attributes);
-
-        return $clone;
-    }
-
-    private function withInvoke(): self
-    {
-        $clone = clone $this;
-        $class = $clone->getClass();
-
-        $method = (new Method('__invoke'))
+        return (new Method('__invoke'))
             ->setPrivate()
             ->addComment('This service is not meant to be used directly');
-
-        $class->addMember($method);
-
-        return $clone;
     }
 
-    private function withImplementationOfInterface(string $interface, string $objectType): self
+    private static function implementationOfInterface(string $interface, string $objectType): array
     {
-        $clone = clone $this;
-        $class = $clone->getClass();
-
-        $class->addImplement($interface);
-
         /** @var ClassType $sourceInterface */
         $sourceInterface = InterfaceType::from($interface);
 
         foreach ($sourceInterface->getMethods() as $method) {
-            $class->addMember($this->implementMethod($method->getName(), $sourceInterface, $objectType));
+            $methods[] = self::implementMethod($method->getName(), $sourceInterface, $objectType);
         }
 
-        return $clone;
+        return $methods ?? [];
     }
 
-    private function implementMethod(string $method, $sourceInterface, string $objectType): Method
+    private static function implementMethod(string $method, $sourceInterface, string $objectType): Method
     {
         $sourceMethod = $sourceInterface->getMethod($method);
         return (new Method($sourceMethod->getName()))

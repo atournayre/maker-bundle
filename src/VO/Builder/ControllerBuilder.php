@@ -22,37 +22,41 @@ class ControllerBuilder extends AbstractBuilder
 
     private static function buildWithForm(FileDefinition $fileDefinition): self|FromTemplateBuilder
     {
+        $config = $fileDefinition->configuration();
+
+        $config = $config
+            ->withExtraProperty('entity', '\\'.$config->getExtraProperty('entity'))
+            ->withExtraProperty('formType', $config->getExtraProperty('formType'))
+            ->withExtraProperty('vo', '\\'.$config->getExtraProperty('vo'))
+            ->withExtraProperty('entityClassName', Str::classNameFromNamespace($config->getExtraProperty('entity'), ''))
+            ->withExtraProperty('voClassName', Str::classNameFromNamespace($config->getExtraProperty('vo'), ''))
+        ;
+
         $self = FromTemplateBuilder::build($fileDefinition);
 
-        // Get the namespace of the new file from file definition
-        $newNamespace = $fileDefinition->fullName();
-
-        $namespace = $self->file->getNamespaces()[$fileDefinition->namespace()];
-
-        $classes = $namespace->getClasses();
-        $classesKeys = array_keys($classes);
-        $identifierForTemplateClass = current($classesKeys);
-
-        /** @var ClassType $newClass */
-        $newClass = clone $classes[$identifierForTemplateClass];
-        $newClass->setName(Str::classNameFromNamespace($newNamespace, ''));
-
-        $namespace->add($newClass);
-        $namespace->removeClass($identifierForTemplateClass);
-
-        $self = $self
-            ->withFileDefinition($self->fileDefinition->withSourceCode((string)$self->file));
+        $self = (new self($fileDefinition))
+            ->createFromCode((string)$self->file)
+            ->changeClassName($fileDefinition->fullName());
 
         $class = $self->getClass();
 
+        self::updateMethodCreateVo($class, $fileDefinition);
+        self::updateMethodCreateForm($class, $fileDefinition);
+
+        return $self
+            ->withUse($config->getExtraProperty('entity'))
+            ->withUse($config->getExtraProperty('formType'))
+            ->withUse($config->getExtraProperty('vo'))
+            ->removeUse(\Symfony\Component\Form\Extension\Core\Type\FormType::class)
+        ;
+    }
+
+    private static function updateMethodCreateVo(ClassType $class, FileDefinition $fileDefinition): void
+    {
         $config = $fileDefinition->configuration();
-
-        $entityNamespace = '\\'.$config->getExtraProperty('entity');
-        $formTypeNamespace = $config->getExtraProperty('formType');
-        $voNamespace = '\\'.$config->getExtraProperty('vo');
-
-        $entityClassName = Str::classNameFromNamespace($entityNamespace, '');
-        $voClassName = Str::classNameFromNamespace($voNamespace, '');
+        $entityClassName = $config->getExtraProperty('entityClassName');
+        $voClassName = $config->getExtraProperty('voClassName');
+        $voNamespace = $config->getExtraProperty('vo');
 
         $methodCreateVo = $class->getMethod('createVO');
 
@@ -65,9 +69,15 @@ class ControllerBuilder extends AbstractBuilder
 
         // Replace VoNamespace by the vo class name in the body
         $methodCreateVo->setBody('return '.$voClassName.'::create($entity);');
+    }
+
+    private static function updateMethodCreateForm(ClassType $class, FileDefinition $fileDefinition): void
+    {
+        $config = $fileDefinition->configuration();
+        $formTypeNamespace = $config->getExtraProperty('formType');
+        $voClassName = Str::classNameFromNamespace($config->getExtraProperty('vo'), '');
 
         $formType = \Symfony\Component\Form\Extension\Core\Type\FormType::class;
-        $namespace->removeUse($formType);
 
         // Replace FormType by the form type class name in the body
         $methodCreateForm = $class->getMethod('createForm');
@@ -75,36 +85,16 @@ class ControllerBuilder extends AbstractBuilder
         $body = Str::replace($body, $formType, $formTypeNamespace);
         $methodCreateForm->setBody($body);
 
-        $methodCreateForm->addComment('@param '.$voClassName.'|null $data');
-
-        return $self
-            ->withUse($entityNamespace)
-            ->withUse($formTypeNamespace)
-            ->withUse($voNamespace)
-            ;
+        $methodCreateForm->addComment('@param ' . $voClassName . '|null $data');
     }
 
     private static function buildSimple(FileDefinition $fileDefinition): self|FromTemplateBuilder
     {
         $self = FromTemplateBuilder::build($fileDefinition);
 
-        // Get the namespace of the new file from file definition
-        $newNamespace = $fileDefinition->fullName();
-
-        $namespace = $self->file->getNamespaces()[$fileDefinition->namespace()];
-
-        $classes = $namespace->getClasses();
-        $classesKeys = array_keys($classes);
-        $identifierForTemplateClass = current($classesKeys);
-
-        /** @var ClassType $newClass */
-        $newClass = clone $classes[$identifierForTemplateClass];
-        $newClass->setName(Str::classNameFromNamespace($newNamespace, ''));
-
-        $namespace->add($newClass);
-        $namespace->removeClass($identifierForTemplateClass);
-
-        return $self
-            ->withFileDefinition($self->fileDefinition->withSourceCode((string)$self->file));
+        return (new self($fileDefinition))
+            ->createFromCode((string)$self->file)
+            ->changeClassName($fileDefinition->fullName())
+        ;
     }
 }

@@ -6,7 +6,6 @@ namespace Atournayre\Bundle\MakerBundle\VO\Builder;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
 use Nette\PhpGenerator\Method;
-use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\Property;
 use Webmozart\Assert\Assert;
 
@@ -14,35 +13,22 @@ class DtoBuilder extends AbstractBuilder
 {
     public static function build(FileDefinition $fileDefinition): self
     {
-        $file = new PhpFile;
-        $file->addComment('This file has been auto-generated');
-        $file->setStrictTypes();
-        $file->addClass($fileDefinition->fullName())
-            ->setFinal();
+        $dtoProperties = $fileDefinition->configuration()->dtoProperties();
+
+        $properties = array_map(
+            fn (array $propertyDatas) => self::property($propertyDatas),
+            $dtoProperties
+        );
 
         return (new self($fileDefinition))
-            ->withFile($file)
-            ->withProperties()
-            ->withNamedConstructorFromArray()
-            ->withMethodValidate()
+            ->createFile()
+            ->withProperties($properties)
+            ->addMember(self::namedConstructorFromArray($dtoProperties))
+            ->addMember(self::methodValidate($dtoProperties, $fileDefinition))
         ;
     }
 
-    private function withProperties(): self
-    {
-        $clone = clone $this;
-        $class = $clone->getClass();
-
-        $properties = $this->fileDefinition->configuration()->dtoProperties();
-
-        foreach ($properties as $property) {
-            $class->addMember($this->property($property));
-        }
-
-        return $clone;
-    }
-
-    private function property(array $propertyDatas): Property
+    private static function property(array $propertyDatas): Property
     {
         Assert::inArray(
             $propertyDatas['type'],
@@ -85,15 +71,11 @@ class DtoBuilder extends AbstractBuilder
         ];
     }
 
-    private function withNamedConstructorFromArray(): self
+    private static function namedConstructorFromArray(array $dtoPoperties): Method
     {
-        $clone = clone $this;
-        $class = $clone->getClass();
-        $properties = $clone->fileDefinition->configuration()->dtoProperties();
-
         $bodyParts = [];
         $bodyParts[] = '$dto = new self();';
-        foreach ($properties as $property) {
+        foreach ($dtoPoperties as $property) {
             $bodyParts[] = Str::sprintf('$dto->%s = $data[\'%s\'];', $property['fieldName'], $property['fieldName']);
         }
         $bodyParts[] = '';
@@ -107,26 +89,22 @@ class DtoBuilder extends AbstractBuilder
             $method->addBody($line);
         }
 
-        $class->addMember($method);
-
-        return $clone;
+        return $method;
     }
 
-    private function withMethodValidate(): self
+    private static function methodValidate(array $dtoPoperties, FileDefinition $fileDefinition): Method
     {
-        $clone = clone $this;
-        $class = $clone->getClass();
-        $properties = $clone->fileDefinition->configuration()->dtoProperties();
+        $className = $fileDefinition->classname();
 
         $validationErrors = [];
-        foreach ($properties as $property) {
+        foreach ($dtoPoperties as $property) {
             $if = 'if (%s) {'.PHP_EOL.'    $errors[\'%s\'] = \'validation.%s.%s.empty\';'.PHP_EOL.'}';
             $ifTest = match ($property['type']) {
                 'datetime' => "null === \$this->{$property['fieldName']}",
                 default => "'' == \$this->{$property['fieldName']}",
             };
             $fieldName = Str::property($property['fieldName']);
-            $dtoName = Str::asCamelCase($class->getName());
+            $dtoName = Str::asCamelCase($className);
 
             $validationErrors[] = Str::sprintf($if, $ifTest, $fieldName, $dtoName, $fieldName);
         }
@@ -141,13 +119,9 @@ return $errors;';
 
         $body = Str::sprintf($errors, Str::implode("\n", $validationErrors));
 
-        $method = (new Method('validate'))
+        return (new Method('validate'))
             ->setPublic()
             ->setReturnType('array')
             ->setBody($body);
-
-        $class->addMember($method);
-
-        return $clone;
     }
 }

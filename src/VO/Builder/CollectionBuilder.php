@@ -6,7 +6,6 @@ namespace Atournayre\Bundle\MakerBundle\VO\Builder;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
 use Nette\PhpGenerator\Literal;
-use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\Property;
 use Webmozart\Assert\Assert;
 
@@ -14,41 +13,49 @@ class CollectionBuilder extends AbstractBuilder
 {
     public static function build(FileDefinition $fileDefinition): self|FromTemplateBuilder
     {
-        $config = $fileDefinition->configuration();
-        Assert::true($config->hasExtraProperty('collectionRelatedObject'), 'The collectionRelatedObject property is required');
-        Assert::true($config->hasExtraProperty('collectionIsImmutable'), 'The collectionIsImmutable property is required');
+        $extends = self::extendsClass($fileDefinition);
+        $type = self::collectionType($fileDefinition);
+        $property = self::propertyType($fileDefinition);
 
-        $extends = $config->getExtraProperty('collectionIsImmutable')
-            ? \Atournayre\Collection\TypedCollectionImmutable::class
-            : \Atournayre\Collection\TypedCollection::class;
-        $type = Str::prefixByRootNamespace($config->getExtraProperty('collectionRelatedObject'), $config->rootNamespace());
-
-        $file = new PhpFile;
-        $file->addComment('This file has been auto-generated');
-        $file->setStrictTypes();
-        $file->addClass($fileDefinition->fullName())
-            ->setFinal()
-            ->setExtends($extends)
+        return (new self($fileDefinition))
+            ->createFile()
+            ->extends($extends)
+            ->withUse($extends)
+            ->withUse($type)
+            ->addMember($property)
         ;
+    }
 
-        $property = new Property('type');
-        $property
+    private static function propertyType(FileDefinition $fileDefinition): Property
+    {
+        $type = self::collectionType($fileDefinition);
+
+        return (new Property('type'))
             ->setVisibility('protected')
             ->setStatic()
             ->setType('string')
             ->setValue(new Literal(Str::classNameSemiColonFromNamespace($type)))
         ;
+    }
 
-        $self = (new self($fileDefinition))
-            ->withFile($file);
+    private static function extendsClass(FileDefinition $fileDefinition): string
+    {
+        $config = $fileDefinition->configuration();
+        Assert::true($config->hasExtraProperty('collectionIsImmutable'), 'The collectionIsImmutable property is required');
 
-        $class = $self->getClass();
+        return $config->getExtraProperty('collectionIsImmutable')
+            ? \Atournayre\Collection\TypedCollectionImmutable::class
+            : \Atournayre\Collection\TypedCollection::class;
+    }
 
-        $class->addMember($property);
+    private static function collectionType(FileDefinition $fileDefinition): string
+    {
+        $config = $fileDefinition->configuration();
+        Assert::true($config->hasExtraProperty('collectionRelatedObject'), 'The collectionRelatedObject property is required');
 
-        return ($self)
-            ->withUse($extends)
-            ->withUse($type)
-        ;
+        return Str::prefixByRootNamespace(
+            $config->getExtraProperty('collectionRelatedObject'),
+            $config->rootNamespace()
+        );
     }
 }

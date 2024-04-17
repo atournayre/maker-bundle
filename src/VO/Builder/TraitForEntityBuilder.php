@@ -15,40 +15,37 @@ class TraitForEntityBuilder extends AbstractBuilder
     public static function build(FileDefinition $fileDefinition): self
     {
         $config = $fileDefinition->configuration();
-
-        $file = new PhpFile;
-        $file->addComment('This file has been auto-generated');
-        $file->addTrait($fileDefinition->fullName());
-
-        $trait = (new self($fileDefinition))
-            ->withFile($file)
-            ->withUse(\Doctrine\ORM\Mapping::class, 'ORM');
-
         $traitProperties = $config->traitProperties();
+
+        $uses = [
+            \Doctrine\ORM\Mapping::class => 'ORM',
+        ];
 
         $nullableProperties = array_filter($traitProperties, fn($property) => !$property['nullable']);
         if (!empty($nullableProperties)) {
-            $trait = $trait->withUse(\Webmozart\Assert\Assert::class);
+            $uses[\Webmozart\Assert\Assert::class] = null;
         }
 
         $dateTimeInterfaceProperties = array_filter($traitProperties, fn($property) => $property['type'] === '\DateTimeInterface');
         if (!empty($dateTimeInterfaceProperties)) {
-            $trait = $trait->withUse(\Doctrine\DBAL\Types\Types::class);
+            $uses[\Doctrine\DBAL\Types\Types::class] = null;
         }
 
-        return $trait
-            ->withProperties()
-            ->withPropertyGettersForEntity()
-            ->withPropertySettersForEntity();
+        $properties = array_map(
+            fn(array $propertyDatas) => self::defineProperty($propertyDatas),
+            $traitProperties
+        );
+
+        return (new self($fileDefinition))
+            ->createFileAsTrait()
+            ->withUses($uses)
+            ->withProperties($properties)
+            ->addMembers(self::gettersForEntity($traitProperties))
+            ->addMembers(self::settersForEntity($traitProperties));
     }
 
-    private function withPropertySettersForEntity(): self
+    private static function settersForEntity(array $traitProperties): array
     {
-        $clone = clone $this;
-        $class = $clone->getClass();
-
-        $traitProperties = $clone->fileDefinition->configuration()->traitProperties();
-
         foreach ($traitProperties as $property) {
             $method = new Method(Str::setter($property['fieldName']));
             $method->setPublic()
@@ -62,19 +59,14 @@ class TraitForEntityBuilder extends AbstractBuilder
             $method->addBody('$this->' . $property['fieldName'] . ' = $' . $property['fieldName'] . ';')
                 ->addBody('return $this;');
 
-            $class->addMember($method);
+            $methods[] = $method;
         }
 
-        return $clone;
+        return $methods ?? [];
     }
 
-    private function withPropertyGettersForEntity(): self
+    private static function gettersForEntity(array $traitProperties): array
     {
-        $clone = clone $this;
-        $class = $clone->getClass();
-
-        $traitProperties = $clone->fileDefinition->configuration()->traitProperties();
-
         foreach ($traitProperties as $property) {
             if (!$property['nullable']) {
                 $fieldName = Str::property($property['fieldName']);
@@ -89,7 +81,7 @@ class TraitForEntityBuilder extends AbstractBuilder
 
                 $method->addBody('return $this->' . $property['fieldName'] . ';');
 
-                $class->addMember($method);
+                $methods[] = $method;
             }
 
             $method = new Method(Str::getter($property['fieldName']));
@@ -98,37 +90,24 @@ class TraitForEntityBuilder extends AbstractBuilder
                 ->setReturnNullable()
                 ->setBody('return $this->' . $property['fieldName'] . ';');
 
-            $class->addMember($method);
+            $methods[] = $method;
         }
 
-        return $clone;
+        return $methods ?? [];
     }
 
-    private function withProperties(): self
-    {
-        $clone = clone $this;
-        $class = $clone->getClass();
-        $properties = $clone->fileDefinition->configuration()->traitProperties();
-
-        foreach ($properties as $property) {
-            $class->addMember($this->defineProperty($property));
-        }
-
-        return $clone;
-    }
-
-    private function defineProperty(array $propertyDatas): Property
+    private static function defineProperty(array $propertyDatas): Property
     {
         $type = $propertyDatas['type'];
         $fieldNameRaw = $propertyDatas['fieldName'];
 
         Assert::inArray(
             $type,
-            array_keys($this->correspondingTypes()),
-            Str::sprintf('Property "%s" should be of type %s; %s given', $fieldNameRaw, Str::implode(', ', array_keys($this->correspondingTypes())), $type)
+            array_keys(self::correspondingTypes()),
+            Str::sprintf('Property "%s" should be of type %s; %s given', $fieldNameRaw, Str::implode(', ', array_keys(self::correspondingTypes())), $type)
         );
 
-        $propertyType = $this->correspondingTypes()[$type];
+        $propertyType = self::correspondingTypes()[$type];
 
         $fieldName = Str::property($fieldNameRaw);
 
@@ -139,10 +118,10 @@ class TraitForEntityBuilder extends AbstractBuilder
             ->setValue(null)
         ;
 
-        return $this->propertyUsedByEntity($property);
+        return self::propertyUsedByEntity($property);
     }
 
-    private function correspondingTypes(): array
+    private static function correspondingTypes(): array
     {
         return [
             'string' => 'string',
@@ -153,7 +132,7 @@ class TraitForEntityBuilder extends AbstractBuilder
         ];
     }
 
-    private function propertyUsedByEntity(Property $property): Property
+    private static function propertyUsedByEntity(Property $property): Property
     {
         $clone = clone $property;
 
@@ -161,7 +140,7 @@ class TraitForEntityBuilder extends AbstractBuilder
             'nullable' => true, // By default, all properties are nullable, not to break schema
         ];
 
-        $propertyType = $this->doctrineCorrespondingTypes()[$clone->getType()];
+        $propertyType = self::doctrineCorrespondingTypes()[$clone->getType()];
         if (null !== $propertyType) {
             $columnArgs['type'] = $propertyType;
         }
@@ -171,7 +150,7 @@ class TraitForEntityBuilder extends AbstractBuilder
         return $clone;
     }
 
-    private function doctrineCorrespondingTypes(): array
+    private static function doctrineCorrespondingTypes(): array
     {
         return [
             'string' => null,

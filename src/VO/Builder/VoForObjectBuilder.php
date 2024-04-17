@@ -6,7 +6,6 @@ namespace Atournayre\Bundle\MakerBundle\VO\Builder;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
 use Nette\PhpGenerator\Method;
-use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\Property;
 use Webmozart\Assert\Assert;
 
@@ -14,47 +13,39 @@ class VoForObjectBuilder extends AbstractBuilder
 {
     public static function build(FileDefinition $fileDefinition): self
     {
-        $file = new PhpFile;
-        $file->addComment('This file has been auto-generated');
-        $file->setStrictTypes();
-        $file->addClass($fileDefinition->fullName())
-            ->setFinal();
+        $voProperties = $fileDefinition->configuration()->voProperties();
+        $properties = array_map(fn($property) => self::defineProperty($property), $voProperties);
+        $getters = array_map(fn($property) => self::defineGetter($property), $voProperties);
+        $withers = array_map(fn($property) => self::defineWither($property), $voProperties);
 
         return (new self($fileDefinition))
-            ->withFile($file)
+            ->createFile()
             ->withUse(\Webmozart\Assert\Assert::class)
-            ->withComment()
-            ->withConstructor()
-            ->withNamedConstructor()
-            ->withProperties()
-            ->withGetters()
-            ->withWithers()
+            ->addComment(self::comment())
+            ->addMember(self::constructor($voProperties))
+            ->addMember(self::namedConstructor($voProperties))
+            ->withProperties($properties)
+            ->addMembers($getters)
+            ->addMembers($withers)
         ;
     }
 
-    private function withConstructor(): self
+    private static function constructor(array $voProperties): Method
     {
-        $clone = clone $this;
-        $class = $clone->getClass();
-
         $method = new Method('__construct');
         $method->setPrivate();
 
-        $properties = $clone->fileDefinition->configuration()->voProperties();
-
-        foreach ($properties as $property) {
+        foreach ($voProperties as $property) {
             $method->addParameter($property['fieldName'])
-                ->setType($this->correspondingTypes()[$property['type']])
+                ->setType(self::correspondingTypes()[$property['type']])
             ;
             $method->addBody('$this->' . $property['fieldName'] . ' = $' . $property['fieldName'] . ';');
         }
 
-        $class->addMember($method);
-
-        return $clone;
+        return $method;
     }
 
-    public function correspondingTypes(): array
+    private static function correspondingTypes(): array
     {
         return [
             'string' => 'string',
@@ -65,61 +56,41 @@ class VoForObjectBuilder extends AbstractBuilder
         ];
     }
 
-    private function withNamedConstructor(): self
+    private static function namedConstructor(array $voProperties): Method
     {
-        $clone = clone $this;
-        $class = $clone->getClass();
-
         $method = new Method('create');
         $method->setStatic()
             ->setPublic()
             ->setReturnType('self')
         ;
 
-        $properties = $clone->fileDefinition->configuration()->voProperties();
-
-        foreach ($properties as $property) {
+        foreach ($voProperties as $property) {
             $method->addParameter($property['fieldName'])
-                ->setType($this->correspondingTypes()[$property['type']])
+                ->setType(self::correspondingTypes()[$property['type']])
             ;
         }
 
-        $selfContent = implode(', $', array_column($properties, 'fieldName'));
+        $selfContent = implode(', $', array_column($voProperties, 'fieldName'));
 
         $method->addBody('// Add assertions');
         $method->addBody('');
         $method->addBody('return new self(' . ($selfContent ? '$'.$selfContent : '') . ');');
 
-        $class->addMember($method);
-
-        return $clone;
+        return $method;
     }
 
-    private function withProperties(): self
-    {
-        $clone = clone $this;
-        $class = $clone->getClass();
-        $properties = $clone->fileDefinition->configuration()->voProperties();
-
-        foreach ($properties as $property) {
-            $class->addMember($this->defineProperty($property));
-        }
-
-        return $clone;
-    }
-
-    private function defineProperty(array $property): Property
+    private static function defineProperty(array $property): Property
     {
         $type = $property['type'];
         $fieldNameRaw = $property['fieldName'];
 
         Assert::inArray(
             $type,
-            array_keys($this->correspondingTypes()),
-            Str::sprintf('Property "%s" should be of type %s; %s given', $fieldNameRaw, Str::implode(', ', array_keys($this->correspondingTypes())), $type)
+            array_keys(self::correspondingTypes()),
+            Str::sprintf('Property "%s" should be of type %s; %s given', $fieldNameRaw, Str::implode(', ', array_keys(self::correspondingTypes())), $type)
         );
 
-        $propertyType = $this->correspondingTypes()[$type];
+        $propertyType = self::correspondingTypes()[$type];
 
         $fieldName = Str::property($fieldNameRaw);
 
@@ -129,22 +100,9 @@ class VoForObjectBuilder extends AbstractBuilder
         return $property;
     }
 
-    private function withGetters(): self
+    private static function defineGetter(array $property): Method
     {
-        $clone = clone $this;
-        $class = $clone->getClass();
-        $properties = $clone->fileDefinition->configuration()->voProperties();
-
-        foreach ($properties as $property) {
-            $class->addMember($this->defineGetter($property));
-        }
-
-        return $clone;
-    }
-
-    private function defineGetter(array $property): Method
-    {
-        $propertyType = $this->correspondingTypes()[$property['type']];
+        $propertyType = self::correspondingTypes()[$property['type']];
 
         return (new Method(Str::property($property['fieldName'])))
             ->setPublic()
@@ -152,23 +110,9 @@ class VoForObjectBuilder extends AbstractBuilder
             ->setBody('return $this->' . $property['fieldName'] . ';');
     }
 
-    private function withWithers(): self
+    private static function defineWither(array $property): Method
     {
-        $clone = clone $this;
-        $class = $clone->getClass();
-
-        $properties = $clone->fileDefinition->configuration()->voProperties();
-
-        foreach ($properties as $property) {
-            $class->addMember($this->defineWither($property));
-        }
-
-        return $clone;
-    }
-
-    private function defineWither(array $property): Method
-    {
-        $propertyType = $this->correspondingTypes()[$property['type']];
+        $propertyType = self::correspondingTypes()[$property['type']];
 
         $fieldName = Str::property($property['fieldName']);
 
@@ -187,12 +131,9 @@ class VoForObjectBuilder extends AbstractBuilder
         return $method;
     }
 
-    private function withComment(): self
+    private static function comment(): array
     {
-        $clone = clone $this;
-        $class = $clone->getClass();
-
-        $comment = [
+        return [
             '',
             'ONLY',
             '- primitive types : string, int, float, bool, array, \DateTimeInterface or VO',
@@ -212,11 +153,5 @@ class VoForObjectBuilder extends AbstractBuilder
             '',
             '@object-type VO',
         ];
-
-        foreach ($comment as $line) {
-            $class->addComment($line);
-        }
-
-        return $clone;
     }
 }

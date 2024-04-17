@@ -7,7 +7,6 @@ use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\Helper\UStr;
 use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
 use Nette\PhpGenerator\Method;
-use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\Property;
 use Symfony\Component\String\UnicodeString;
 use Webmozart\Assert\Assert;
@@ -17,21 +16,20 @@ class VoForEntityBuilder extends AbstractBuilder
     public static function build(FileDefinition $fileDefinition): self
     {
         $entityNamespace = self::entityNamespace($fileDefinition);
+        $voProperties = $fileDefinition->configuration()->voProperties();
 
-        $file = new PhpFile;
-        $file->addComment('This file has been auto-generated');
-        $file->setStrictTypes();
-        $file->addClass($fileDefinition->fullName())
-            ->setFinal();
+        $properties = array_map(fn($property) => self::defineProperty($property), $voProperties);
+        $getters = array_map(fn($property) => self::defineGetter($property), $voProperties);
 
         return (new self($fileDefinition))
-            ->withFile($file)
+            ->createFile()
             ->withUse(\Webmozart\Assert\Assert::class)
             ->withUse($entityNamespace->toString())
-            ->withComment()
-            ->withNamedConstructor()
-            ->withProperties()
-            ->withGetters();
+            ->addComment(self::comment())
+            ->addMember(self::namedConstructor($voProperties, $entityNamespace))
+            ->withProperties($properties)
+            ->addMembers($getters)
+            ;
     }
 
     private static function entityNamespace(FileDefinition $fileDefinition): UnicodeString
@@ -40,22 +38,9 @@ class VoForEntityBuilder extends AbstractBuilder
         return UStr::prefixByRootNamespace($config->voRelatedToAnEntity(), $config->rootNamespace());
     }
 
-    private function withGetters(): self
+    private static function defineGetter(array $property): Method
     {
-        $clone = clone $this;
-        $class = $clone->getClass();
-        $properties = $clone->fileDefinition->configuration()->voProperties();
-
-        foreach ($properties as $property) {
-            $class->addMember($this->defineGetter($property));
-        }
-
-        return $clone;
-    }
-
-    private function defineGetter(array $property): Method
-    {
-        $propertyType = $this->correspondingTypes()[$property['type']];
+        $propertyType = self::correspondingTypes()[$property['type']];
 
         return (new Method(Str::property($property['fieldName'])))
             ->setPublic()
@@ -63,7 +48,7 @@ class VoForEntityBuilder extends AbstractBuilder
             ->setBody('return $this->' . $property['fieldName'] . ';');
     }
 
-    public function correspondingTypes(): array
+    private static function correspondingTypes(): array
     {
         return [
             'string' => 'string',
@@ -74,31 +59,18 @@ class VoForEntityBuilder extends AbstractBuilder
         ];
     }
 
-    private function withProperties(): self
-    {
-        $clone = clone $this;
-        $class = $clone->getClass();
-        $properties = $clone->fileDefinition->configuration()->voProperties();
-
-        foreach ($properties as $property) {
-            $class->addMember($this->defineProperty($property));
-        }
-
-        return $clone;
-    }
-
-    private function defineProperty(array $property): Property
+    private static function defineProperty(array $property): Property
     {
         $type = $property['type'];
         $fieldNameRaw = $property['fieldName'];
 
         Assert::inArray(
             $type,
-            array_keys($this->correspondingTypes()),
-            Str::sprintf('Property "%s" should be of type %s; %s given', $fieldNameRaw, Str::implode(', ', array_keys($this->correspondingTypes())), $type)
+            array_keys(self::correspondingTypes()),
+            Str::sprintf('Property "%s" should be of type %s; %s given', $fieldNameRaw, Str::implode(', ', array_keys(self::correspondingTypes())), $type)
         );
 
-        $propertyType = $this->correspondingTypes()[$type];
+        $propertyType = self::correspondingTypes()[$type];
 
         $property = new Property(Str::property($fieldNameRaw));
         $property->setPrivate()->setType($propertyType);
@@ -106,16 +78,11 @@ class VoForEntityBuilder extends AbstractBuilder
         return $property;
     }
 
-    private function withNamedConstructor(): self
+    private static function namedConstructor(array $voProperties, UnicodeString $entityNamespace): Method
     {
-        $properties = $this->fileDefinition->configuration()->voProperties();
-        $clone = clone $this;
-        $class = $clone->getClass();
-
         $method = new Method('create');
         $method->setStatic()->setPublic()->setReturnType('self');
 
-        $entityNamespace = self::entityNamespace($this->fileDefinition);
         $entityName = $entityNamespace
             ->afterLast('\\')
             ->camel()
@@ -125,7 +92,7 @@ class VoForEntityBuilder extends AbstractBuilder
         $method->addBody('// Add assertions here if needed');
         $method->addBody('$self = new self();');
 
-        foreach ($properties as $property) {
+        foreach ($voProperties as $property) {
             $linePattern = '// $self->%s = $%s->%s();';
             $line = Str::sprintf($linePattern, $property['fieldName'], $entityName, Str::getter($property['fieldName']));
             $method->addBody($line);
@@ -133,17 +100,12 @@ class VoForEntityBuilder extends AbstractBuilder
 
         $method->addBody('return $self;');
 
-        $class->addMember($method);
-
-        return $clone;
+        return $method;
     }
 
-    private function withComment(): self
+    private static function comment(): array
     {
-        $clone = clone $this;
-        $class = $clone->getClass();
-
-        $comment = [
+        return [
             '',
             'ONLY',
             '- primitive types : string, int, float, bool, array, \DateTimeInterface or VO',
@@ -163,11 +125,5 @@ class VoForEntityBuilder extends AbstractBuilder
             '',
             '@object-type VO',
         ];
-
-        foreach ($comment as $line) {
-            $class->addComment($line);
-        }
-
-        return $clone;
     }
 }
