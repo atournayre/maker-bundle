@@ -15,7 +15,7 @@ use Nette\PhpGenerator\Property;
 use Nette\PhpGenerator\TraitType;
 use Webmozart\Assert\Assert;
 
-abstract class AbstractBuilder // implements BuilderInterface
+abstract class AbstractBuilder
 {
     protected PhpFile $file;
 
