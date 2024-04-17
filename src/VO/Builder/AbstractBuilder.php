@@ -71,14 +71,6 @@ abstract class AbstractBuilder // implements BuilderInterface
         return $this->file->getClasses()[$this->fileDefinition->fullName()];
     }
 
-    protected function withFileDefinition(FileDefinition $fileDefinition): self
-    {
-        $clone = clone $this;
-        $clone->fileDefinition = $fileDefinition;
-
-        return $clone;
-    }
-
     protected function setAttributes(array $attributes): self
     {
         Assert::allIsInstanceOf($attributes, Attribute::class);
