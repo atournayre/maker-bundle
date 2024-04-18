@@ -250,4 +250,13 @@ abstract class AbstractBuilder
 
         return $clone;
     }
+
+    protected function addTrait(string $trait): self
+    {
+        $clone = clone $this;
+        $class = $clone->getClass();
+        $class->addTrait($trait);
+
+        return $clone;
+    }
 }

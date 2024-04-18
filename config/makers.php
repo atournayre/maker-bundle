@@ -4,6 +4,7 @@ declare(strict_types=1);
 use Atournayre\Bundle\MakerBundle\Maker\MakeCollection;
 use Atournayre\Bundle\MakerBundle\Maker\MakeController;
 use Atournayre\Bundle\MakerBundle\Maker\MakeDto;
+use Atournayre\Bundle\MakerBundle\Maker\MakeEvent;
 use Atournayre\Bundle\MakerBundle\Maker\MakeException;
 use Atournayre\Bundle\MakerBundle\Maker\MakeInterface;
 use Atournayre\Bundle\MakerBundle\Maker\MakeLogger;
@@ -23,6 +24,7 @@ return static function (ContainerConfigurator $container): void {
         ->set(MakeCollection::class)->tag('maker.command')
         ->set(MakeController::class)->tag('maker.command')
         ->set(MakeDto::class)->tag('maker.command')
+        ->set(MakeEvent::class)->tag('maker.command')
         ->set(MakeException::class)->tag('maker.command')
         ->set(MakeInterface::class)->tag('maker.command')
         ->set(MakeLogger::class)->tag('maker.command')
