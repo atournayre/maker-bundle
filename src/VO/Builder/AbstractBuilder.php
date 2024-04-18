@@ -255,7 +255,20 @@ abstract class AbstractBuilder
     {
         $clone = clone $this;
         $class = $clone->getClass();
+
+        $class->removeTrait($trait);
         $class->addTrait($trait);
+
+        return $clone
+            ->withUse($trait);
+    }
+
+    protected function updateMethod(string $methodName, Method $method): self
+    {
+        $clone = clone $this;
+        $class = $clone->getClass();
+        $class->removeMethod($methodName);
+        $class->addMember($method);
 
         return $clone;
     }

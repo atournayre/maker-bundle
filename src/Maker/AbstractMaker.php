@@ -32,8 +32,9 @@ abstract class AbstractMaker extends \Symfony\Bundle\MakerBundle\Maker\AbstractM
 
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
     {
-        $namespace = $input->hasArgument('namespace') ? $input->getArgument('namespace') : '';
-        $namespace = Str::cleanNamespace($namespace);
+        $namespace = $input->hasArgument('namespace')
+            ? Str::cleanNamespace($input->getArgument('namespace'))
+            : '';
 
         $configurations = $this->configurations($namespace);
 

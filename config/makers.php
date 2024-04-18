@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 
+use Atournayre\Bundle\MakerBundle\Maker\MakeAddEventsToEntities;
 use Atournayre\Bundle\MakerBundle\Maker\MakeCollection;
 use Atournayre\Bundle\MakerBundle\Maker\MakeController;
 use Atournayre\Bundle\MakerBundle\Maker\MakeDto;
@@ -21,6 +22,7 @@ return static function (ContainerConfigurator $container): void {
         ->defaults()
         ->private()
         ->autowire()
+        ->set(MakeAddEventsToEntities::class)->tag('maker.command')
         ->set(MakeCollection::class)->tag('maker.command')
         ->set(MakeController::class)->tag('maker.command')
         ->set(MakeDto::class)->tag('maker.command')

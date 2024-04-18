@@ -6,6 +6,7 @@ namespace Atournayre\Bundle\MakerBundle\VO;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Nette\PhpGenerator\PhpFile;
+use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
 use function Symfony\Component\String\u;
 
@@ -119,6 +120,13 @@ class FileDefinition
     {
         $fileDefinition = clone $this;
         $fileDefinition->sourceCode = $sourceCode;
+        return $fileDefinition;
+    }
+
+    public function withSourceCodeFromAbsolutePath(): self
+    {
+        $fileDefinition = clone $this;
+        $fileDefinition->sourceCode = (new SplFileInfo($this->absolutePath, '', ''))->getContents();
         return $fileDefinition;
     }
 
