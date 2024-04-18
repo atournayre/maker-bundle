@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\EventListener;
+namespace App\EventListener\Make;
 
 use App\Collection\EventCollection;
 use App\Trait\EventsTrait;
