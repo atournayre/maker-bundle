@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\EventListener\Make;
 
 use App\Collection\EventCollection;
+use App\Contracts\Event\HasEventsInterface;
 use App\Trait\EventsTrait;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Nette\PhpGenerator\PhpFile;
@@ -25,14 +26,16 @@ final class MakeEntityListener
 
     public function __invoke(ConsoleTerminateEvent $event): void
     {
-        if ($event->getCommand()->getName() !== 'make:entity') {
+        if (!$this->supports($event)) {
             return;
         }
 
-        // Add limitations to exit early
-        // e.g. Skip a specific entity
-
         $this->decorateEntity($event);
+    }
+
+    private function supports(ConsoleTerminateEvent $event): bool
+    {
+        return $event->getCommand()->getName() === 'make:entity';
     }
 
     private function decorateEntity(ConsoleTerminateEvent $event): void
@@ -81,6 +84,11 @@ final class MakeEntityListener
         $namespace = $class->getNamespace();
         $namespace->addUse(EventsTrait::class);
         $namespace->addUse(EventCollection::class);
+        $namespace->addUse(HasEventsInterface::class);
+
+        $implements = $class->getImplements();
+        $implements[] = HasEventsInterface::class;
+        $class->setImplements(array_unique($implements));
 
         $traits = $class->getTraits();
 
