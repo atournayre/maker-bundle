@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
+use Atournayre\Bundle\MakerBundle\Helper\MakeHelper;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\Builder\EventBuilder;
 use Atournayre\Bundle\MakerBundle\VO\Builder\ListenerBuilder;
@@ -65,22 +66,22 @@ class MakeEvent extends AbstractMaker
             return null;
         }
 
-        $defaultType = $this->fieldDefaultType($fieldName);
+        $defaultType = MakeHelper::fieldDefaultType($fieldName);
 
         $type = null;
 
         while (null === $type) {
             $question = new Question('Field type (enter <comment>?</comment> to see all types)', $defaultType);
-            $question->setAutocompleterValues($this->allowedTypes());
+            $question->setAutocompleterValues(MakeHelper::allowedTypes());
             $type = $io->askQuestion($question);
 
             if ('?' === $type) {
-                $io->writeln($this->allowedTypes());
+                $io->writeln(MakeHelper::allowedTypes());
                 $io->writeln('');
 
                 $type = null;
-            } elseif (!\in_array($type, $this->allowedTypes())) {
-                $io->writeln($this->allowedTypes());
+            } elseif (!\in_array($type, MakeHelper::allowedTypes())) {
+                $io->writeln(MakeHelper::allowedTypes());
                 $io->error(sprintf('Invalid type "%s".', $type));
                 $io->writeln('');
 
@@ -112,37 +113,6 @@ class MakeEvent extends AbstractMaker
         }
 
         $this->eventProperties = $currentFields;
-    }
-
-    private function fieldDefaultType(string $fieldName): string
-    {
-        $defaultType = 'string';
-        // try to guess the type by the field name prefix/suffix
-        // convert to snake case for simplicity
-        $snakeCasedField = Str::asSnakeCase($fieldName);
-
-        if ('_at' === $suffix = substr($snakeCasedField, -3)) {
-            $defaultType = 'datetime';
-        } elseif ('_id' === $suffix) {
-            $defaultType = 'integer';
-        } elseif (str_starts_with($snakeCasedField, 'is_')) {
-            $defaultType = 'boolean';
-        } elseif (str_starts_with($snakeCasedField, 'has_')) {
-            $defaultType = 'boolean';
-        }
-
-        return $defaultType;
-    }
-
-    private function allowedTypes(): array
-    {
-        return [
-            'string',
-            'integer',
-            'float',
-            'boolean',
-            'datetime',
-        ];
     }
 
     protected function configurations(string $namespace): array

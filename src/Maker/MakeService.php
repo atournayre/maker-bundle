@@ -6,6 +6,7 @@ namespace Atournayre\Bundle\MakerBundle\Maker;
 use App\Attribute\CommandService;
 use App\Attribute\QueryService;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
+use Atournayre\Bundle\MakerBundle\Helper\MakeHelper;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\Builder\AddAttributeBuilder;
 use Atournayre\Bundle\MakerBundle\VO\Builder\ServiceCommandBuilder;
@@ -21,7 +22,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
-use Symfony\Component\Finder\Finder;
 
 #[AutoconfigureTag('maker.command')]
 class MakeService extends AbstractMaker
@@ -91,17 +91,12 @@ class MakeService extends AbstractMaker
 
     private function availableVOs(): array
     {
-        $finder = (new Finder())
-            ->files()
-            ->in(Str::sprintf('%s/VO', $this->rootDir))
-            ->name('*.php')
-            ->sortByName();
-
-        $vos = [];
-        foreach ($finder as $file) {
-            $vos[] = Str::namespaceFromPath($file->getPathname(), $this->rootDir);
-        }
-        return $vos;
+        return array_map(
+            fn(string $file) => Str::namespaceFromPath($file, $this->rootDir),
+            MakeHelper::findFilesInDirectory([
+                Str::sprintf('%s/VO', $this->rootDir),
+            ])
+        );
     }
 
     protected function configurations(string $namespace): array
@@ -132,12 +127,8 @@ class MakeService extends AbstractMaker
 
     public function configureDependencies(DependencyBuilder $dependencies): void
     {
-        $deps = [
+        MakeHelper::configureDependencies($dependencies, [
             \Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag::class => 'symfony/dependency-injection',
-        ];
-
-        foreach ($deps as $class => $package) {
-            $dependencies->addClassDependency($class, $package);
-        }
+        ]);
     }
 }

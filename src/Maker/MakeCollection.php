@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
+use Atournayre\Bundle\MakerBundle\Helper\MakeHelper;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\Builder\CollectionBuilder;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
@@ -15,8 +16,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Finder\Finder;
 
 #[AutoconfigureTag('maker.command')]
 class MakeCollection extends AbstractMaker
@@ -59,35 +58,14 @@ class MakeCollection extends AbstractMaker
 
     private function relatedObjects(): array
     {
-        return $this->findFilesInDirectory([
-            Str::sprintf('%s/Entity', $this->rootDir),
-            Str::sprintf('%s/DTO', $this->rootDir),
-            Str::sprintf('%s/VO/Entity', $this->rootDir),
-        ]);
-    }
-
-    private function findFilesInDirectory(string|array $directory): array
-    {
-        $directories = array_filter(
-            is_array($directory) ? $directory : [$directory],
-            fn($directory) => (new Filesystem())->exists($directory)
+        return array_map(
+            fn(string $file) => Str::namespaceFromPath($file, $this->rootDir),
+            MakeHelper::findFilesInDirectory([
+                Str::sprintf('%s/Entity', $this->rootDir),
+                Str::sprintf('%s/DTO', $this->rootDir),
+                Str::sprintf('%s/VO/Entity', $this->rootDir),
+            ])
         );
-
-        if ([] === $directories) {
-            return [];
-        }
-
-        $finder = (new Finder())
-            ->files()
-            ->in($directories)
-            ->name('*.php')
-            ->sortByName();
-
-        $files = [];
-        foreach ($finder as $file) {
-            $files[] = Str::namespaceFromPath($file->getPathname(), $this->rootDir);
-        }
-        return $files;
     }
 
     protected function configurations(string $namespace): array
