@@ -6,6 +6,7 @@ namespace Atournayre\Bundle\MakerBundle\Maker;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\Builder\EventBuilder;
+use Atournayre\Bundle\MakerBundle\VO\Builder\ListenerBuilder;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
@@ -28,13 +29,13 @@ class MakeEvent extends AbstractMaker
     public function configureCommand(Command $command, InputConfiguration $inputConfig): void
     {
         $command
-            ->setDescription('Creates a new Event')
+            ->setDescription('Creates a new Event (and Listener)')
             ->addArgument('namespace', InputArgument::REQUIRED, 'The namespace of the Event <fg=yellow>(e.g. App\\\\Event\\\\DummyEvent)</>');
     }
 
     public static function getCommandDescription(): string
     {
-        return 'Create a new Event';
+        return 'Create a new Event (and Listener)';
     }
 
     private function askForNextField(ConsoleStyle $io, array $fields, bool $isFirstField): ?array
@@ -146,13 +147,21 @@ class MakeEvent extends AbstractMaker
 
     protected function configurations(string $namespace): array
     {
-        $configurations[] = (new MakerConfig(
-            namespace: $namespace,
-            builder: EventBuilder::class,
-            classnameSuffix: 'Event',
-        ))->withExtraProperty('eventProperties', $this->eventProperties);
+        $listenerNamespace = Str::replace($namespace, 'Event', 'Listener');
+        $listenerNamespace = Str::replace($listenerNamespace, '\Listener\\', '\EventListener\\');
 
-        return $configurations ?? [];
+        return [
+            (new MakerConfig(
+                namespace: $namespace,
+                builder: EventBuilder::class,
+                classnameSuffix: 'Event',
+            ))->withExtraProperty('eventProperties', $this->eventProperties),
+            (new MakerConfig(
+                namespace: $listenerNamespace,
+                builder: ListenerBuilder::class,
+                classnameSuffix: 'Listener',
+            ))->withExtraProperty('eventNamespace', $namespace),
+        ];
     }
 
     public function configureDependencies(DependencyBuilder $dependencies): void
