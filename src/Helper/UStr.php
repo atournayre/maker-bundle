@@ -103,4 +103,9 @@ class UStr
     {
         return u($namespace)->replace('\\\\', '\\');
     }
+
+    public static function startsWith(string $classname, string $string): bool
+    {
+        return u($classname)->startsWith($string);
+    }
 }

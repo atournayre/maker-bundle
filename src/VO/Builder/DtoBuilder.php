@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\VO\Builder;
 
+use App\Contracts\Null\NullableInterface;
+use Atournayre\Bundle\MakerBundle\Helper\MakeHelper;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
 use Nette\PhpGenerator\Method;
@@ -20,11 +22,15 @@ class DtoBuilder extends AbstractBuilder
             $dtoProperties
         );
 
+        $nullableTrait = MakeHelper::nullableTrait($fileDefinition);
+
         return (new self($fileDefinition))
             ->createFile()
             ->withProperties($properties)
             ->addMember(self::namedConstructorFromArray($dtoProperties))
             ->addMember(self::methodValidate($dtoProperties, $fileDefinition))
+            ->addImplement(NullableInterface::class)
+            ->addTrait($nullableTrait)
         ;
     }
 

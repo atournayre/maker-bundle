@@ -89,4 +89,9 @@ class Str
     {
         return UStr::cleanNamespace($namespace)->toString();
     }
+
+    public static function startsWith(string $classname, string $string): bool
+    {
+        return UStr::startsWith($classname, $string);
+    }
 }

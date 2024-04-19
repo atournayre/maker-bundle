@@ -400,4 +400,31 @@ class HelperTest extends TestCase
     {
         self::assertEquals($expected, Str::cleanNamespace($namespace));
     }
+
+    public static function dataProviderStartsWith(): array
+    {
+        return [
+            ['App\DTO\Dummy', 'App', true],
+            ['App\DTO\Dummy', 'App\DTO', true],
+            ['App\DTO\Dummy', 'App\DTO\Dummy', true],
+            ['App\DTO\Dummy', 'App\DTO\Dummy\Extra', false],
+            ['App\DTO\Dummy', 'App\DTO\Extra', false],
+            ['App\DTO\Dummy', 'App\Extra', false],
+            ['App\DTO\Dummy', 'Extra', false],
+        ];
+    }
+
+    /**
+     * @dataProvider dataProviderStartsWith
+     * @covers       \Atournayre\Bundle\MakerBundle\Helper\Str::startsWith
+     * @covers       \Atournayre\Bundle\MakerBundle\Helper\UStr::startsWith
+     * @param string $string
+     * @param string $prefix
+     * @param bool $expected
+     * @return void
+     */
+    public function testStartsWith(string $string, string $prefix, bool $expected): void
+    {
+        self::assertEquals($expected, Str::startsWith($string, $prefix));
+    }
 }

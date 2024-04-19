@@ -182,8 +182,8 @@ abstract class AbstractBuilder
         $clone = clone $this;
         $class = $clone->getClass();
         $class->addImplement($interface);
-
-        return $clone;
+        return $clone
+            ->withUse($interface);
     }
 
     protected function addMembers(array $members): self

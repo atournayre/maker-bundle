@@ -3,8 +3,10 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Helper;
 
+use App\Trait\NotNullableTrait;
+use App\Trait\NullableTrait;
+use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
-use Symfony\Bundle\MakerBundle\Str;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 
@@ -69,5 +71,14 @@ final class MakeHelper
         foreach ($dependencies as $class => $package) {
             $dependencyBuilder->addClassDependency($class, $package);
         }
+    }
+
+    public static function nullableTrait(FileDefinition $fileDefinition): string
+    {
+        if (Str::startsWith($fileDefinition->classname(), 'Null')) {
+            return NullableTrait::class;
+        }
+
+        return NotNullableTrait::class;
     }
 }
