@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\VO\Builder;
 
+use App\Contracts\Null\NullableInterface;
+use Atournayre\Bundle\MakerBundle\Helper\MakeHelper;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\Helper\UStr;
 use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
@@ -20,6 +22,7 @@ class VoForEntityBuilder extends AbstractBuilder
 
         $properties = array_map(fn($property) => self::defineProperty($property), $voProperties);
         $getters = array_map(fn($property) => self::defineGetter($property), $voProperties);
+        $nullableTrait = MakeHelper::nullableTrait($fileDefinition);
 
         return (new self($fileDefinition))
             ->createFile()
@@ -29,6 +32,8 @@ class VoForEntityBuilder extends AbstractBuilder
             ->addMember(self::namedConstructor($voProperties, $entityNamespace))
             ->withProperties($properties)
             ->addMembers($getters)
+            ->addImplement(NullableInterface::class)
+            ->addTrait($nullableTrait)
             ;
     }
 

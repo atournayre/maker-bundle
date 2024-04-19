@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\VO\Builder;
 
+use App\Contracts\Null\NullableInterface;
+use Atournayre\Bundle\MakerBundle\Helper\MakeHelper;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
 use Nette\PhpGenerator\Method;
@@ -17,6 +19,7 @@ class VoForObjectBuilder extends AbstractBuilder
         $properties = array_map(fn($property) => self::defineProperty($property), $voProperties);
         $getters = array_map(fn($property) => self::defineGetter($property), $voProperties);
         $withers = array_map(fn($property) => self::defineWither($property), $voProperties);
+        $nullableTrait = MakeHelper::nullableTrait($fileDefinition);
 
         return (new self($fileDefinition))
             ->createFile()
@@ -27,6 +30,8 @@ class VoForObjectBuilder extends AbstractBuilder
             ->withProperties($properties)
             ->addMembers($getters)
             ->addMembers($withers)
+            ->addImplement(NullableInterface::class)
+            ->addTrait($nullableTrait)
         ;
     }
 
