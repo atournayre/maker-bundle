@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Atournayre\Bundle\MakerBundle\VO\Builder;
 
 use App\Contracts\Null\NullableInterface;
+use App\Trait\IsTrait;
 use Atournayre\Bundle\MakerBundle\Helper\MakeHelper;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
@@ -32,6 +33,7 @@ class VoForObjectBuilder extends AbstractBuilder
             ->addMembers($withers)
             ->addImplement(NullableInterface::class)
             ->addTrait($nullableTrait)
+            ->addTrait(IsTrait::class)
         ;
     }
 
