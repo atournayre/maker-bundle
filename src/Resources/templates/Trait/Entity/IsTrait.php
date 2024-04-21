@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Trait;
+namespace App\Trait\Entity;
 
 use Webmozart\Assert\Assert;
 
-trait EntityIsTrait
+trait IsTrait
 {
 	public function is(self $entity): bool
 	{
@@ -16,7 +16,6 @@ trait EntityIsTrait
 
 	public function isNot(self $entity): bool
 	{
-		Assert::propertyExists($entity, 'id', 'Entity must have an id property');
-		return $this->id !== $entity->id;
+		return !$this->is($entity);
 	}
 }

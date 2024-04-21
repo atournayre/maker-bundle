@@ -8,8 +8,8 @@ use App\Contracts\Event\HasEventsInterface;
 use App\Entity\Traits\BlameableEntityTrait;
 use App\Entity\Traits\TimestampableEntityTrait;
 use App\Trait\EventsTrait;
-use App\Trait\IdEntityTrait;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
+use App\Trait\Entity\IdTrait;
 use Nette\PhpGenerator\PhpFile;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -136,6 +136,6 @@ final class MakeEntityListener
             $class->removeMethod('getId');
         }
 
-        $class->addTrait(IdEntityTrait::class);
+        $class->addTrait(IdTrait::class);
     }
 }

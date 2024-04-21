@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Trait;
+namespace App\Trait\Entity;
 
 use ApiPlatform\Metadata\ApiProperty;
 use Doctrine\ORM\Mapping as ORM;
 
-trait IdEntityTrait
+trait IdTrait
 {
-	use EntityIsTrait;
+	use IsTrait;
 
 	#[ORM\Id]
 	#[ORM\Column]
