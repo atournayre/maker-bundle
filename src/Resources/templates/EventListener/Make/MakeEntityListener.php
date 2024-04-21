@@ -5,7 +5,10 @@ namespace App\EventListener\Make;
 
 use App\Collection\EventCollection;
 use App\Contracts\Event\HasEventsInterface;
+use App\Entity\Traits\BlameableEntityTrait;
+use App\Entity\Traits\TimestampableEntityTrait;
 use App\Trait\EventsTrait;
+use App\Trait\IdEntityTrait;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Nette\PhpGenerator\PhpFile;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
@@ -46,7 +49,10 @@ final class MakeEntityListener
 
         $phpFile = PhpFile::fromCode($entity->getContents());
 
+        $this->updateId($phpFile);
         $this->addEvents($phpFile);
+        $this->addTrait($phpFile, BlameableEntityTrait::class);
+        $this->addTrait($phpFile, TimestampableEntityTrait::class);
         // Add other changes here
 
         file_put_contents($entity->getPathname(), (string)$phpFile);
@@ -101,5 +107,35 @@ final class MakeEntityListener
         $class->hasMethod('__construct') ?: $class->addMethod('__construct');
         $constructor = $class->getMethod('__construct');
         $constructor->addBody('$this->events = EventCollection::createAsList([]);');
+    }
+
+    private function addTrait(PhpFile $phpFile, string $trait): void
+    {
+        $classes = $phpFile->getClasses();
+        $class = array_shift($classes);
+
+        $namespace = $class->getNamespace();
+        $namespace->addUse($trait);
+
+        $traits = $class->getTraits();
+
+        if (array_key_exists($trait, $traits)) {
+            return;
+        }
+
+        $class->addTrait($trait);
+    }
+
+    private function updateId(PhpFile $phpFile): void
+    {
+        $classes = $phpFile->getClasses();
+        $class = array_shift($classes);
+
+        if ($class->hasProperty('id')) {
+            $class->removeProperty('id');
+            $class->removeMethod('getId');
+        }
+
+        $class->addTrait(IdEntityTrait::class);
     }
 }
