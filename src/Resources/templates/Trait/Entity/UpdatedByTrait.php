@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Entity\Traits;
+namespace App\Trait\Entity;
 
 use App\Contracts\Security\UserInterface;
 use Doctrine\ORM\Mapping as ORM;

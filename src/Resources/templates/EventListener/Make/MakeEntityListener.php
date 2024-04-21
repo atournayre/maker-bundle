@@ -5,8 +5,8 @@ namespace App\EventListener\Make;
 
 use App\Collection\EventCollection;
 use App\Contracts\Event\HasEventsInterface;
-use App\Entity\Traits\BlameableEntityTrait;
-use App\Entity\Traits\TimestampableEntityTrait;
+use App\Trait\Entity\BlameableEntityTrait;
+use App\Trait\Entity\TimestampableEntityTrait;
 use App\Trait\EventsTrait;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use App\Trait\Entity\IdTrait;
