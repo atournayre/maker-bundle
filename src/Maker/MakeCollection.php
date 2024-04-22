@@ -22,6 +22,7 @@ class MakeCollection extends AbstractMaker
 {
     private ?string $collectionRelatedObject = null;
     private bool $collectionIsImmutable = true;
+    private bool $collectionOfDecimals = false;
 
     public static function getCommandName(): string
     {
@@ -43,6 +44,13 @@ class MakeCollection extends AbstractMaker
     public function interact(InputInterface $input, ConsoleStyle $io, Command $command): void
     {
         parent::interact($input, $io, $command);
+
+        $questionDecimal = new Question('Is it a collection of decimal values? (yes/no)', 'no');
+        $this->collectionOfDecimals = $io->askQuestion($questionDecimal) === 'yes';
+
+        if ($this->collectionOfDecimals) {
+            return;
+        }
 
         $questionImmutablility = new Question('Collection must be immutable? (yes/no)', 'yes');
         $this->collectionIsImmutable = $io->askQuestion($questionImmutablility) === 'yes';
@@ -70,14 +78,25 @@ class MakeCollection extends AbstractMaker
 
     protected function configurations(string $namespace): array
     {
-        $configurations[] = (new MakerConfig(
-            namespace: $namespace,
-            builder: CollectionBuilder::class,
-        ))
-            ->withExtraProperty('collectionRelatedObject', Str::prefixByRootNamespace($this->collectionRelatedObject, $this->rootNamespace))
-            ->withExtraProperty('collectionIsImmutable', $this->collectionIsImmutable);
+        if ($this->collectionOfDecimals) {
+            return [
+                (new MakerConfig(
+                    namespace: $namespace,
+                    builder: CollectionBuilder::class,
+                    classnameSuffix: 'Collection',
+                ))->withExtraProperty('collectionOfDecimals', $this->collectionOfDecimals)
+            ];
+        }
 
-        return $configurations ?? [];
+        return [
+            (new MakerConfig(
+                namespace: $namespace,
+                builder: CollectionBuilder::class,
+                classnameSuffix: 'Collection',
+            ))
+            ->withExtraProperty('collectionRelatedObject', Str::prefixByRootNamespace($this->collectionRelatedObject, $this->rootNamespace))
+            ->withExtraProperty('collectionIsImmutable', $this->collectionIsImmutable)
+        ];
     }
 
     public function configureDependencies(DependencyBuilder $dependencies): void

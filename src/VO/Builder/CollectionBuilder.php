@@ -41,6 +41,11 @@ class CollectionBuilder extends AbstractBuilder
     private static function extendsClass(FileDefinition $fileDefinition): string
     {
         $config = $fileDefinition->configuration();
+
+        if ($config->hasExtraProperty('collectionOfDecimals')) {
+            return \Atournayre\Collection\DecimalValueCollection::class;
+        }
+
         Assert::true($config->hasExtraProperty('collectionIsImmutable'), 'The collectionIsImmutable property is required');
 
         return $config->getExtraProperty('collectionIsImmutable')
@@ -51,6 +56,11 @@ class CollectionBuilder extends AbstractBuilder
     private static function collectionType(FileDefinition $fileDefinition): string
     {
         $config = $fileDefinition->configuration();
+
+        if ($config->hasExtraProperty('collectionOfDecimals')) {
+            return \Atournayre\Types\DecimalValue::class;
+        }
+
         Assert::true($config->hasExtraProperty('collectionRelatedObject'), 'The collectionRelatedObject property is required');
 
         return Str::prefixByRootNamespace(
