@@ -49,7 +49,8 @@ Legend:
 
 | Status | Command                       | Description and documentation                                           |
 |--------|-------------------------------|-------------------------------------------------------------------------|
-| ✅️     | `make:add:events-to-entities` | [Add events to entities](docs/add-events-to-entities.md)               |
+| ✅️     | `make:add:events-to-entities` | [Add events to entities](docs/add-events-to-entities.md)                |
+| ✅️     | `make:new:command`            | [Create a new Command](docs/new-default.md)                             |
 | ⚠️     | `make:new:controller`         | [Create a new Controller](docs/new-default.md)                          |
 | ✅️     | `make:new:collection`         | [Create a new Collection](docs/new-default.md)                          |
 | ✅      | `make:new:dto`                | [Create a new DTO](docs/new-default.md)                                 |
