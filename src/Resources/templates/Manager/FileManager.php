@@ -4,11 +4,12 @@ declare(strict_types=1);
 namespace App\Manager;
 
 use App\Collection\SplFileInfoCollection;
+use Atournayre\Bundle\MakerBundle\Resources\templates\Contracts\FileManagerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use function Symfony\Component\String\u;
 
-final class FileManager
+final class FileManager implements FileManagerInterface
 {
     public readonly Finder $finder;
     public readonly Filesystem $filesystem;
@@ -20,9 +21,9 @@ final class FileManager
         $this->filesystem = new Filesystem();
     }
 
-    public static function from(string $projectDir): self
+    public static function from(string $directoryOrFile): self
     {
-        return new self($projectDir);
+        return new self($directoryOrFile);
     }
 
     public function createDirectory(string $directory): void
