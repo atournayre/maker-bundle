@@ -6,6 +6,7 @@ namespace App\EventListener\Make;
 use App\Collection\EventCollection;
 use App\Contracts\Event\HasEventsInterface;
 use App\Trait\Entity\BlameableEntityTrait;
+use App\Trait\Entity\IsTrait;
 use App\Trait\Entity\TimestampableEntityTrait;
 use App\Trait\EventsTrait;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
@@ -53,6 +54,7 @@ final class MakeEntityListener
         $this->addEvents($phpFile);
         $this->addTrait($phpFile, BlameableEntityTrait::class);
         $this->addTrait($phpFile, TimestampableEntityTrait::class);
+        $this->addTrait($phpFile, IsTrait::class);
         // Add other changes here
 
         file_put_contents($entity->getPathname(), (string)$phpFile);
