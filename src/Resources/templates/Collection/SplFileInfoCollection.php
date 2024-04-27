@@ -14,6 +14,46 @@ final class SplFileInfoCollection extends TypedCollection
     public static function fromFinder(Finder $finder): self
     {
         $files = iterator_to_array($finder);
-        return self::createAsMap($files);
+        return self::createAsList($files);
     }
+
+    public function filterByExtension(string $extension): self
+    {
+        $array = $this
+            ->toMap()
+            ->filter(fn(SplFileInfo $file) => $file->getExtension() === $extension)
+            ->toArray();
+
+        return self::createAsList($array);
+    }
+
+    public function filterBySize(int $size): self
+    {
+        $array = $this
+            ->toMap()
+            ->filter(fn(SplFileInfo $file) => $file->getSize() === $size)
+            ->toArray();
+
+        return self::createAsList($array);
+    }
+
+    public function filterByContent(string $content): self
+    {
+        $array = $this
+            ->toMap()
+            ->filter(fn(SplFileInfo $file) => str_contains($file->getContents(), $content))
+            ->toArray();
+
+        return self::createAsList($array);
+    }
+
+    public function totalSize(): float
+    {
+        return $this
+            ->toMap()
+            ->map(fn(SplFileInfo $file) => $file->getSize())
+            ->sum();
+    }
+
+
 }
