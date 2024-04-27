@@ -30,7 +30,7 @@ class TraitForObjectBuilder extends AbstractBuilder
     private static function gettersForObject(array $traitProperties): array
     {
         foreach ($traitProperties as $property) {
-            $fieldName = Str::property($property['fieldName']);
+            $fieldName = Str::gett($property['fieldName']);
             $propertyType = self::correspondingTypes()[$property['type']];
 
             $method = new Method($fieldName);

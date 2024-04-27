@@ -69,7 +69,7 @@ class TraitForEntityBuilder extends AbstractBuilder
     {
         foreach ($traitProperties as $property) {
             if (!$property['nullable']) {
-                $fieldName = Str::property($property['fieldName']);
+                $fieldName = Str::getter($property['fieldName']);
                 $method = new Method($fieldName);
                 $method->setPublic()
                     ->setReturnType($property['type'])
