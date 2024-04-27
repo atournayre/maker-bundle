@@ -3,16 +3,14 @@ declare(strict_types=1);
 
 namespace App\Configuration;
 
+use App\Contracts\Mail\MailerConfigurationInterface;
+use App\Trait\Mail\MailerConfigurationTrait;
 use App\Type\Primitive\IntegerType;
 use Atournayre\Types\EmailAddress;
 
-final class MailerConfiguration
+final class MailerConfiguration implements MailerConfigurationInterface
 {
-    public readonly ?EmailAddress $fromAddress;
-    public readonly ?string $fromName;
-    public readonly ?EmailAddress $replyToAddress;
-    public readonly ?string $replyToName;
-    public readonly ?IntegerType $attachmentsMaxSize;
+    use MailerConfigurationTrait;
 
     public function __construct(
         // Add autowire
