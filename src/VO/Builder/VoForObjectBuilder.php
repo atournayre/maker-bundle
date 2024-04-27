@@ -111,7 +111,7 @@ class VoForObjectBuilder extends AbstractBuilder
     {
         $propertyType = self::correspondingTypes()[$property['type']];
 
-        return (new Method(Str::property($property['fieldName'])))
+        return (new Method(Str::getter($property['fieldName'])))
             ->setPublic()
             ->setReturnType($propertyType)
             ->setBody('return $this->' . $property['fieldName'] . ';');
