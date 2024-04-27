@@ -45,11 +45,9 @@ class ServiceQueryBuilder extends AbstractBuilder
             ->setAttributes($attributes)
             ->addImplement(PreConditionsChecksInterface::class)
             ->addImplement(FailFastInterface::class)
-            ->addImplement(TagQueryServiceInterface::class)
             ->addImplement(PostConditionsChecksInterface::class)
             ->addMember(self::implementationOfInterface(PreConditionsChecksInterface::class, $voParameter))
             ->addMember(self::implementationOfInterface(FailFastInterface::class, $voParameter))
-            ->addMember(self::implementationOfInterface(TagQueryServiceInterface::class, $voParameter))
             ->addMember(self::implementationOfInterface(PostConditionsChecksInterface::class, $voParameter))
             ->addMember(self::invoke())
         ;
@@ -58,8 +56,10 @@ class ServiceQueryBuilder extends AbstractBuilder
     private static function invoke(): Method
     {
         return (new Method('__invoke'))
-            ->setPrivate()
-            ->addComment('This service is not meant to be used directly');
+            ->setPublic()
+            ->addComment('This service is not meant to be used directly')
+            ->addComment('@throws \RuntimeException')
+            ->setBody('throw new \RuntimeException(\'This service is not meant to be used directly\');');
     }
 
     private static function implementationOfInterface(string $interface, string $objectType): array

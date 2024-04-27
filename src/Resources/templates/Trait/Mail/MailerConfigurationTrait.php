@@ -14,36 +14,30 @@ trait MailerConfigurationTrait
 	private ?string $replyToName = null;
 	private ?IntegerType $attachmentsMaxSize = null;
 
-
 	public function fromAddress(): ?EmailAddress
 	{
 		return $this->fromAddress;
 	}
-
 
 	public function fromName(): ?string
 	{
 		return $this->fromName;
 	}
 
-
 	public function replyToAddress(): ?EmailAddress
 	{
 		return $this->replyToAddress;
 	}
-
 
 	public function replyToName(): ?string
 	{
 		return $this->replyToName;
 	}
 
-
 	public function attachmentsMaxSize(): ?IntegerType
 	{
 		return $this->attachmentsMaxSize;
 	}
-
 
 	public function withFromAddress(?EmailAddress $fromAddress): self
 	{
@@ -52,14 +46,12 @@ trait MailerConfigurationTrait
 		return $clone;
 	}
 
-
 	public function withFromName(?string $fromName): self
 	{
 		$clone = clone $this;
 		$clone->fromName = $fromName;
 		return $clone;
 	}
-
 
 	public function withReplyToAddress(?EmailAddress $replyToAddress): self
 	{
@@ -68,7 +60,6 @@ trait MailerConfigurationTrait
 		return $clone;
 	}
 
-
 	public function withReplyToName(?string $replyToName): self
 	{
 		$clone = clone $this;
@@ -76,11 +67,35 @@ trait MailerConfigurationTrait
 		return $clone;
 	}
 
-
 	public function withAttachmentsMaxSize(?IntegerType $attachmentsMaxSize): self
 	{
 		$clone = clone $this;
 		$clone->attachmentsMaxSize = $attachmentsMaxSize;
 		return $clone;
 	}
+
+    public function setFromAddress(?string $fromAddress): void
+    {
+        $this->fromAddress = $fromAddress ? EmailAddress::fromString($fromAddress) : null;
+    }
+
+    public function setFromName(?string $fromName): void
+    {
+        $this->fromName = $fromName;
+    }
+
+    public function setReplyToAddress(?string $replyToAddress): void
+    {
+        $this->replyToAddress = $replyToAddress ? EmailAddress::fromString($replyToAddress) : null;
+    }
+
+    public function setReplyToName(?string $replyToName): void
+    {
+        $this->replyToName = $replyToName;
+    }
+
+    public function setAttachmentsMaxSize(?int $attachmentsMaxSize): void
+    {
+        $this->attachmentsMaxSize = $attachmentsMaxSize ? IntegerType::fromInt($attachmentsMaxSize) : null;
+    }
 }
