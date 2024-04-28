@@ -18,7 +18,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Atournayre\\Bundle\\MakerBundle\\": "src/"
+            "Atournayre\\Bundle\\MakerBundle\\": "src/",
+            "App\\": "src/Resources/templates"
         }
     },
     "autoload-dev": {
