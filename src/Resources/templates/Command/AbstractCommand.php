@@ -19,7 +19,6 @@ abstract class AbstractCommand extends Command implements CommandInterface
     private static string $STOPWATCH_EXECUTION_POST_CONDITIONS = 'post_conditions';
     private static string $STOPWATCH_EXECUTION_FAIL_FAST = 'fail_fast';
     private static string $STOPWATCH_EXECUTION_EXECUTE = 'execute';
-
     private SymfonyStyle $io;
     protected bool $force;
 
@@ -58,7 +57,6 @@ abstract class AbstractCommand extends Command implements CommandInterface
         $currentDateTime = $this->clock->now();
         $stopwatch = new Stopwatch();
         $stopwatch->start(self::$STOPWATCH_EXECUTION);
-        $hasError = false;
 
         $this->io->section($this->title());
 
@@ -86,15 +84,17 @@ abstract class AbstractCommand extends Command implements CommandInterface
 
             $this->logger->success();
             $this->writeSuccessMessage($this->io);
-        } catch (\Exception $e) {
-            $this->logger->exception($e);
-            $hasError = true;
-        } finally {
             $this->logger->end();
             $stopwatch->stop(self::$STOPWATCH_EXECUTION);
             $this->writeLogs($input, $stopwatch);
-
-            return $hasError ? Command::FAILURE : Command::SUCCESS;
+            return Command::SUCCESS;
+        } catch (\Exception $e) {
+            $this->logger->exception($e);
+            $this->logger->end();
+            $stopwatch->stop(self::$STOPWATCH_EXECUTION);
+            $this->writeLogs($input, $stopwatch);
+            $this->io->error($e->getMessage());
+            return Command::FAILURE;
         }
     }
 
@@ -121,6 +121,12 @@ abstract class AbstractCommand extends Command implements CommandInterface
         }
 
         $this->io->table(['Section', 'Started', 'Ended', 'Duration', 'Memory'], array_map(function ($section) use ($stopwatch) {
+            $eventsNames = array_keys(current($stopwatch->getSections())->getEvents());
+
+            if (!in_array($section, $eventsNames)) {
+                return [$section, 'N/A', 'N/A', 'N/A', 'N/A'];
+            }
+
             $event = $stopwatch->getEvent($section);
             $dateTime = new \DateTime();
             $originInSec = (int)($event->getOrigin() / 1000);
