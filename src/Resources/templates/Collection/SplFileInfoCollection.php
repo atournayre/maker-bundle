@@ -54,6 +54,4 @@ final class SplFileInfoCollection extends TypedCollection
             ->map(fn(SplFileInfo $file) => $file->getSize())
             ->sum();
     }
-
-
 }
