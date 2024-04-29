@@ -1,20 +1,26 @@
 # Sending emails
 
 ## Files
+- Adapter
+  - Mail
+    - SymfonyEmailAdapter.php
+- Collection
+  - Mail
+    - EmailAddressCollection.php
+    - TagCollection.php
 - Configuration
   - MailerConfiguration.php
 - Contracts
   - Mail
     - ConfigurationMailInterface.php
-    - MailerConfigurationInterface.php
     - SendMailInterface.php
 - Service
   - Mail
     - MailService.php
     - SymfonySendMailService.php
-- Trait
+- VO
   - Mail
-    - MailerConfigurationTrait.php
+    - Email.php
 
 ## Configuration
 
@@ -45,21 +51,46 @@ Use the `MailService` to send emails.
 ```php
 namespace App\Service;
 
+use App\Collection\Mail\EmailAddressCollection;
+use App\Collection\TagCollection;
 use App\Service\Mail\MailService;
+use Atournayre\Types\EmailAddress;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-class MyService
+final class MyService
 {
     public function __construct(
         #[Autowire(service: 'app.mailer.send.noreply')]
         private MailService $mailService,
-    )
+    ) {}
+
+    public function __invoke(): void
     {
+        $mail = $this->createMail();
+        $this->mailService->send($mail);
     }
 
-    public function __invoke()
+    private function createMail(): Mail
     {
-        $mail;
-        $this->mailService->send($mail);
+        $from = EmailAddress::fromString('from@example.com');
+
+        $to = EmailAddressCollection::createAsList([
+            EmailAddress::fromString('to@example.com'),
+        ]);
+
+        $tags = TagCollection::createAsMap([
+            'tag1' => 'test_tag',
+        ]);
+
+        return Email::fromConfiguration(
+            $this->mailService->getConfiguration(),
+            'This is a test email',
+            $from
+        )
+            ->withTo($to)
+            ->withText('This is a text.')
+            ->withHtml('<p>This is an html.</p>')
+            ->withTags($tags)
+        ;
     }
 ```
