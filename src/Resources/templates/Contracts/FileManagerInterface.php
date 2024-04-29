@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Atournayre\Bundle\MakerBundle\Resources\templates\Contracts;
+namespace App\Contracts;
 
 use App\Collection\SplFileInfoCollection;
 
