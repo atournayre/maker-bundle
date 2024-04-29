@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace App\Manager;
 
 use App\Collection\SplFileInfoCollection;
-use Atournayre\Bundle\MakerBundle\Resources\templates\Contracts\FileManagerInterface;
+use App\Contracts\FileManagerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use function Symfony\Component\String\u;
