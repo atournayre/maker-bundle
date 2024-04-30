@@ -44,7 +44,7 @@ class Email implements NullableInterface
     {
         Assert::notEmpty($subject);
         if (is_string($from)) {
-            Assert::notEmpty($from);
+            $from = EmailAddress::fromString($from);
         }
 
         return new self($subject, $from);
@@ -67,14 +67,8 @@ class Email implements NullableInterface
     {
         $errors = [];
 
-        if (null === $this->from) {
-            $errors['from'] = 'validation.email.from.empty';
-        }
         if ($this->to->hasNoElement()) {
             $errors['to'] = 'validation.email.to.empty';
-        }
-        if (empty($this->subject)) {
-            $errors['subject'] = 'validation.email.subject.empty';
         }
 
         return $errors;
