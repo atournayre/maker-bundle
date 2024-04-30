@@ -70,7 +70,8 @@ class HelperTest extends TestCase
             ['long-name', 'withLongName'],
             ['long name', 'withLongName'],
             ['long Name', 'withLongName'],
-            ['LonG NaMe', 'withLongName'],
+            ['longName', 'withLongName'],
+            ['LonG NaMe', 'withLonGNaMe'],
         ];
     }
 
@@ -95,7 +96,9 @@ class HelperTest extends TestCase
             ['long-name', 'getLongName'],
             ['long name', 'getLongName'],
             ['long Name', 'getLongName'],
-            ['LonG NaMe', 'getLongName'],
+            ['longName', 'getLongName'],
+            ['longname', 'getLongname'],
+            ['LonG NaMe', 'getLonGNaMe'],
         ];
     }
 
@@ -120,7 +123,9 @@ class HelperTest extends TestCase
             ['long-name', 'setLongName'],
             ['long name', 'setLongName'],
             ['long Name', 'setLongName'],
-            ['LonG NaMe', 'setLongName'],
+            ['longName', 'setLongName'],
+            ['longname', 'setLongname'],
+            ['LonG NaMe', 'setLonGNaMe'],
         ];
     }
 
@@ -145,7 +150,8 @@ class HelperTest extends TestCase
             ['long-name', 'longName'],
             ['long name', 'longName'],
             ['long Name', 'longName'],
-            ['LonG NaMe', 'longName'],
+            ['longname', 'longname'],
+            ['LonG NaMe', 'lonGNaMe'],
         ];
     }
 

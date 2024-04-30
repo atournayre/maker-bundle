@@ -26,22 +26,22 @@ class UStr
 
     public static function wither(string $name): UnicodeString
     {
-        return u($name)->lower()->camel()->title()->prepend('with');
+        return u($name)->camel()->title()->prepend('with');
     }
 
     public static function getter(string $name): UnicodeString
     {
-        return u($name)->lower()->camel()->title()->prepend('get');
+        return u($name)->camel()->title()->prepend('get');
     }
 
     public static function setter(string $name): UnicodeString
     {
-        return u($name)->lower()->camel()->title()->prepend('set');
+        return u($name)->camel()->title()->prepend('set');
     }
 
     public static function property(string $name): UnicodeString
     {
-        return u($name)->lower()->camel();
+        return u($name)->camel();
     }
 
     public static function prefixByRootNamespace(string $string, string $rootNamespace): UnicodeString
