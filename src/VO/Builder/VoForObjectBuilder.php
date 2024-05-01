@@ -17,7 +17,6 @@ class VoForObjectBuilder extends AbstractBuilder
     public static function build(FileDefinition $fileDefinition): self
     {
         $voProperties = $fileDefinition->configuration()->voProperties();
-        $properties = array_map(fn($property) => self::defineProperty($property), $voProperties);
         $getters = array_map(fn($property) => self::defineGetter($property), $voProperties);
         $withers = array_map(fn($property) => self::defineWither($property), $voProperties);
         $nullableTrait = MakeHelper::nullableTrait($fileDefinition);
@@ -28,7 +27,6 @@ class VoForObjectBuilder extends AbstractBuilder
             ->addComment(self::comment())
             ->addMember(self::constructor($voProperties))
             ->addMember(self::namedConstructor($voProperties))
-            ->withProperties($properties)
             ->addMembers($getters)
             ->addMembers($withers)
             ->addImplement(NullableInterface::class)
@@ -43,10 +41,9 @@ class VoForObjectBuilder extends AbstractBuilder
         $method->setPrivate();
 
         foreach ($voProperties as $property) {
-            $method->addParameter($property['fieldName'])
+            $method->addPromotedParameter($property['fieldName'])
                 ->setType(self::correspondingTypes()[$property['type']])
             ;
-            $method->addBody('$this->' . $property['fieldName'] . ' = $' . $property['fieldName'] . ';');
         }
 
         return $method;
