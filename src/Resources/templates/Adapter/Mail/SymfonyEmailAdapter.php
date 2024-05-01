@@ -21,26 +21,22 @@ class SymfonyEmailAdapter
         Assert::true($email->isValid(), 'Email is not valid.');
 
         $from = $email->from()->toString();
-        /** @var Address $tos */
+
         $tos = self::collectionToAddresses($email->to());
-        /** @var Address $replyTos */
+        $ccs = self::collectionToAddresses($email->cc());
+        $bccs = self::collectionToAddresses($email->bcc());
         $replyTos = self::collectionToAddresses($email->replyTo());
 
         $symfonyEmail = new SymfonyEmail();
         $symfonyEmail->from($from);
+        $symfonyEmail->subject($email->subject());
+        $symfonyEmail->text($email->text());
+        $symfonyEmail->html($email->html());
+        $symfonyEmail->to(...$tos);
+        $symfonyEmail->cc(...$ccs);
+        $symfonyEmail->bcc(...$bccs);
+        $symfonyEmail->replyTo(...$replyTos);
 
-        foreach ($tos as $to) {
-            $symfonyEmail->addTo($to);
-        }
-        foreach ($email->cc() as $cc) {
-            $symfonyEmail->addCc(new Address($cc->toString()));
-        }
-        foreach ($email->bcc() as $bcc) {
-            $symfonyEmail->addBcc(new Address($bcc->toString()));
-        }
-        foreach ($replyTos as $replyTo) {
-            $symfonyEmail->addReplyTo($replyTo);
-        }
         foreach ($email->attachments() as $attachment) {
             $symfonyEmail->attachFromPath($attachment->getPathname());
         }
@@ -49,10 +45,6 @@ class SymfonyEmailAdapter
         foreach ($email->tags()->values() as $tagName => $tagValue) {
             $headers->addTextHeader($tagName, $tagValue);
         }
-
-        $symfonyEmail->subject($email->subject());
-        $symfonyEmail->text($email->text());
-        $symfonyEmail->html($email->html());
 
         return $symfonyEmail;
     }
@@ -63,6 +55,10 @@ class SymfonyEmailAdapter
      */
     private static function collectionToAddresses(EmailAddressCollection $emailAddressCollection): array
     {
+        if ($emailAddressCollection->hasNoElement()) {
+            return [];
+        }
+
         return $emailAddressCollection
             ->toMap()
             ->map(fn($email) => new Address($email->toString()))

@@ -22,27 +22,24 @@ class Email implements NullableInterface
     use IsTrait;
 
     private ?MailerConfiguration $configuration = null;
-    private array|EmailAddressCollection $to = [];
-    private array|EmailAddressCollection $cc = [];
-    private array|EmailAddressCollection $bcc = [];
-    private array|EmailAddressCollection $replyTo = [];
-    private array|SplFileInfoCollection $attachments = [];
-    private array|TagCollection $tags = [];
+    private ?EmailAddressCollection $to = null;
+    private ?EmailAddressCollection $cc = null;
+    private ?EmailAddressCollection $bcc = null;
+    private ?EmailAddressCollection $replyTo = null;
+    private ?SplFileInfoCollection $attachments = null;
+    private ?TagCollection $tags = null;
     private ?string $text = null;
     private ?string $html = null;
 
     private function __construct(
         private string $subject,
-        private string|EmailAddress $from,
+        private EmailAddress $from,
     ) {
     }
 
-    public static function create(string $subject, string|EmailAddress $from): static
+    public static function create(string $subject, EmailAddress $from): static
     {
         Assert::notEmpty($subject, 'Email subject cannot be empty.');
-        if (is_string($from)) {
-            $from = EmailAddress::fromString($from);
-        }
 
         return new static($subject, $from);
     }
@@ -50,7 +47,7 @@ class Email implements NullableInterface
     public static function fromConfiguration(
         MailerConfiguration $configuration,
         string $subject,
-        string|EmailAddress $from,
+        EmailAddress $from,
     ): static
     {
         return self::create($subject, $from)
@@ -64,7 +61,7 @@ class Email implements NullableInterface
     {
         $errors = [];
 
-        if ($this->to->hasNoElement()) {
+        if (null === $this->to || $this->to->hasNoElement()) {
             $errors['to'] = 'validation.email.to.empty';
         }
 
@@ -81,34 +78,34 @@ class Email implements NullableInterface
         return $this->subject;
     }
 
-    public function from(): string|EmailAddress
+    public function from(): EmailAddress
     {
-        return is_string($this->from) ? EmailAddress::fromString($this->from) : $this->from;
+        return $this->from;
     }
 
-    public function to(): array|EmailAddressCollection
+    public function to(): EmailAddressCollection
     {
-        return is_array($this->to) ? EmailAddressCollection::createAsList($this->to) : $this->to;
+        return $this->to;
     }
 
-    public function cc(): array|EmailAddressCollection
+    public function cc(): EmailAddressCollection
     {
-        return is_array($this->cc) ? EmailAddressCollection::createAsList($this->cc) : $this->cc;
+        return $this->cc ?? EmailAddressCollection::createAsList([]);
     }
 
-    public function bcc(): array|EmailAddressCollection
+    public function bcc(): EmailAddressCollection
     {
-        return is_array($this->bcc) ? EmailAddressCollection::createAsList($this->bcc) : $this->bcc;
+        return $this->bcc ?? EmailAddressCollection::createAsList([]);
     }
 
-    public function replyTo(): array|EmailAddressCollection
+    public function replyTo(): EmailAddressCollection
     {
-        return is_array($this->replyTo) ? EmailAddressCollection::createAsList($this->replyTo) : $this->replyTo;
+        return $this->replyTo ?? EmailAddressCollection::createAsList([]);
     }
 
-    public function attachments(): array|SplFileInfoCollection
+    public function attachments(): SplFileInfoCollection
     {
-        return is_array($this->attachments) ? SplFileInfoCollection::createAsList($this->attachments) : $this->attachments;
+        return $this->attachments ?? SplFileInfoCollection::createAsList([]);
     }
 
     public function text(): ?string
@@ -121,9 +118,9 @@ class Email implements NullableInterface
         return $this->html;
     }
 
-    public function tags(): array|TagCollection
+    public function tags(): TagCollection
     {
-        return is_array($this->tags) ? TagCollection::createAsList($this->tags) : $this->tags;
+        return $this->tags ?? TagCollection::createAsMap([]);
     }
 
     public function withSubject(string $subject): static
@@ -133,42 +130,42 @@ class Email implements NullableInterface
         return $clone;
     }
 
-    public function withFrom(string|EmailAddress $from): static
+    public function withFrom(EmailAddress $from): static
     {
         $clone = clone $this;
         $clone->from = $from;
         return $clone;
     }
 
-    public function withTo(array|EmailAddressCollection $to): static
+    public function withTo(EmailAddressCollection $to): static
     {
         $clone = clone $this;
         $clone->to = $to;
         return $clone;
     }
 
-    public function withCc(array|EmailAddressCollection $cc): static
+    public function withCc(EmailAddressCollection $cc): static
     {
         $clone = clone $this;
         $clone->cc = $cc;
         return $clone;
     }
 
-    public function withBcc(array|EmailAddressCollection $bcc): static
+    public function withBcc(EmailAddressCollection $bcc): static
     {
         $clone = clone $this;
         $clone->bcc = $bcc;
         return $clone;
     }
 
-    public function withReplyTo(array|EmailAddressCollection $replyTo): static
+    public function withReplyTo(EmailAddressCollection $replyTo): static
     {
         $clone = clone $this;
         $clone->replyTo = $replyTo;
         return $clone;
     }
 
-    public function withAttachments(array|SplFileInfoCollection $attachments): static
+    public function withAttachments(SplFileInfoCollection $attachments): static
     {
         $clone = clone $this;
         $clone->attachments = $attachments;
@@ -193,7 +190,7 @@ class Email implements NullableInterface
         return $clone;
     }
 
-    public function withTags(array|TagCollection $tags): static
+    public function withTags(TagCollection $tags): static
     {
         $clone = clone $this;
         $clone->tags = $tags;

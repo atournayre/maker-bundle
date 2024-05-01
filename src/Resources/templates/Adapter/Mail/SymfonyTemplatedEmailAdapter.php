@@ -7,7 +7,7 @@ use App\VO\Mail\Email;
 use App\VO\Mail\TemplatedEmail;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail as SymfonyTemplatedEmail;
 
-final class SymfonyTemplatedEmailAdapter extends SymfonyEmailAdapter
+class SymfonyTemplatedEmailAdapter extends SymfonyEmailAdapter
 {
     public static function fromMessage(TemplatedEmail|Email $email): SymfonyTemplatedEmail
     {
