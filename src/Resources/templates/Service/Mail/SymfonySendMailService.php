@@ -4,7 +4,10 @@ declare(strict_types=1);
 namespace App\Service\Mail;
 
 use App\Adapter\Mail\SymfonyEmailAdapter;
+use App\Adapter\Mail\SymfonyTemplatedEmailAdapter;
 use App\Contracts\Mail\SendMailInterface;
+use App\VO\Mail\Email;
+use App\VO\Mail\TemplatedEmail;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\RawMessage;
 
@@ -32,6 +35,10 @@ final class SymfonySendMailService implements SendMailInterface
      */
     private function adaptMessage($message): RawMessage
     {
-        return SymfonyEmailAdapter::fromMessage($message);
+        return match (true) {
+            $message instanceof TemplatedEmail => SymfonyTemplatedEmailAdapter::fromMessage($message),
+            $message instanceof Email => SymfonyEmailAdapter::fromMessage($message),
+            default => throw new \InvalidArgumentException('Invalid message type.'),
+        };
     }
 }

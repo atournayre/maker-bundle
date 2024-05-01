@@ -9,7 +9,7 @@ use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email as SymfonyEmail;
 use Webmozart\Assert\Assert;
 
-final class SymfonyEmailAdapter
+class SymfonyEmailAdapter
 {
     /**
      * @param Email $email
