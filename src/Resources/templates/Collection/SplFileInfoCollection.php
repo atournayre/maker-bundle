@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Collection;
 
+use App\VO\File\FileSize;
 use Atournayre\Collection\TypedCollection;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -47,11 +48,13 @@ final class SplFileInfoCollection extends TypedCollection
         return self::createAsList($array);
     }
 
-    public function totalSize(): float
+    public function totalSize(): FileSize
     {
-        return $this
+        $sizeInBytes = $this
             ->toMap()
             ->map(fn(SplFileInfo $file) => $file->getSize())
             ->sum();
+
+        return FileSize::fromBytes((int) $sizeInBytes);
     }
 }
