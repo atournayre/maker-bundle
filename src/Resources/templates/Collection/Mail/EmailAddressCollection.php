@@ -9,4 +9,13 @@ use Atournayre\Types\EmailAddress;
 final class EmailAddressCollection extends TypedCollection
 {
 	protected static string $type = EmailAddress::class;
+
+    public static function fromArray(array $emails): self
+    {
+        $emailsAdresses = self::createAsList($emails)
+            ->toMap()
+            ->map(fn(string $email): EmailAddress => EmailAddress::fromString($email));
+
+        return self::createAsList($emailsAdresses->toArray());
+    }
 }
