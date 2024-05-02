@@ -2,8 +2,9 @@
     "name": "atournayre/maker-bundle",
     "type": "symfony-bundle",
     "license": "MIT",
-    "description": "This bundle Extend Symfony Maker Bundle.",
-    "minimum-stability": "stable",
+    "description": "This bundle extend Symfony Maker Bundle and helps you create lots of files so you can forget about writing boilerplate code and it also provide minimal files to start a project.",
+    "keywords": ["generator", "code generator", "scaffolding", "scaffold", "dev", "commands", "controllers", "collections", "DTO", "VO", "events", "interfaces", "logger", "services", "traits"],
+    "minimum-stability": "dev",
     "require": {
         "php": ">=8.1",
         "atournayre/collection": "^0.6.0",
