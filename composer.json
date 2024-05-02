@@ -6,12 +6,12 @@
     "minimum-stability": "stable",
     "require": {
         "php": ">=8.1",
-        "atournayre/collection": "^0.4.0",
-        "atournayre/types": "^0.7.0",
+        "atournayre/collection": "^0.6.0",
+        "atournayre/types": "^0.9.0",
         "nette/php-generator": "^4.1",
         "symfony/framework-bundle": "^6.4|^7.0",
         "symfony/maker-bundle": "^1.56",
-        "symfony/mime": "^6.4",
+        "symfony/mime": "^6.4|^7.0",
         "symfony/twig-bundle": "^6.4|^7.0",
         "symfony/yaml": "^6.4|^7.0",
         "webmozart/assert": "^1.11"
