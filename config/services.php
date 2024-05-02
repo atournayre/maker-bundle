@@ -1,5 +1,6 @@
 <?php
 
+use Atournayre\Bundle\MakerBundle\Config\MakerBundleConfig;
 use Atournayre\Bundle\MakerBundle\Generator\FileGenerator;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
@@ -7,11 +8,6 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
  * @link https://symfony.com/doc/current/bundles/best_practices.html#services
  */
 return static function (ContainerConfigurator $container): void {
-    $container
-        ->parameters()
-            ->set('atournayre_maker.root_namespace', 'App')
-    ;
-
     $services = $container->services()
         ->defaults()
         ->private()
@@ -22,5 +18,7 @@ return static function (ContainerConfigurator $container): void {
         ->alias(Generator::class, 'maker.generator');
 
     $services
-        ->set(FileGenerator::class);
+        ->set(FileGenerator::class)
+        ->set(MakerBundleConfig::class)
+    ;
 };

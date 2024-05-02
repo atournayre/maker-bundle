@@ -21,5 +21,9 @@ class AtournayreMakerExtension extends Extension
 
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
+
+        $container->setParameter('atournayre_maker.root_namespace', $config['root_namespace']);
+        $container->setParameter('atournayre_maker.namespaces', $config['namespaces']);
+        $container->setParameter('atournayre_maker.resources', $config['resources']);
     }
 }
