@@ -97,7 +97,7 @@ class MakeService extends AbstractMaker
 
     private function availableVOs(): array
     {
-        $serviceConfiguration = ($this->makerBundleConfig)()->resources->service;
+        $serviceConfiguration = $this->bundleConfiguration->resources->service;
         return array_map(
             fn(string $file) => Str::namespaceFromPath($file, $this->rootDir),
             MakeHelper::findFilesInDirectory(
