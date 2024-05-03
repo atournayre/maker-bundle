@@ -16,13 +16,15 @@ final class Namespaces
     public readonly ?string $dispatcher;
     public readonly ?string $dto;
     public readonly ?string $entity;
+    public readonly ?string $event;
     public readonly ?string $eventListener;
     public readonly ?string $exception;
     public readonly ?string $factory;
     public readonly ?string $helper;
     public readonly ?string $logger;
     public readonly ?string $manager;
-    public readonly ?string $service;
+    public readonly ?string $serviceCommand;
+    public readonly ?string $serviceQuery;
     public readonly ?string $trait;
     public readonly ?string $type;
     public readonly ?string $vo;
@@ -31,7 +33,7 @@ final class Namespaces
     {
         $instance = new self();
         $instance->adapter = $namespaces['adapter'] ?? null;
-        $instance->argumentValueResolver = $namespaces['argumentValueResolver'] ?? null;
+        $instance->argumentValueResolver = $namespaces['argument_value_resolver'] ?? null;
         $instance->attribute = $namespaces['attribute'] ?? null;
         $instance->collection = $namespaces['collection'] ?? null;
         $instance->command = $namespaces['command'] ?? null;
@@ -41,13 +43,15 @@ final class Namespaces
         $instance->dispatcher = $namespaces['dispatcher'] ?? null;
         $instance->dto = $namespaces['dto'] ?? null;
         $instance->entity = $namespaces['entity'] ?? null;
-        $instance->eventListener = $namespaces['eventListener'] ?? null;
+        $instance->event = $namespaces['event'] ?? null;
+        $instance->eventListener = $namespaces['event_listener'] ?? null;
         $instance->exception = $namespaces['exception'] ?? null;
         $instance->factory = $namespaces['factory'] ?? null;
         $instance->helper = $namespaces['helper'] ?? null;
         $instance->logger = $namespaces['logger'] ?? null;
         $instance->manager = $namespaces['manager'] ?? null;
-        $instance->service = $namespaces['service'] ?? null;
+        $instance->serviceCommand = $namespaces['service_command'] ?? null;
+        $instance->serviceQuery = $namespaces['service_query'] ?? null;
         $instance->trait = $namespaces['trait'] ?? null;
         $instance->type = $namespaces['type'] ?? null;
         $instance->vo = $namespaces['vo'] ?? null;

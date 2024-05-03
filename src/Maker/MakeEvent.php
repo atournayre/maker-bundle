@@ -31,7 +31,7 @@ class MakeEvent extends AbstractMaker
     {
         $command
             ->setDescription('Creates a new Event (and Listener)')
-            ->addArgument('namespace', InputArgument::REQUIRED, 'The namespace of the Event <fg=yellow>(e.g. App\\\\Event\\\\DummyEvent)</>');
+            ->addArgument('namespace', InputArgument::REQUIRED, 'The class name of the Event <fg=yellow>(e.g. DummyEvent)</>');
     }
 
     public static function getCommandDescription(): string
@@ -125,11 +125,13 @@ class MakeEvent extends AbstractMaker
                 namespace: $namespace,
                 builder: EventBuilder::class,
                 classnameSuffix: 'Event',
+                namespacePrefix: $this->configNamespaces->event,
             ))->withExtraProperty('eventProperties', $this->eventProperties),
             (new MakerConfig(
                 namespace: $listenerNamespace,
                 builder: ListenerBuilder::class,
                 classnameSuffix: 'Listener',
+                namespacePrefix: $this->configNamespaces->eventListener,
             ))->withExtraProperty('eventNamespace', $namespace),
         ];
     }

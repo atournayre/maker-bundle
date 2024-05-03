@@ -29,7 +29,7 @@ class MakeException extends AbstractMaker
     {
         $command
             ->setDescription('Creates a new exception')
-            ->addArgument('namespace', InputArgument::REQUIRED, 'The namespace of the exception <fg=yellow>(e.g. App\\\\Exception\\\\Dummy)</>');
+            ->addArgument('namespace', InputArgument::REQUIRED, 'The class name of the exception <fg=yellow>(e.g. Dummy)</>');
     }
 
     public static function getCommandDescription(): string
@@ -68,6 +68,7 @@ class MakeException extends AbstractMaker
             (new MakerConfig(
                 namespace: $namespace,
                 builder: ExceptionBuilder::class,
+                namespacePrefix: $this->configNamespaces->exception,
             ))
                 ->withExtraProperty('exceptionType', $this->exceptionType)
                 ->withExtraProperty('exceptionNamedConstructor', $this->exceptionNamedConstructor),

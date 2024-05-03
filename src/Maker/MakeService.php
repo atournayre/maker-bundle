@@ -32,6 +32,7 @@ class MakeService extends AbstractMaker
     private string $vo;
     private string $builder;
     private string $attributeName;
+    private string $namespacePrefix;
 
     public static function getCommandName(): string
     {
@@ -42,7 +43,7 @@ class MakeService extends AbstractMaker
     {
         $command
             ->setDescription('Creates a new Service')
-            ->addArgument('namespace', InputArgument::REQUIRED, 'The namespace of the Service <fg=yellow>(e.g. App\\\\Service\\\\Command\\\\DummyCommandService, App\\\\Service\\\\Query\\\\DummyQueryService)</>')
+            ->addArgument('namespace', InputArgument::REQUIRED, 'The class name of the Service <fg=yellow>(e.g. DummyCommandService, DummyQueryService)</>')
             ->addOption('command', null, InputOption::VALUE_OPTIONAL, 'Create a Command Service', 0)
             ->addOption('query', null, InputOption::VALUE_OPTIONAL, 'Create a Query Service', 1)
         ;
@@ -87,6 +88,11 @@ class MakeService extends AbstractMaker
             default => throw new \InvalidArgumentException('Invalid command or query'),
         };
 
+        $this->namespacePrefix = match ($commandOrQuery) {
+            self::COMMAND => $this->configNamespaces->serviceCommand,
+            self::QUERY => $this->configNamespaces->serviceQuery,
+            default => throw new \InvalidArgumentException('Invalid command or query'),
+        };
     }
 
     private function availableVOs(): array
@@ -107,6 +113,7 @@ class MakeService extends AbstractMaker
             (new MakerConfig(
                 namespace: $namespace,
                 builder: $this->builder,
+                namespacePrefix: $this->namespacePrefix,
             ))->withExtraProperty('vo', $vo),
             (new MakerConfig(
                 namespace: $vo,
@@ -119,6 +126,7 @@ class MakeService extends AbstractMaker
                         ])
                     ],
                 ],
+                namespacePrefix: $this->configNamespaces->vo,
             ))
                 ->withRoot($this->rootNamespace, $this->rootDir)
                 ->withTemplatePathFromNamespace(),

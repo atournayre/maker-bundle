@@ -27,7 +27,7 @@ class MakeInterface extends AbstractMaker
     {
         $command
             ->setDescription('Creates a new interface')
-            ->addArgument('namespace', InputArgument::REQUIRED, 'The namespace of the interface <fg=yellow>(e.g. App\\\\Contracts\\\\DummyInterface)</>');
+            ->addArgument('namespace', InputArgument::REQUIRED, 'The class name of the interface <fg=yellow>(e.g. DummyInterface)</>');
     }
 
     protected function configurations(string $namespace): array
@@ -37,6 +37,7 @@ class MakeInterface extends AbstractMaker
                 namespace: $namespace,
                 builder: InterfaceBuilder::class,
                 classnameSuffix: 'Interface',
+                namespacePrefix: $this->configNamespaces->contracts,
             ),
         ];
     }

@@ -24,6 +24,7 @@ class MakerConfig
         private array            $extraProperties = [],
         private readonly ?string $classnameSuffix = null,
         private ?string          $templatePath = null,
+        private readonly ?string $namespacePrefix = null,
     )
     {
     }
@@ -110,6 +111,10 @@ class MakerConfig
 
     public function namespace(): string
     {
+        if (null !== $this->namespacePrefix) {
+            return sprintf('%s\%s', $this->namespacePrefix, $this->namespace);
+        }
+
         return $this->namespace;
     }
 

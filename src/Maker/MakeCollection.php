@@ -33,7 +33,7 @@ class MakeCollection extends AbstractMaker
     {
         $command
             ->setDescription('Creates a new Collection')
-            ->addArgument('namespace', InputArgument::REQUIRED, 'The namespace of the Collection <fg=yellow>(e.g. App\\\\Collection\\\\DummyCollection)</>');
+            ->addArgument('namespace', InputArgument::REQUIRED, 'The class name of the Collection <fg=yellow>(e.g. DummyCollection)</>');
     }
 
     public static function getCommandDescription(): string
@@ -66,13 +66,11 @@ class MakeCollection extends AbstractMaker
 
     private function relatedObjects(): array
     {
+        $directories = $this->makerBundleConfig->getConfiguration()->resources->collection->resources;
+
         return array_map(
             fn(string $file) => Str::namespaceFromPath($file, $this->rootDir),
-            MakeHelper::findFilesInDirectory([
-                Str::sprintf('%s/Entity', $this->rootDir),
-                Str::sprintf('%s/DTO', $this->rootDir),
-                Str::sprintf('%s/VO/Entity', $this->rootDir),
-            ])
+            MakeHelper::findFilesInDirectory($directories)
         );
     }
 
@@ -84,6 +82,7 @@ class MakeCollection extends AbstractMaker
                     namespace: $namespace,
                     builder: CollectionBuilder::class,
                     classnameSuffix: 'Collection',
+                    namespacePrefix: $this->configNamespaces->collection,
                 ))->withExtraProperty('collectionOfDecimals', $this->collectionOfDecimals)
             ];
         }
@@ -93,6 +92,7 @@ class MakeCollection extends AbstractMaker
                 namespace: $namespace,
                 builder: CollectionBuilder::class,
                 classnameSuffix: 'Collection',
+                namespacePrefix: $this->configNamespaces->collection,
             ))
             ->withExtraProperty('collectionRelatedObject', Str::prefixByRootNamespace($this->collectionRelatedObject, $this->rootNamespace))
             ->withExtraProperty('collectionIsImmutable', $this->collectionIsImmutable)
