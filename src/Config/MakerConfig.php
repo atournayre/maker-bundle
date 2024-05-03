@@ -27,7 +27,10 @@ class MakerConfig
         private readonly ?string $namespacePrefix = null,
     )
     {
-    }
+        $this->namespace = null === $this->namespacePrefix
+            ? $this->namespace
+            : sprintf('%s\%s', $this->namespacePrefix, $this->namespace);
+   }
 
     public function rootNamespace(): string
     {
@@ -111,10 +114,6 @@ class MakerConfig
 
     public function namespace(): string
     {
-        if (null !== $this->namespacePrefix) {
-            return sprintf('%s\%s', $this->namespacePrefix, $this->namespace);
-        }
-
         return $this->namespace;
     }
 
