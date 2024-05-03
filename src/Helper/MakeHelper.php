@@ -30,7 +30,7 @@ final class MakeHelper
     {
         $directories = array_filter(
             is_array($includedDirectory) ? $includedDirectory : [$includedDirectory],
-            fn($directory) => (new Filesystem())->exists($includedDirectory)
+            fn($directory) => (new Filesystem())->exists($directory)
         );
 
         if ([] === $directories) {

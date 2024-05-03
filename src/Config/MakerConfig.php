@@ -178,7 +178,7 @@ class MakerConfig
 
     public function voRelatedToAnEntityWithRootNamespace(): string
     {
-        return $this->prefixByRootNamespace($this->voRelatedToAnEntity);
+        return $this->prefixByRootNamespace(Str::namespaceFromPath($this->voRelatedToAnEntity, $this->rootDir()));
     }
 
     public function getExtraPropertyWithRootNamespace(string $extraProperty): string

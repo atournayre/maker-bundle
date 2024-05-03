@@ -5,7 +5,6 @@ namespace Atournayre\Bundle\MakerBundle\Maker;
 
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 use Atournayre\Bundle\MakerBundle\Helper\MakeHelper;
-use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\Builder\VoForEntityBuilder;
 use Atournayre\Bundle\MakerBundle\VO\Builder\VoForObjectBuilder;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
@@ -17,8 +16,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Finder\Finder;
 
 #[AutoconfigureTag('maker.command')]
 class MakeVo extends AbstractMaker
@@ -45,7 +42,7 @@ class MakeVo extends AbstractMaker
 
     private function askForNextField(ConsoleStyle $io, array $fields, bool $isFirstField): ?array
     {
-        $io->writeln('');
+        $io->newLine();
 
         if ($isFirstField) {
             $questionText = 'New property name (press <return> to stop adding fields)';
@@ -71,21 +68,21 @@ class MakeVo extends AbstractMaker
         }
 
         $defaultType = MakeHelper::fieldDefaultType($fieldName);
+        $allowedTypes = $this->allowedTypes();
 
         $type = null;
 
         while (null === $type) {
-            $question = new Question('Field type (enter <comment>?</comment> to see all types)', $defaultType);
-            $question->setAutocompleterValues(MakeHelper::allowedTypes());
+            $question = new ChoiceQuestion('Field type (enter <comment>?</comment> to see all types)', $allowedTypes, $defaultType);
             $type = $io->askQuestion($question);
 
             if ('?' === $type) {
-                $io->writeln(MakeHelper::allowedTypes());
+                $io->writeln($allowedTypes);
                 $io->writeln('');
 
                 $type = null;
-            } elseif (!\in_array($type, MakeHelper::allowedTypes())) {
-                $io->writeln(MakeHelper::allowedTypes());
+            } elseif (!\in_array($type, $allowedTypes)) {
+                $io->writeln($allowedTypes);
                 $io->error(sprintf('Invalid type "%s".', $type));
                 $io->writeln('');
 
@@ -94,6 +91,19 @@ class MakeVo extends AbstractMaker
         }
 
         return ['fieldName' => $fieldName, 'type' => $type];
+    }
+
+    private function allowedTypes(): array
+    {
+        return array_values(
+            array_merge(
+                $this->configResources->valueObject->primitivesMapping,
+                MakeHelper::findFilesInDirectory(
+                    $this->configResources->valueObject->resources,
+                    $this->configResources->valueObject->exclude
+                )
+            )
+        );
     }
 
     public function interact(InputInterface $input, ConsoleStyle $io, Command $command): void
@@ -133,24 +143,9 @@ class MakeVo extends AbstractMaker
 
     private function entities(): array
     {
-        $entityDirectory = Str::sprintf('%s/Entity', $this->rootDir);
-
-        $filesystem = new Filesystem();
-        if (!$filesystem->exists($entityDirectory)) {
-            return [];
-        }
-
-        $finder = (new Finder())
-            ->files()
-            ->in($entityDirectory)
-            ->name('*.php')
-            ->sortByName();
-
-        $entities = [];
-        foreach ($finder as $file) {
-            $entities[] = Str::namespaceFromPath($file->getPathname(), $this->rootDir);
-        }
-        return $entities;
+        return MakeHelper::findFilesInDirectory(
+            $this->bundleConfiguration->directories->entity
+        );
     }
 
     protected function configurations(string $namespace): array
@@ -162,14 +157,19 @@ class MakeVo extends AbstractMaker
                 voProperties: $this->voProperties,
                 voRelatedToAnEntity: $this->voRelatedEntity,
                 namespacePrefix: $this->configNamespaces->vo
-            ))->withVoEntityNamespace();
+            ))
+                ->withVoEntityNamespace()
+                ->withExtraProperty('allowedTypes', $this->allowedTypes())
+            ;
         } else {
-            $configurations[] = new MakerConfig(
+            $configurations[] = (new MakerConfig(
                 namespace: $namespace,
                 builder: VoForObjectBuilder::class,
                 voProperties: $this->voProperties,
                 namespacePrefix: $this->configNamespaces->vo,
-            );
+            ))
+                ->withExtraProperty('allowedTypes', $this->allowedTypes())
+            ;
         }
 
         return $configurations ?? [];

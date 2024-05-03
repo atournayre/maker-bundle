@@ -30,6 +30,7 @@ class AtournayreMakerExtension extends Extension
                 'root_namespace' => $config['root_namespace'],
                 'namespaces' => $config['namespaces'],
                 'resources' => $config['resources'],
+                'directories' => $config['directories'],
             ]);
     }
 }

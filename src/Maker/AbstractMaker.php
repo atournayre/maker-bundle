@@ -6,6 +6,7 @@ namespace Atournayre\Bundle\MakerBundle\Maker;
 use Atournayre\Bundle\MakerBundle\Collection\FileDefinitionCollection;
 use Atournayre\Bundle\MakerBundle\DTO\Config\BundleConfiguration;
 use Atournayre\Bundle\MakerBundle\DTO\Config\Namespaces;
+use Atournayre\Bundle\MakerBundle\DTO\Config\Resources;
 use Atournayre\Bundle\MakerBundle\Generator\FileGenerator;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
@@ -18,6 +19,7 @@ abstract class AbstractMaker extends \Symfony\Bundle\MakerBundle\Maker\AbstractM
 {
     protected readonly string $rootNamespace;
     protected readonly Namespaces $configNamespaces;
+    protected readonly Resources $configResources;
 
     public function __construct(
         protected readonly string        $rootDir,
@@ -27,6 +29,7 @@ abstract class AbstractMaker extends \Symfony\Bundle\MakerBundle\Maker\AbstractM
     {
         $this->rootNamespace = $this->bundleConfiguration->rootNamespace;
         $this->configNamespaces = $this->bundleConfiguration->namespaces;
+        $this->configResources = $this->bundleConfiguration->resources;
     }
 
     public function configureDependencies(DependencyBuilder $dependencies): void

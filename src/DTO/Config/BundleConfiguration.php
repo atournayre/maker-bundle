@@ -9,6 +9,7 @@ final class BundleConfiguration
         public readonly string $rootNamespace,
         public readonly Namespaces $namespaces,
         public readonly Resources $resources,
+        public readonly Directories $directories,
     )
     {
     }
@@ -19,6 +20,7 @@ final class BundleConfiguration
             $data['root_namespace'],
             Namespaces::fromArray($data['namespaces']),
             Resources::fromArray($data['resources']),
+            Directories::fromArray($data['directories']),
         );
     }
 }

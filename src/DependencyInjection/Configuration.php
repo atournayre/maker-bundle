@@ -18,6 +18,7 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->getRootNode();
 
         $this->addRootNamespaceSection($rootNode);
+        $this->addDirectoriesSection($rootNode);
         $this->addNamespacesSection($rootNode);
         $this->addResourcesSection($rootNode);
 
@@ -73,6 +74,22 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    private function addDirectoriesSection(ArrayNodeDefinition $rootNode): void
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('directories')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('entity')->defaultValue('%kernel.project_dir%/src/Entity')->end()
+                        ->scalarNode('form')->defaultValue('%kernel.project_dir%/src/Form')->end()
+                        ->scalarNode('vo')->defaultValue('%kernel.project_dir%/src/VO')->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
     private function addResourcesSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
@@ -86,7 +103,7 @@ class Configuration implements ConfigurationInterface
                                 ->arrayNode('primitives_mapping')
                                     ->addDefaultsIfNotSet()
                                     ->children()
-                                        ->scalarNode('bool')->defaultValue('bool')->end()
+                                        ->scalarNode('boolean')->defaultValue('boolean')->end()
                                         ->scalarNode('integer')->defaultValue('int')->end()
                                         ->scalarNode('float')->defaultValue('float')->end()
                                         ->scalarNode('string')->defaultValue('string')->end()
@@ -115,7 +132,7 @@ class Configuration implements ConfigurationInterface
                                 ->arrayNode('primitives_mapping')
                                     ->addDefaultsIfNotSet()
                                     ->children()
-                                        ->scalarNode('bool')->defaultValue('bool')->end()
+                                        ->scalarNode('boolean')->defaultValue('boolean')->end()
                                         ->scalarNode('integer')->defaultValue('int')->end()
                                         ->scalarNode('float')->defaultValue('float')->end()
                                         ->scalarNode('string')->defaultValue('string')->end()
@@ -143,7 +160,7 @@ class Configuration implements ConfigurationInterface
                                 ->arrayNode('primitives_mapping')
                                     ->addDefaultsIfNotSet()
                                     ->children()
-                                        ->scalarNode('bool')->defaultValue('bool')->end()
+                                        ->scalarNode('boolean')->defaultValue('boolean')->end()
                                         ->scalarNode('integer')->defaultValue('int')->end()
                                         ->scalarNode('float')->defaultValue('float')->end()
                                         ->scalarNode('string')->defaultValue('string')->end()
@@ -155,6 +172,7 @@ class Configuration implements ConfigurationInterface
                                     ->beforeNormalization()->castToArray()->end()
                                     ->defaultValue([
                                         '%kernel.project_dir%/src/Collection',
+                                        '%kernel.project_dir%/src/Entity',
                                         '%kernel.project_dir%/src/Types',
                                         '%kernel.project_dir%/src/VO',
                                     ])

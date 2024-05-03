@@ -21,8 +21,8 @@ class VoForEntityBuilder extends AbstractBuilder
         $entityNamespace = self::entityNamespace($fileDefinition);
         $voProperties = $fileDefinition->configuration()->voProperties();
 
-        $properties = array_map(fn($property) => self::defineProperty($property), $voProperties);
-        $getters = array_map(fn($property) => self::defineGetter($property), $voProperties);
+        $properties = array_map(fn($property) => self::defineProperty($property, $fileDefinition), $voProperties);
+        $getters = array_map(fn($property) => self::defineGetter($property, $fileDefinition), $voProperties);
         $nullableTrait = MakeHelper::nullableTrait($fileDefinition);
 
         return (new self($fileDefinition))
@@ -44,9 +44,9 @@ class VoForEntityBuilder extends AbstractBuilder
         return UStr::create($fileDefinition->configuration()->voRelatedToAnEntityWithRootNamespace());
     }
 
-    private static function defineGetter(array $property): Method
+    private static function defineGetter(array $property, FileDefinition $fileDefinition): Method
     {
-        $propertyType = self::correspondingTypes()[$property['type']];
+        $propertyType = self::correspondingTypes($fileDefinition)[$property['type']];
 
         return (new Method(Str::getter($property['fieldName'])))
             ->setPublic()
@@ -54,29 +54,18 @@ class VoForEntityBuilder extends AbstractBuilder
             ->setBody('return $this->' . $property['fieldName'] . ';');
     }
 
-    private static function correspondingTypes(): array
-    {
-        return [
-            'string' => 'string',
-            'integer' => 'int',
-            'float' => 'float',
-            'boolean' => 'bool',
-            'datetime' => '\DateTimeInterface',
-        ];
-    }
-
-    private static function defineProperty(array $property): Property
+    private static function defineProperty(array $property, FileDefinition $fileDefinition): Property
     {
         $type = $property['type'];
         $fieldNameRaw = $property['fieldName'];
 
         Assert::inArray(
             $type,
-            array_keys(self::correspondingTypes()),
-            Str::sprintf('Property "%s" should be of type %s; %s given', $fieldNameRaw, Str::implode(', ', array_keys(self::correspondingTypes())), $type)
+            array_keys(self::correspondingTypes($fileDefinition)),
+            Str::sprintf('Property "%s" should be of type %s; %s given', $fieldNameRaw, Str::implode(', ', array_keys(self::correspondingTypes($fileDefinition))), $type)
         );
 
-        $propertyType = self::correspondingTypes()[$type];
+        $propertyType = self::correspondingTypes($fileDefinition)[$type];
 
         $property = new Property(Str::property($fieldNameRaw));
         $property->setPrivate()->setType($propertyType);

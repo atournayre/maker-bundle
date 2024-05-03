@@ -279,4 +279,26 @@ abstract class AbstractBuilder
 
         return $clone;
     }
+
+    protected static function correspondingTypes(FileDefinition $fileDefinition): array
+    {
+        $configuration = $fileDefinition->configuration();
+        Assert::true($configuration->hasExtraProperty('allowedTypes'), 'The configuration should have an extra property "allowedTypes"');
+
+        $rootDir = $configuration->rootDir();
+        $allowedTypes = $configuration->getExtraProperty('allowedTypes');
+
+        $allowedTypesMapping = [];
+        foreach ($allowedTypes as $allowedType) {
+            if (!str_contains($allowedType, '/')) {
+                $allowedTypesMapping[$allowedType] = $allowedType;
+                continue;
+            }
+            $namespaceFromPath = Str::namespaceFromPath($allowedType, $rootDir);
+            $rootNamespace = $configuration->rootNamespace();
+            $namespace = Str::prefixByRootNamespace($namespaceFromPath, $rootNamespace);
+            $allowedTypesMapping[$allowedType] = $namespace;
+        }
+        return $allowedTypesMapping;
+    }
 }
