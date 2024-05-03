@@ -21,8 +21,7 @@ class ServiceQueryBuilder extends AbstractBuilder
     public static function build(FileDefinition $fileDefinition): self
     {
         $config = $fileDefinition->configuration();
-        $voParameter = Str::prefixByRootNamespace($config->getExtraProperty('vo'), $config->rootNamespace());
-
+        $voParameter = $config->getExtraPropertyWithRootNamespace('vo');
 
         $attributes = [
             new Attribute(\Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag::class, [

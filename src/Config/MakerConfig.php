@@ -176,4 +176,28 @@ class MakerConfig
         $config->namespace = $namespace;
         return $config;
     }
+
+    public function voRelatedToAnEntityWithRootNamespace(): string
+    {
+        return $this->prefixByRootNamespace($this->voRelatedToAnEntity);
+    }
+
+    public function getExtraPropertyWithRootNamespace(string $extraProperty): string
+    {
+        return $this->prefixByRootNamespace($extraProperty);
+    }
+
+    public function prefixByRootNamespace(string $namespace): string
+    {
+        return Str::prefixByRootNamespace($namespace, $this->rootNamespace);
+    }
+
+    public function absolutePathFromNamespace(?string $namespace = null): string
+    {
+        return Str::absolutePathFromNamespace(
+            $namespace ?? $this->namespace,
+            $this->rootNamespace,
+            $this->rootDir
+        );
+    }
 }
