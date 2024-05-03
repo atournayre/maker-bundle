@@ -9,6 +9,7 @@ final class Resources
         public readonly Resource $collection,
         public readonly Resource $dto,
         public readonly Resource $valueObject,
+        public readonly Resource $service,
     )
     {
     }
@@ -19,6 +20,7 @@ final class Resources
             Resource::fromArray($resources['collection'] ?? []),
             Resource::fromArray($resources['dto'] ?? []),
             Resource::fromArray($resources['value_object'] ?? []),
+            Resource::fromArray($resources['service'] ?? []),
         );
     }
 }
