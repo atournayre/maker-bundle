@@ -23,20 +23,31 @@ final class MakeHelper
         ];
     }
 
-    public static function findFilesInDirectory(string|array $directory): array
+    public static function findFilesInDirectory(
+        string|array $includedDirectory,
+        string|array|null $excludedDirectory = null
+    ): array
     {
         $directories = array_filter(
-            is_array($directory) ? $directory : [$directory],
-            fn($directory) => (new Filesystem())->exists($directory)
+            is_array($includedDirectory) ? $includedDirectory : [$includedDirectory],
+            fn($directory) => (new Filesystem())->exists($includedDirectory)
         );
 
         if ([] === $directories) {
             return [];
         }
 
+        if (null !== $excludedDirectory) {
+            $excludedDirectories = array_filter(
+                is_array($excludedDirectory) ? $excludedDirectory : [$excludedDirectory],
+                fn($directory) => (new Filesystem())->exists($directory)
+            );
+        }
+
         $finder = (new Finder())
             ->files()
             ->in($directories)
+            ->exclude($excludedDirectories ?? [])
             ->name('*.php')
             ->sortByName();
 
