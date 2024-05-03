@@ -19,14 +19,12 @@ final class MakerBundleConfig
     {
     }
 
-    public function getConfiguration(): BundleConfiguration
+    public function __invoke(): BundleConfiguration
     {
-        $config = [
+        return BundleConfiguration::fromArray([
             'root_namespace' => $this->rootNamespace,
             'namespaces' => $this->namespaces,
             'resources' => $this->resources,
-        ];
-
-        return BundleConfiguration::fromArray($config);
+        ]);
     }
 }

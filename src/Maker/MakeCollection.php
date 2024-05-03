@@ -66,7 +66,7 @@ class MakeCollection extends AbstractMaker
 
     private function relatedObjects(): array
     {
-        $directories = $this->makerBundleConfig->getConfiguration()->resources->collection->resources;
+        $directories = ($this->makerBundleConfig)()->resources->collection->resources;
 
         return array_map(
             fn(string $file) => Str::namespaceFromPath($file, $this->rootDir),

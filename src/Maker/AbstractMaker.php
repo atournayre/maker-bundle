@@ -27,8 +27,8 @@ abstract class AbstractMaker extends \Symfony\Bundle\MakerBundle\Maker\AbstractM
         protected readonly MakerBundleConfig $makerBundleConfig,
     )
     {
-        $this->rootNamespace = $makerBundleConfig->getConfiguration()->rootNamespace;
-        $this->configNamespaces = $makerBundleConfig->getConfiguration()->namespaces;
+        $this->rootNamespace = $makerBundleConfig()->rootNamespace;
+        $this->configNamespaces = $makerBundleConfig()->namespaces;
     }
 
     public function configureDependencies(DependencyBuilder $dependencies): void
