@@ -5,17 +5,14 @@ namespace Atournayre\Bundle\MakerBundle\Generator;
 
 use Atournayre\Bundle\MakerBundle\Collection\FileDefinitionCollection;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\Assert\Assert;
 
 class FileGenerator
 {
     public function __construct(
-        #[Autowire('%kernel.project_dir%/src')]
-        private readonly string   $rootDir,
-        #[Autowire('%atournayre_maker.root_namespace%')]
-        private readonly string   $rootNamespace,
+        private readonly string $rootDir,
+        private readonly string $rootNamespace,
     )
     {
     }

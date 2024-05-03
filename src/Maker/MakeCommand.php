@@ -32,7 +32,7 @@ class MakeCommand extends AbstractMaker
         $command
             ->setDescription('Creates a new Command')
             ->addArgument('name', InputArgument::REQUIRED, sprintf('Choose a command name (e.g. <fg=yellow>app:%s</>)', Str::asCommand(Str::getRandomTerm())))
-            ->addArgument('namespace', InputArgument::REQUIRED, 'The namespace of the Command <fg=yellow>(e.g. App\\\\Command\\\\DummyCommand)</>');
+            ->addArgument('namespace', InputArgument::REQUIRED, 'The class name of the Command <fg=yellow>(e.g. DummyCommand)</>');
     }
 
     public static function getCommandDescription(): string
@@ -60,6 +60,7 @@ class MakeCommand extends AbstractMaker
                 namespace: $namespace,
                 builder: CommandBuilder::class,
                 classnameSuffix: 'Command',
+                namespacePrefix: $this->configNamespaces->command,
             ))
                 ->withExtraProperty('title', $this->commandTitle)
                 ->withExtraProperty('description', $this->commandDescription)

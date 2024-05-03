@@ -35,7 +35,7 @@ class MakeVo extends AbstractMaker
     {
         $command
             ->setDescription('Creates a new VO')
-            ->addArgument('namespace', InputArgument::REQUIRED, 'The namespace of the VO <fg=yellow>(e.g. App\\\\VO\\\\Dummy)</>');
+            ->addArgument('namespace', InputArgument::REQUIRED, 'The class name of the VO <fg=yellow>(e.g. Dummy)</>');
     }
 
     public static function getCommandDescription(): string
@@ -161,12 +161,14 @@ class MakeVo extends AbstractMaker
                 builder: VoForEntityBuilder::class,
                 voProperties: $this->voProperties,
                 voRelatedToAnEntity: $this->voRelatedEntity,
+                namespacePrefix: $this->configNamespaces->vo
             ))->withVoEntityNamespace();
         } else {
             $configurations[] = new MakerConfig(
                 namespace: $namespace,
                 builder: VoForObjectBuilder::class,
-                voProperties: $this->voProperties
+                voProperties: $this->voProperties,
+                namespacePrefix: $this->configNamespaces->vo,
             );
         }
 

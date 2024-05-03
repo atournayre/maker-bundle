@@ -38,6 +38,10 @@ atournayre_maker:
     root_namespace: 'App'
 ```
 
+#### Debug configuration
+- default configuration `php bin/console config:dump atournayre_maker`.
+- current configuration `php bin/console debug:config atournayre_maker`.
+
 ## Documentation
 
 ### Commands

@@ -63,9 +63,6 @@ class CollectionBuilder extends AbstractBuilder
 
         Assert::true($config->hasExtraProperty('collectionRelatedObject'), 'The collectionRelatedObject property is required');
 
-        return Str::prefixByRootNamespace(
-            $config->getExtraProperty('collectionRelatedObject'),
-            $config->rootNamespace()
-        );
+        return $config->getExtraPropertyWithRootNamespace('collectionRelatedObject');
     }
 }

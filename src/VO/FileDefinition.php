@@ -38,7 +38,7 @@ class FileDefinition
     private function generateEmptyClassFromTemplatePath(string $templatePath): string
     {
         $classname = Str::namespaceFromPath($this->configuration->templatePath(), $this->configuration->rootDir());
-        $namespace = Str::prefixByRootNamespace($classname, $this->configuration->rootNamespace());
+        $namespace = $this->configuration->prefixByRootNamespace($classname);
         $phpFile = new PhpFile;
         $phpFile->addComment('This file has been auto-generated');
         $phpFile->addComment(Str::sprintf('Template "%s" not found, creating an empty file', $templatePath));
@@ -70,7 +70,7 @@ class FileDefinition
         $namespaceWithoutClassName = Str::namespaceWithoutClassname($config->namespace());
         $classname = $namespace->afterLast('\\');
 
-        $absolutePath = Str::absolutePathFromNamespace($config->namespace(), $config->rootNamespace(), $config->rootDir());
+        $absolutePath = $config->absolutePathFromNamespace();
 
         return new self(
             $namespaceWithoutClassName,
@@ -136,7 +136,7 @@ class FileDefinition
             return PhpFile::fromCode($this->sourceCode);
         }
 
-        $absolutePath = Str::absolutePathFromNamespace($this->namespace(), $this->configuration->rootNamespace(), $this->configuration->rootDir());
+        $absolutePath = $this->configuration->absolutePathFromNamespace($this->namespace());
         $sourceCode = file_get_contents($absolutePath);
 
         return PhpFile::fromCode($sourceCode);

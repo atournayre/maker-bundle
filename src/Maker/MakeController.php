@@ -35,7 +35,7 @@ class MakeController extends AbstractMaker
     {
         $command
             ->setDescription('Creates a new Controller')
-            ->addArgument('namespace', InputArgument::REQUIRED, 'The namespace of the Controller <fg=yellow>(e.g. App\\\\Controller\\\\DummyController)</>');
+            ->addArgument('namespace', InputArgument::REQUIRED, 'The class name of the Controller <fg=yellow>(e.g. DummyController)</>');
     }
 
     public static function getCommandDescription(): string
@@ -134,6 +134,7 @@ class MakeController extends AbstractMaker
             $configurations[] = (new MakerConfig(
                 namespace: $namespace,
                 builder: ControllerBuilder::class,
+                namespacePrefix: $this->configNamespaces->controller,
             ))
                 ->withTemplatePathKeepingNamespace('Controller/WithFormController.php')
                 ->withExtraProperty('entity', Str::prefixByRootNamespace($this->controllerRelatedEntity, $this->rootNamespace))
@@ -143,6 +144,7 @@ class MakeController extends AbstractMaker
             $configurations[] = (new MakerConfig(
                 namespace: $namespace,
                 builder: ControllerBuilder::class,
+                namespacePrefix: $this->configNamespaces->controller,
             ))
                 ->withTemplatePathKeepingNamespace('Controller/SimpleController.php')
                 ->withExtraProperty('entity', Str::prefixByRootNamespace($this->controllerRelatedEntity, $this->rootNamespace));

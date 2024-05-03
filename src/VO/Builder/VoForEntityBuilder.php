@@ -41,8 +41,7 @@ class VoForEntityBuilder extends AbstractBuilder
 
     private static function entityNamespace(FileDefinition $fileDefinition): UnicodeString
     {
-        $config = $fileDefinition->configuration();
-        return UStr::prefixByRootNamespace($config->voRelatedToAnEntity(), $config->rootNamespace());
+        return UStr::create($fileDefinition->configuration()->voRelatedToAnEntityWithRootNamespace());
     }
 
     private static function defineGetter(array $property): Method

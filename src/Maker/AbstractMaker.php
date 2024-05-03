@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
 use Atournayre\Bundle\MakerBundle\Collection\FileDefinitionCollection;
+use Atournayre\Bundle\MakerBundle\DTO\Config\BundleConfiguration;
+use Atournayre\Bundle\MakerBundle\DTO\Config\Namespaces;
 use Atournayre\Bundle\MakerBundle\Generator\FileGenerator;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
@@ -11,18 +13,20 @@ use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 abstract class AbstractMaker extends \Symfony\Bundle\MakerBundle\Maker\AbstractMaker
 {
+    protected readonly string $rootNamespace;
+    protected readonly Namespaces $configNamespaces;
+
     public function __construct(
-        #[Autowire('%kernel.project_dir%/src')]
         protected readonly string        $rootDir,
-        #[Autowire('%atournayre_maker.root_namespace%')]
-        protected readonly string        $rootNamespace,
         protected readonly FileGenerator $fileGenerator,
+        protected readonly BundleConfiguration $bundleConfiguration,
     )
     {
+        $this->rootNamespace = $this->bundleConfiguration->rootNamespace;
+        $this->configNamespaces = $this->bundleConfiguration->namespaces;
     }
 
     public function configureDependencies(DependencyBuilder $dependencies): void

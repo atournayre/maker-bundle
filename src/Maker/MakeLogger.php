@@ -22,7 +22,7 @@ class MakeLogger extends AbstractMaker
     {
         $command
             ->setDescription('Creates a new logger')
-            ->addArgument('namespace', InputArgument::REQUIRED, 'The namespace of the interface <fg=yellow>(e.g. App\\\\Logger\\\\DummyLogger)</>');
+            ->addArgument('namespace', InputArgument::REQUIRED, 'The class name of the interface <fg=yellow>(e.g. DummyLogger)</>');
     }
 
     public static function getCommandDescription(): string
@@ -37,6 +37,7 @@ class MakeLogger extends AbstractMaker
                 namespace: $namespace,
                 builder: LoggerBuilder::class,
                 classnameSuffix: 'Logger',
+                namespacePrefix: $this->configNamespaces->logger,
             ),
         ];
     }

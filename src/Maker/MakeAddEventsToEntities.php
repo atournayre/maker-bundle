@@ -46,7 +46,7 @@ class MakeAddEventsToEntities extends AbstractMaker
 
     private function entitiesWithoutEvents(): array
     {
-        $entityDirectory = Str::sprintf('%s/Entity', $this->rootDir);
+        $entityDirectory = $this->configNamespaces->entity;
 
         $filesystem = new Filesystem();
         if (!$filesystem->exists($entityDirectory)) {
