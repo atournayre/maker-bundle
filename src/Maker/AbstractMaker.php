@@ -13,7 +13,6 @@ use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 abstract class AbstractMaker extends \Symfony\Bundle\MakerBundle\Maker\AbstractMaker
 {
@@ -21,7 +20,6 @@ abstract class AbstractMaker extends \Symfony\Bundle\MakerBundle\Maker\AbstractM
     protected readonly Namespaces $configNamespaces;
 
     public function __construct(
-        #[Autowire('%kernel.project_dir%/src')]
         protected readonly string        $rootDir,
         protected readonly FileGenerator $fileGenerator,
         protected readonly BundleConfiguration $bundleConfiguration,

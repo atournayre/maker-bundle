@@ -23,18 +23,29 @@ return static function (ContainerConfigurator $container): void {
         ->defaults()
         ->private()
         ->autowire()
-        ->set(MakeAddEventsToEntities::class)->tag('maker.command')
-        ->set(MakeCollection::class)->tag('maker.command')
-        ->set(MakeCommand::class)->tag('maker.command')
-        ->set(MakeController::class)->tag('maker.command')
-        ->set(MakeDto::class)->tag('maker.command')
-        ->set(MakeEvent::class)->tag('maker.command')
-        ->set(MakeException::class)->tag('maker.command')
-        ->set(MakeInterface::class)->tag('maker.command')
-        ->set(MakeLogger::class)->tag('maker.command')
-        ->set(MakeProjectInstall::class)->tag('maker.command')
-        ->set(MakeService::class)->tag('maker.command')
-        ->set(MakeTrait::class)->tag('maker.command')
-        ->set(MakeVo::class)->tag('maker.command')
     ;
+
+    $makers = [
+        MakeAddEventsToEntities::class,
+        MakeCollection::class,
+        MakeCommand::class,
+        MakeController::class,
+        MakeDto::class,
+        MakeEvent::class,
+        MakeException::class,
+        MakeInterface::class,
+        MakeLogger::class,
+        MakeProjectInstall::class,
+        MakeService::class,
+        MakeTrait::class,
+        MakeVo::class,
+    ];
+
+    foreach ($makers as $maker) {
+        $services
+            ->set($maker)
+            ->arg('$rootDir', '%kernel.project_dir%/src')
+            ->tag('maker.command')
+        ;
+    }
 };

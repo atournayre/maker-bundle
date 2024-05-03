@@ -20,6 +20,10 @@ return static function (ContainerConfigurator $container): void {
 
     $services
         ->set(FileGenerator::class)
+        ->args([
+            '$rootDir' => '%kernel.project_dir%/src',
+            '$rootNamespace' => '%atournayre_maker.root_namespace%',
+        ])
     ;
 
     $services->set(BundleConfiguration::class)
