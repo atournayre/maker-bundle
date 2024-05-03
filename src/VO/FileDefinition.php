@@ -5,6 +5,7 @@ namespace Atournayre\Bundle\MakerBundle\VO;
 
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
+use Atournayre\Bundle\MakerBundle\Printer\Printer;
 use Nette\PhpGenerator\PhpFile;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
@@ -35,6 +36,12 @@ class FileDefinition
         return $fileDefinition->fromTemplatePath();
     }
 
+    private function print(PhpFile $phpFile): string
+    {
+        return (new Printer())
+            ->printFile($phpFile);
+    }
+
     private function generateEmptyClassFromTemplatePath(string $templatePath): string
     {
         $classname = Str::namespaceFromPath($this->configuration->templatePath(), $this->configuration->rootDir());
@@ -44,7 +51,7 @@ class FileDefinition
         $phpFile->addComment(Str::sprintf('Template "%s" not found, creating an empty file', $templatePath));
         $phpFile->addClass($namespace);
 
-        return (string)$phpFile;
+        return $this->print($phpFile);
     }
 
     private function fromTemplatePath(): self
@@ -58,7 +65,7 @@ class FileDefinition
         $phpFile = PhpFile::fromCode($content)
             ->addComment('This file has been auto-generated');
 
-        return $this->withSourceCode((string)$phpFile);
+        return $this->withSourceCode($this->print($phpFile));
     }
 
     private static function fromConfig(MakerConfig $config): self

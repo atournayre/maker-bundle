@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Atournayre\Bundle\MakerBundle\VO\Builder;
 
 use Atournayre\Bundle\MakerBundle\Helper\Str;
+use Atournayre\Bundle\MakerBundle\Printer\Printer;
 use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
 use Nette\PhpGenerator\Attribute;
 use Nette\PhpGenerator\ClassType;
@@ -29,7 +30,8 @@ abstract class AbstractBuilder
 
     public function generate(): string
     {
-        return (string)$this->file;
+        return (new Printer())
+            ->printFile($this->file);
     }
 
     protected function withFile(PhpFile $file): self

@@ -5,6 +5,7 @@ namespace Atournayre\Bundle\MakerBundle\Generator;
 
 use Atournayre\Bundle\MakerBundle\Collection\FileDefinitionCollection;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
+use Atournayre\Bundle\MakerBundle\VO\Builder\AbstractBuilder;
 use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\Assert\Assert;
 
@@ -35,6 +36,7 @@ class FileGenerator
     {
         foreach ($fileDefinitionCollection->getFileDefinitions() as $fileDefinition) {
             $builder = $fileDefinition->builder().'::build';
+            /** @var AbstractBuilder $builderCreate */
             $builderCreate = $builder($fileDefinition);
             $sourceCode = $builderCreate->generate();
             $fileDefinitionCollection->set($fileDefinition->uniqueIdentifier(), $fileDefinition->withSourceCode($sourceCode));
