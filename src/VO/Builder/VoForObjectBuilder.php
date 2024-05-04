@@ -12,16 +12,16 @@ use Nette\PhpGenerator\Method;
 
 class VoForObjectBuilder extends AbstractBuilder
 {
-    public static function build(FileDefinition $fileDefinition): self
+    public static function build(FileDefinition $fileDefinition): static
     {
         $voProperties = $fileDefinition->configuration()->voProperties();
 
-        $getters = array_map(fn($property) => self::defineGetter($property, $fileDefinition), $voProperties);
-        $withers = array_map(fn($property) => self::defineWither($property, $fileDefinition), $voProperties);
+        $getters = array_map(fn(array $property) => self::defineGetter($property, $fileDefinition), $voProperties);
+        $withers = array_map(fn(array $property) => self::defineWither($property, $fileDefinition), $voProperties);
 
         $nullableTrait = MakeHelper::nullableTrait($fileDefinition);
 
-        return (new self($fileDefinition))
+        return static::create($fileDefinition)
             ->createFile()
             ->withUse(\Webmozart\Assert\Assert::class)
             ->addComment(self::comment())
@@ -35,6 +35,11 @@ class VoForObjectBuilder extends AbstractBuilder
         ;
     }
 
+    /**
+     * @param array{type: string, fieldName: string}[] $voProperties
+     * @param FileDefinition $fileDefinition
+     * @return Method
+     */
     private static function constructor(array $voProperties, FileDefinition $fileDefinition): Method
     {
         $method = new Method('__construct');
@@ -49,6 +54,11 @@ class VoForObjectBuilder extends AbstractBuilder
         return $method;
     }
 
+    /**
+     * @param array{type: string, fieldName: string}[] $voProperties
+     * @param FileDefinition $fileDefinition
+     * @return Method
+     */
     private static function namedConstructor(array $voProperties, FileDefinition $fileDefinition): Method
     {
         $method = new Method('create');
@@ -72,6 +82,11 @@ class VoForObjectBuilder extends AbstractBuilder
         return $method;
     }
 
+    /**
+     * @param array{type: string, fieldName: string} $property
+     * @param FileDefinition $fileDefinition
+     * @return Method
+     */
     private static function defineGetter(array $property, FileDefinition $fileDefinition): Method
     {
         $propertyType = self::correspondingTypes($fileDefinition)[$property['type']];
@@ -82,6 +97,11 @@ class VoForObjectBuilder extends AbstractBuilder
             ->setBody('return $this->' . $property['fieldName'] . ';');
     }
 
+    /**
+     * @param array{type: string, fieldName: string} $property
+     * @param FileDefinition $fileDefinition
+     * @return Method
+     */
     private static function defineWither(array $property, FileDefinition $fileDefinition): Method
     {
         $propertyType = self::correspondingTypes($fileDefinition)[$property['type']];
@@ -103,6 +123,9 @@ class VoForObjectBuilder extends AbstractBuilder
         return $method;
     }
 
+    /**
+     * @return string[]
+     */
     private static function comment(): array
     {
         return [

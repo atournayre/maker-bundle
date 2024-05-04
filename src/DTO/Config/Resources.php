@@ -16,6 +16,9 @@ final class Resources
     {
     }
 
+    /**
+     * @param array<string, array<string, array<string, string>>> $resources
+     */
     public static function fromArray(array $resources): self
     {
         return new self(

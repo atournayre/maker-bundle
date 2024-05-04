@@ -11,7 +11,7 @@ use Webmozart\Assert\Assert;
 
 class TraitForObjectBuilder extends AbstractBuilder
 {
-    public static function build(FileDefinition $fileDefinition): self
+    public static function build(FileDefinition $fileDefinition): static
     {
         $traitProperties = $fileDefinition->configuration()->traitProperties();
 
@@ -20,13 +20,18 @@ class TraitForObjectBuilder extends AbstractBuilder
             $traitProperties
         );
 
-        return (new self($fileDefinition))
+        return static::create($fileDefinition)
             ->createFileAsTrait()
             ->withProperties($properties)
             ->addMembers(self::gettersForObject($traitProperties, $fileDefinition))
             ->addMembers(self::withersForObject($traitProperties, $fileDefinition));
     }
 
+    /**
+     * @param array{type: string, fieldName: string, nullable: bool}[] $traitProperties
+     * @param FileDefinition $fileDefinition
+     * @return Method[]
+     */
     private static function gettersForObject(array $traitProperties, FileDefinition $fileDefinition): array
     {
         foreach ($traitProperties as $property) {
@@ -45,6 +50,11 @@ class TraitForObjectBuilder extends AbstractBuilder
         return $methods ?? [];
     }
 
+    /**
+     * @param array{type: string, fieldName: string, nullable: bool}[] $traitProperties
+     * @param FileDefinition $fileDefinition
+     * @return Method[]
+     */
     private static function withersForObject(array $traitProperties, FileDefinition $fileDefinition): array
     {
         foreach ($traitProperties as $property) {
@@ -67,6 +77,11 @@ class TraitForObjectBuilder extends AbstractBuilder
         return $methods ?? [];
     }
 
+    /**
+     * @param array{type: string, fieldName: string, nullable: bool} $propertyDatas
+     * @param FileDefinition $fileDefinition
+     * @return Property
+     */
     private static function defineProperty(array $propertyDatas, FileDefinition $fileDefinition): Property
     {
         $type = $propertyDatas['type'];

@@ -44,7 +44,7 @@ class FileDefinition
 
     private function generateEmptyClassFromTemplatePath(string $templatePath): string
     {
-        $classname = Str::namespaceFromPath($this->configuration->templatePath(), $this->configuration->rootDir());
+        $classname = $this->configuration->namespaceFromPath();
         $namespace = $this->configuration->prefixByRootNamespace($classname);
         $phpFile = new PhpFile;
         $phpFile->addComment('This file has been auto-generated');
@@ -56,10 +56,10 @@ class FileDefinition
 
     private function fromTemplatePath(): self
     {
-        $templateExists = file_exists($this->configuration->templatePath());
+        $templateExists = $this->configuration->templatePathExists();
 
         $content = $templateExists
-            ? file_get_contents($this->configuration->templatePath())
+            ? $this->configuration->templateContent()
             : $this->generateEmptyClassFromTemplatePath($this->configuration->templatePath());
 
         $phpFile = PhpFile::fromCode($content)
@@ -103,9 +103,9 @@ class FileDefinition
         return $this->absolutePath;
     }
 
-    public function sourceCode(): ?string
+    public function sourceCode(): string
     {
-        return $this->sourceCode;
+        return $this->sourceCode ?? '';
     }
 
     public function builder(): string
@@ -143,8 +143,7 @@ class FileDefinition
             return PhpFile::fromCode($this->sourceCode);
         }
 
-        $absolutePath = $this->configuration->absolutePathFromNamespace($this->namespace());
-        $sourceCode = file_get_contents($absolutePath);
+        $sourceCode = $this->configuration->templateContent();
 
         return PhpFile::fromCode($sourceCode);
     }

@@ -33,6 +33,10 @@ class MakeAddEventsToEntities extends AbstractMaker
         return 'Add events to entities';
     }
 
+    /**
+     * @param string $namespace
+     * @return MakerConfig[]
+     */
     protected function configurations(string $namespace): array
     {
         return array_map(

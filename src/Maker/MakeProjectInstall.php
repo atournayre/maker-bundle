@@ -39,6 +39,10 @@ class MakeProjectInstall extends AbstractMaker
         return 'Create multiple files to get started with a new project';
     }
 
+    /**
+     * @param string $namespace
+     * @return MakerConfig[]
+     */
     protected function configurations(string $namespace): array
     {
         $templates = $this->getTemplates();

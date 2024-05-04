@@ -15,11 +15,11 @@ use Nette\PhpGenerator\TraitType;
 
 class AddEventsToEntityBuilder extends AbstractBuilder
 {
-    public static function build(FileDefinition $fileDefinition): self
+    public static function build(FileDefinition $fileDefinition): static
     {
         $fileDefinition = $fileDefinition->withSourceCodeFromAbsolutePath();
 
-        $file = (new self($fileDefinition))
+        $file = static::create($fileDefinition)
             ->createFromCode($fileDefinition->sourceCode())
             ->addImplement(HasEventsInterface::class)
             ->withUse(HasEventsInterface::class)

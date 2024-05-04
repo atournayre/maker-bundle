@@ -62,6 +62,10 @@ class MakeException extends AbstractMaker
         $this->exceptionNamedConstructor = $namedConstructor;
     }
 
+    /**
+     * @param string $namespace
+     * @return MakerConfig[]
+     */
     protected function configurations(string $namespace): array
     {
         return [

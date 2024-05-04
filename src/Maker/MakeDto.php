@@ -17,6 +17,9 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 #[AutoconfigureTag('maker.command')]
 class MakeDto extends AbstractMaker
 {
+    /**
+     * @var array<int|string, array>
+     */
     private array $dtoProperties = [];
 
     public static function getCommandName(): string
@@ -122,6 +125,10 @@ class MakeDto extends AbstractMaker
         $this->dtoProperties = $currentFields;
     }
 
+    /**
+     * @param string $namespace
+     * @return MakerConfig[]
+     */
     protected function configurations(string $namespace): array
     {
         return [

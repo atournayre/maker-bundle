@@ -7,9 +7,9 @@ use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
 
 class InterfaceBuilder extends AbstractBuilder
 {
-    public static function build(FileDefinition $fileDefinition): self
+    public static function build(FileDefinition $fileDefinition): static
     {
-        return (new self($fileDefinition))
+        return static::create($fileDefinition)
             ->createFileAsInterface()
         ;
     }

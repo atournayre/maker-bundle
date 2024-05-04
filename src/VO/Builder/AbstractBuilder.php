@@ -20,13 +20,24 @@ abstract class AbstractBuilder
 {
     protected PhpFile $file;
 
-    protected function __construct(
+    final private function __construct(
         protected FileDefinition $fileDefinition,
     )
     {
     }
 
-    abstract public static function build(FileDefinition $fileDefinition): self;
+    public static function create(FileDefinition $fileDefinition): static|self
+    {
+        return new static($fileDefinition);
+    }
+
+    public static function createFromTemplate(FileDefinition $fileDefinition): static|self
+    {
+        return static::create($fileDefinition)
+            ->withFile($fileDefinition->toPhpFile());
+    }
+
+    abstract public static function build(FileDefinition $fileDefinition): static|self;
 
     public function generate(): string
     {
@@ -280,6 +291,10 @@ abstract class AbstractBuilder
         return $clone;
     }
 
+    /**
+     * @param FileDefinition $fileDefinition
+     * @return array<string, string>
+     */
     protected static function correspondingTypes(FileDefinition $fileDefinition): array
     {
         $configuration = $fileDefinition->configuration();

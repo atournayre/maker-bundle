@@ -75,6 +75,10 @@ class MakeCollection extends AbstractMaker
         );
     }
 
+    /**
+     * @param string $namespace
+     * @return MakerConfig[]
+     */
     protected function configurations(string $namespace): array
     {
         if ($this->collectionOfDecimals) {

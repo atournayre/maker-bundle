@@ -7,9 +7,8 @@ use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
 
 class FromTemplateBuilder extends AbstractBuilder
 {
-    public static function build(FileDefinition $fileDefinition): self
+    public static function build(FileDefinition $fileDefinition): static
     {
-        return (new self($fileDefinition))
-            ->withFile($fileDefinition->toPhpFile());
+        return static::createFromTemplate($fileDefinition);
     }
 }

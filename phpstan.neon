@@ -1,0 +1,18 @@
+includes:
+    - vendor/phpstan/phpstan-symfony/extension.neon
+
+parameters:
+    level: 2
+    excludePaths:
+        - src/Resources/templates
+    ignoreErrors:
+        - '#Class ApiPlatform\\Metadata\\ApiProperty not found.#'
+        - '#Class Doctrine\\DBAL\\Types\\Types not found.#'
+        - '#Class Doctrine\\ORM\\Mapping not found.#'
+        - '#Class Doctrine\\ORM\\Mapping\\Column not found.#'
+        - '#Class Doctrine\\ORM\\Mapping\\Id not found.#'
+        - '#Class Psr\\Clock\\ClockInterface not found.#'
+        - '#Class Symfony\\Bundle\\SecurityBundle\\Security not found.#'
+        - '#Class Symfony\\Component\\Form\\Extension\\Core\\Type\\FormType not found.#'
+        - '#Class Symfony\\Component\\Form\\FormInterface not found.#'
+    treatPhpDocTypesAsCertain: false

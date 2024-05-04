@@ -20,6 +20,9 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 #[AutoconfigureTag('maker.command')]
 class MakeEvent extends AbstractMaker
 {
+    /**
+     * @var array<int|string, array>
+     */
     private array $eventProperties = [];
 
     public static function getCommandName(): string
@@ -114,6 +117,10 @@ class MakeEvent extends AbstractMaker
         $this->eventProperties = $currentFields;
     }
 
+    /**
+     * @param string $namespace
+     * @return MakerConfig[]
+     */
     protected function configurations(string $namespace): array
     {
         $makerConfigEvent = (new MakerConfig(

@@ -11,7 +11,7 @@ use Nette\PhpGenerator\Method;
 
 class ListenerBuilder extends AbstractBuilder
 {
-    public static function build(FileDefinition $fileDefinition): self
+    public static function build(FileDefinition $fileDefinition): static
     {
         $eventNamespace = $fileDefinition->configuration()->getExtraProperty('eventNamespace');
         $eventName = Str::classNameFromNamespace($eventNamespace, 'Event');
@@ -22,7 +22,7 @@ class ListenerBuilder extends AbstractBuilder
             ]),
         ];
 
-        return (new self($fileDefinition))
+        return static::create($fileDefinition)
             ->createFile()
             ->withUse($eventNamespace)
             ->setAttributes($attributes)

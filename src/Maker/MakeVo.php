@@ -20,6 +20,9 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 #[AutoconfigureTag('maker.command')]
 class MakeVo extends AbstractMaker
 {
+    /**
+     * @var array<int|string, array>
+     */
     private array $voProperties = [];
     private ?string $voRelatedEntity = null;
 
@@ -134,31 +137,35 @@ class MakeVo extends AbstractMaker
         );
     }
 
+    /**
+     * @param string $namespace
+     * @return MakerConfig[]
+     */
     protected function configurations(string $namespace): array
     {
         if ($this->voRelatedEntity) {
-            $configurations[] = (new MakerConfig(
-                namespace: $namespace,
-                builder: VoForEntityBuilder::class,
-                voProperties: $this->voProperties,
-                voRelatedToAnEntity: $this->voRelatedEntity,
-                namespacePrefix: $this->configNamespaces->vo
-            ))
-                ->withVoEntityNamespace()
-                ->withExtraProperty('allowedTypes', $this->allowedTypes($this->configResources->valueObject))
-            ;
-        } else {
-            $configurations[] = (new MakerConfig(
+            return [
+                (new MakerConfig(
+                    namespace: $namespace,
+                    builder: VoForEntityBuilder::class,
+                    voProperties: $this->voProperties,
+                    voRelatedToAnEntity: $this->voRelatedEntity,
+                    namespacePrefix: $this->configNamespaces->vo
+                ))
+                    ->withVoEntityNamespace()
+                    ->withExtraProperty('allowedTypes', $this->allowedTypes($this->configResources->valueObject)),
+            ];
+        }
+
+        return [
+            (new MakerConfig(
                 namespace: $namespace,
                 builder: VoForObjectBuilder::class,
                 voProperties: $this->voProperties,
                 namespacePrefix: $this->configNamespaces->vo,
             ))
-                ->withExtraProperty('allowedTypes', $this->allowedTypes($this->configResources->valueObject))
-            ;
-        }
-
-        return $configurations ?? [];
+                ->withExtraProperty('allowedTypes', $this->allowedTypes($this->configResources->valueObject)),
+        ];
     }
 
     public function configureDependencies(DependencyBuilder $dependencies): void

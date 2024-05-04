@@ -30,6 +30,10 @@ class MakeLogger extends AbstractMaker
         return 'Create a new Logger';
     }
 
+    /**
+     * @param string $namespace
+     * @return MakerConfig[]
+     */
     protected function configurations(string $namespace): array
     {
         return [

@@ -16,12 +16,16 @@ class MakerConfig
         private string           $rootDir = '',
         private readonly bool    $enableApiPlatform = false,
         private readonly bool    $traitsCreateEntityId = false,
+        /** @var array<string, string> */
         private readonly array   $dtoProperties = [],
+        /** @var array<string, string> */
         private readonly array   $voProperties = [],
         private readonly ?string $voRelatedToAnEntity = null,
+        /** @var array<string, string> */
         private readonly array   $traitProperties = [],
         private readonly bool    $traitIsUsedByEntity = false,
         private readonly bool    $traitSeparateAccessors = false,
+        /** @var array */
         private array            $extraProperties = [],
         private readonly ?string $classnameSuffix = null,
         private ?string          $templatePath = null,
@@ -82,11 +86,17 @@ class MakerConfig
         return $this->traitsCreateEntityId;
     }
 
+    /**
+     * @return array{fieldName: string, type: string, nullable: bool}[]
+     */
     public function dtoProperties(): array
     {
         return $this->dtoProperties;
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function voProperties(): array
     {
         return $this->voProperties;
@@ -220,5 +230,23 @@ class MakerConfig
             $this->rootNamespace,
             $this->rootDir
         );
+    }
+
+    public function namespaceFromPath(): string
+    {
+        Assert::notNull($this->templatePath, 'Template path must be set to get the namespace from path');
+        return Str::namespaceFromPath($this->templatePath, $this->rootDir);
+    }
+
+    public function templatePathExists(): bool
+    {
+        Assert::notNull($this->templatePath, 'Template path must be set to check if it exists');
+        return file_exists($this->templatePath);
+    }
+
+    public function templateContent(): string
+    {
+        Assert::notNull($this->templatePath, 'Template path must be set to get the content');
+        return file_get_contents($this->templatePath);
     }
 }

@@ -30,6 +30,10 @@ class MakeInterface extends AbstractMaker
             ->addArgument('namespace', InputArgument::REQUIRED, 'The class name of the interface <fg=yellow>(e.g. DummyInterface)</>');
     }
 
+    /**
+     * @param string $namespace
+     * @return MakerConfig[]
+     */
     protected function configurations(string $namespace): array
     {
         return [

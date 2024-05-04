@@ -11,7 +11,7 @@ use Webmozart\Assert\Assert;
 
 class CommandBuilder extends AbstractBuilder
 {
-    public static function build(FileDefinition $fileDefinition): self
+    public static function build(FileDefinition $fileDefinition): static
     {
         $config = $fileDefinition->configuration();
 
@@ -26,7 +26,7 @@ class CommandBuilder extends AbstractBuilder
             ]),
         ];
 
-        return (new self($fileDefinition))
+        return static::create($fileDefinition)
             ->createFile()
             ->withUse(\Symfony\Component\Console\Attribute\AsCommand::class)
             ->withUse(\Symfony\Component\Console\Input\InputInterface::class)

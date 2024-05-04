@@ -45,21 +45,29 @@ class MakeTrait extends AbstractMaker
         ;
     }
 
+    /**
+     * @param string $namespace
+     * @return MakerConfig[]
+     */
     protected function configurations(string $namespace): array
     {
         if ($this->traitIsUsedByEntity) {
-            $configurations[] = (new MakerConfig(
-                namespace: $namespace,
-                builder: TraitForEntityBuilder::class,
-                enableApiPlatform: $this->enableApiPlatform,
-                traitProperties: $this->traitProperties,
-                traitIsUsedByEntity: true,
-                classnameSuffix: 'EntityTrait',
-                namespacePrefix: $this->configNamespaces->traitEntity
-            ))
-                ->withExtraProperty('allowedTypes', $this->allowedTypes($this->configResources->trait));
-        } else {
-            $configurations[] = (new MakerConfig(
+            return [
+                (new MakerConfig(
+                    namespace: $namespace,
+                    builder: TraitForEntityBuilder::class,
+                    enableApiPlatform: $this->enableApiPlatform,
+                    traitProperties: $this->traitProperties,
+                    traitIsUsedByEntity: true,
+                    classnameSuffix: 'EntityTrait',
+                    namespacePrefix: $this->configNamespaces->traitEntity
+                ))
+                    ->withExtraProperty('allowedTypes', $this->allowedTypes($this->configResources->trait)),
+            ];
+        }
+
+        return [
+            (new MakerConfig(
                 namespace: $namespace,
                 builder: TraitForObjectBuilder::class,
                 enableApiPlatform: $this->enableApiPlatform,
@@ -67,10 +75,8 @@ class MakeTrait extends AbstractMaker
                 classnameSuffix: 'Trait',
                 namespacePrefix: $this->configNamespaces->trait,
             ))
-                ->withExtraProperty('allowedTypes', $this->allowedTypes($this->configResources->trait));
-        }
-
-        return $configurations ?? [];
+                ->withExtraProperty('allowedTypes', $this->allowedTypes($this->configResources->trait)),
+        ];
     }
 
     public function interact(InputInterface $input, ConsoleStyle $io, Command $command): void

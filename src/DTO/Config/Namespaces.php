@@ -5,59 +5,62 @@ namespace Atournayre\Bundle\MakerBundle\DTO\Config;
 
 final class Namespaces
 {
-    public readonly ?string $adapter;
-    public readonly ?string $argumentValueResolver;
-    public readonly ?string $attribute;
-    public readonly ?string $collection;
-    public readonly ?string $command;
-    public readonly ?string $configuration;
-    public readonly ?string $contracts;
-    public readonly ?string $controller;
-    public readonly ?string $dispatcher;
-    public readonly ?string $dto;
-    public readonly ?string $entity;
-    public readonly ?string $event;
-    public readonly ?string $eventListener;
-    public readonly ?string $exception;
-    public readonly ?string $factory;
-    public readonly ?string $helper;
-    public readonly ?string $logger;
-    public readonly ?string $manager;
-    public readonly ?string $serviceCommand;
-    public readonly ?string $serviceQuery;
-    public readonly ?string $trait;
-    public readonly ?string $traitEntity;
-    public readonly ?string $type;
-    public readonly ?string $vo;
+    public function __construct(
+        public readonly ?string $adapter = null,
+        public readonly ?string $argumentValueResolver = null,
+        public readonly ?string $attribute = null,
+        public readonly ?string $collection = null,
+        public readonly ?string $command = null,
+        public readonly ?string $configuration = null,
+        public readonly ?string $contracts = null,
+        public readonly ?string $controller = null,
+        public readonly ?string $dispatcher = null,
+        public readonly ?string $dto = null,
+        public readonly ?string $entity = null,
+        public readonly ?string $event = null,
+        public readonly ?string $eventListener = null,
+        public readonly ?string $exception = null,
+        public readonly ?string $factory = null,
+        public readonly ?string $helper = null,
+        public readonly ?string $logger = null,
+        public readonly ?string $manager = null,
+        public readonly ?string $serviceCommand = null,
+        public readonly ?string $serviceQuery = null,
+        public readonly ?string $trait = null,
+        public readonly ?string $traitEntity = null,
+        public readonly ?string $type = null,
+        public readonly ?string $vo = null,
+    )
+    {
+    }
 
     public static function fromArray(array $namespaces): self
     {
-        $instance = new self();
-        $instance->adapter = $namespaces['adapter'] ?? null;
-        $instance->argumentValueResolver = $namespaces['argument_value_resolver'] ?? null;
-        $instance->attribute = $namespaces['attribute'] ?? null;
-        $instance->collection = $namespaces['collection'] ?? null;
-        $instance->command = $namespaces['command'] ?? null;
-        $instance->configuration = $namespaces['configuration'] ?? null;
-        $instance->contracts = $namespaces['contracts'] ?? null;
-        $instance->controller = $namespaces['controller'] ?? null;
-        $instance->dispatcher = $namespaces['dispatcher'] ?? null;
-        $instance->dto = $namespaces['dto'] ?? null;
-        $instance->entity = $namespaces['entity'] ?? null;
-        $instance->event = $namespaces['event'] ?? null;
-        $instance->eventListener = $namespaces['event_listener'] ?? null;
-        $instance->exception = $namespaces['exception'] ?? null;
-        $instance->factory = $namespaces['factory'] ?? null;
-        $instance->helper = $namespaces['helper'] ?? null;
-        $instance->logger = $namespaces['logger'] ?? null;
-        $instance->manager = $namespaces['manager'] ?? null;
-        $instance->serviceCommand = $namespaces['service_command'] ?? null;
-        $instance->serviceQuery = $namespaces['service_query'] ?? null;
-        $instance->trait = $namespaces['trait'] ?? null;
-        $instance->traitEntity = $namespaces['trait_entity'] ?? null;
-        $instance->type = $namespaces['type'] ?? null;
-        $instance->vo = $namespaces['vo'] ?? null;
-
-        return $instance;
+        return new self(
+            $namespaces['adapter'] ?? null,
+            $namespaces['argument_value_resolver'] ?? null,
+            $namespaces['attribute'] ?? null,
+            $namespaces['collection'] ?? null,
+            $namespaces['command'] ?? null,
+            $namespaces['configuration'] ?? null,
+            $namespaces['contracts'] ?? null,
+            $namespaces['controller'] ?? null,
+            $namespaces['dispatcher'] ?? null,
+            $namespaces['dto'] ?? null,
+            $namespaces['entity'] ?? null,
+            $namespaces['event'] ?? null,
+            $namespaces['event_listener'] ?? null,
+            $namespaces['exception'] ?? null,
+            $namespaces['factory'] ?? null,
+            $namespaces['helper'] ?? null,
+            $namespaces['logger'] ?? null,
+            $namespaces['manager'] ?? null,
+            $namespaces['service_command'] ?? null,
+            $namespaces['service_query'] ?? null,
+            $namespaces['trait'] ?? null,
+            $namespaces['trait_entity'] ?? null,
+            $namespaces['type'] ?? null,
+            $namespaces['vo'] ?? null,
+        );
     }
 }

@@ -6,8 +6,11 @@ namespace Atournayre\Bundle\MakerBundle\DTO\Config;
 final class Resource
 {
     public function __construct(
+        /** @var array<string, string> */
         public readonly array $primitivesMapping,
+        /** @var array<string> */
         public readonly array $resources,
+        /** @var array<string> */
         public readonly array $exclude,
     )
     {

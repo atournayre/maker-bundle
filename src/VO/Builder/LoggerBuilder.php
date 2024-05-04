@@ -10,9 +10,9 @@ use App\Logger\AbstractLogger;
 
 class LoggerBuilder extends AbstractBuilder
 {
-    public static function build(FileDefinition $fileDefinition): self
+    public static function build(FileDefinition $fileDefinition): static
     {
-        return (new self($fileDefinition))
+        return static::create($fileDefinition)
             ->createFile()
             ->extends(AbstractLogger::class)
             ->addImplement(LoggerInterface::class)

@@ -8,12 +8,12 @@ use Nette\PhpGenerator\Method;
 
 class ExceptionBuilder extends AbstractBuilder
 {
-    public static function build(FileDefinition $fileDefinition): self
+    public static function build(FileDefinition $fileDefinition): static
     {
         $config = $fileDefinition->configuration();
         $exceptionType = $config->getExtraProperty('exceptionType');
 
-        return (new self($fileDefinition))
+        return static::create($fileDefinition)
             ->createFile()
             ->extends($exceptionType)
             ->addMember(self::namedConstructor($fileDefinition))

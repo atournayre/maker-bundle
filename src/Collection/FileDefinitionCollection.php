@@ -23,6 +23,9 @@ class FileDefinitionCollection
         $this->fileDefinitions[$key] = $fileDefinition;
     }
 
+    /**
+     * @return FileDefinition[]
+     */
     public function getFileDefinitions(): array
     {
         return $this->fileDefinitions;

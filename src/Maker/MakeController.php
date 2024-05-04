@@ -88,46 +88,61 @@ class MakeController extends AbstractMaker
         throw new \RuntimeException('Creating controller without form is not implemented yet!');
     }
 
+    /**
+     * @return string[]
+     */
     private function entities(): array
     {
         return MakeHelper::findFilesInDirectory($this->bundleConfiguration->directories->entity);
     }
 
+    /**
+     * @return string[]
+     */
     private function formTypes(): array
     {
         return MakeHelper::findFilesInDirectory($this->bundleConfiguration->directories->form);
     }
 
+    /**
+     * @return string[]
+     */
     private function vos(): array
     {
         return MakeHelper::findFilesInDirectory($this->bundleConfiguration->directories->vo);
     }
 
+    /**
+     * @param string $namespace
+     * @return MakerConfig[]
+     */
     protected function configurations(string $namespace): array
     {
         if ($this->useAForm) {
-            $configurations[] = (new MakerConfig(
-                namespace: $namespace,
-                builder: ControllerBuilder::class,
-                classnameSuffix: 'Controller',
-                namespacePrefix: $this->configNamespaces->controller,
-            ))
-                ->withTemplatePathKeepingNamespace('Controller/WithFormController.php')
-                ->withExtraProperty('entityPath', $this->controllerRelatedEntity)
-                ->withExtraProperty('formTypePath', $this->controllerRelatedFormType)
-                ->withExtraProperty('voPath', $this->controllerRelatedVO);
-        } else {
-            $configurations[] = (new MakerConfig(
+            return [
+                (new MakerConfig(
+                    namespace: $namespace,
+                    builder: ControllerBuilder::class,
+                    classnameSuffix: 'Controller',
+                    namespacePrefix: $this->configNamespaces->controller,
+                ))
+                    ->withTemplatePathKeepingNamespace('Controller/WithFormController.php')
+                    ->withExtraProperty('entityPath', $this->controllerRelatedEntity)
+                    ->withExtraProperty('formTypePath', $this->controllerRelatedFormType)
+                    ->withExtraProperty('voPath', $this->controllerRelatedVO),
+            ];
+        }
+
+        return [
+            (new MakerConfig(
                 namespace: $namespace,
                 builder: ControllerBuilder::class,
                 classnameSuffix: 'Controller',
                 namespacePrefix: $this->configNamespaces->controller,
             ))
                 ->withTemplatePathKeepingNamespace('Controller/SimpleController.php')
-                ->withExtraProperty('entityPath', $this->controllerRelatedEntity);
-        }
-
-        return $configurations ?? [];
+                ->withExtraProperty('entityPath', $this->controllerRelatedEntity),
+        ];
     }
 
     public function configureDependencies(DependencyBuilder $dependencies): void

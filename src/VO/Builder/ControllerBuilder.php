@@ -10,7 +10,7 @@ use Webmozart\Assert\Assert;
 
 class ControllerBuilder extends AbstractBuilder
 {
-    public static function build(FileDefinition $fileDefinition): self|FromTemplateBuilder
+    public static function build(FileDefinition $fileDefinition): static
     {
         $hasForm = $fileDefinition->configuration()->hasExtraProperty('formTypePath');
 
@@ -21,7 +21,7 @@ class ControllerBuilder extends AbstractBuilder
         return self::buildSimple($fileDefinition);
     }
 
-    private static function buildWithForm(FileDefinition $fileDefinition): self|FromTemplateBuilder
+    private static function buildWithForm(FileDefinition $fileDefinition): static
     {
         $config = $fileDefinition->configuration();
         $rootNamespace = $config->rootNamespace();
@@ -44,9 +44,9 @@ class ControllerBuilder extends AbstractBuilder
 
         $fileDefinition = $fileDefinition->withConfiguration($config);
 
-        $self = FromTemplateBuilder::build($fileDefinition);
+        $self = static::createFromTemplate($fileDefinition);
 
-        $self = (new self($fileDefinition))
+        $self = static::create($fileDefinition)
             ->createFromCode((string)$self->file)
             ->changeClassName($fileDefinition->fullName());
 
@@ -102,11 +102,11 @@ class ControllerBuilder extends AbstractBuilder
         $methodCreateForm->addComment('@param ' . $voClassName . '|null $data');
     }
 
-    private static function buildSimple(FileDefinition $fileDefinition): self|FromTemplateBuilder
+    private static function buildSimple(FileDefinition $fileDefinition): static
     {
-        $self = FromTemplateBuilder::build($fileDefinition);
+        $self = static::createFromTemplate($fileDefinition);
 
-        return (new self($fileDefinition))
+        return static::create($fileDefinition)
             ->createFromCode((string)$self->file)
             ->changeClassName($fileDefinition->fullName())
         ;

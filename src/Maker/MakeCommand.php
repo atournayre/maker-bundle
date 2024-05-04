@@ -53,6 +53,10 @@ class MakeCommand extends AbstractMaker
         $this->commandName = trim($input->getArgument('name'));
     }
 
+    /**
+     * @param string $namespace
+     * @return MakerConfig[]
+     */
     protected function configurations(string $namespace): array
     {
         return [

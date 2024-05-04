@@ -18,7 +18,7 @@ use Nette\PhpGenerator\Method;
 
 class ServiceCommandBuilder extends AbstractBuilder
 {
-    public static function build(FileDefinition $fileDefinition): self
+    public static function build(FileDefinition $fileDefinition): static
     {
         $config = $fileDefinition->configuration();
         $voParameter = $config->getExtraPropertyWithRootNamespace('vo');
@@ -29,7 +29,7 @@ class ServiceCommandBuilder extends AbstractBuilder
             ]),
         ];
 
-        return (new self($fileDefinition))
+        return static::create($fileDefinition)
             ->createFile()
             ->isReadOnly()
             ->withUse(FailFast::class)

@@ -12,7 +12,7 @@ use Webmozart\Assert\Assert;
 
 class TraitForEntityBuilder extends AbstractBuilder
 {
-    public static function build(FileDefinition $fileDefinition): self
+    public static function build(FileDefinition $fileDefinition): static
     {
         $config = $fileDefinition->configuration();
         $traitProperties = $config->traitProperties();
@@ -36,7 +36,7 @@ class TraitForEntityBuilder extends AbstractBuilder
             $traitProperties
         );
 
-        return (new self($fileDefinition))
+        return static::create($fileDefinition)
             ->createFileAsTrait()
             ->withUses($uses)
             ->withProperties($properties)
@@ -44,6 +44,10 @@ class TraitForEntityBuilder extends AbstractBuilder
             ->addMembers(self::settersForEntity($traitProperties));
     }
 
+    /**
+     * @param array{fieldName: string, type: string, nullable: bool}[] $traitProperties
+     * @return Method[]
+     */
     private static function settersForEntity(array $traitProperties): array
     {
         foreach ($traitProperties as $property) {
@@ -65,6 +69,10 @@ class TraitForEntityBuilder extends AbstractBuilder
         return $methods ?? [];
     }
 
+    /**
+     * @param array{fieldName: string, type: string, nullable: bool}[] $traitProperties
+     * @return Method[]
+     */
     private static function gettersForEntity(array $traitProperties): array
     {
         foreach ($traitProperties as $property) {
@@ -75,10 +83,7 @@ class TraitForEntityBuilder extends AbstractBuilder
                     ->setReturnType($property['type'])
                     ->setReturnNullable($property['nullable']);
 
-                if (!$property['nullable']) {
-                    $method->addBody('Assert::notNull($this->' . $property['fieldName'] . ');');
-                }
-
+                $method->addBody('Assert::notNull($this->' . $property['fieldName'] . ');');
                 $method->addBody('return $this->' . $property['fieldName'] . ';');
 
                 $methods[] = $method;
@@ -96,6 +101,11 @@ class TraitForEntityBuilder extends AbstractBuilder
         return $methods ?? [];
     }
 
+    /**
+     * @param array{fieldName: string, type: string, nullable: bool} $propertyDatas
+     * @param FileDefinition $fileDefinition
+     * @return Property
+     */
     private static function defineProperty(array $propertyDatas, FileDefinition $fileDefinition): Property
     {
         $type = $propertyDatas['type'];

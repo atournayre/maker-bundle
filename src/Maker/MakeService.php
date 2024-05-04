@@ -107,6 +107,10 @@ class MakeService extends AbstractMaker
         );
     }
 
+    /**
+     * @param string $namespace
+     * @return MakerConfig[]
+     */
     protected function configurations(string $namespace): array
     {
         $vo = Str::prefixByRootNamespace($this->vo, $this->rootNamespace);

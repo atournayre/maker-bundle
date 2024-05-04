@@ -14,6 +14,10 @@ final class BundleConfiguration
     {
     }
 
+    /**
+     * @param array $data
+     * @return self
+     */
     public static function fromArray(array $data): self
     {
         return new self(

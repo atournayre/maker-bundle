@@ -16,7 +16,7 @@ use Webmozart\Assert\Assert;
 
 class VoForEntityBuilder extends AbstractBuilder
 {
-    public static function build(FileDefinition $fileDefinition): self
+    public static function build(FileDefinition $fileDefinition): static
     {
         $entityNamespace = self::entityNamespace($fileDefinition);
         $voProperties = $fileDefinition->configuration()->voProperties();
@@ -25,7 +25,7 @@ class VoForEntityBuilder extends AbstractBuilder
         $getters = array_map(fn($property) => self::defineGetter($property, $fileDefinition), $voProperties);
         $nullableTrait = MakeHelper::nullableTrait($fileDefinition);
 
-        return (new self($fileDefinition))
+        return static::create($fileDefinition)
             ->createFile()
             ->withUse(\Webmozart\Assert\Assert::class)
             ->withUse($entityNamespace->toString())
@@ -44,16 +44,29 @@ class VoForEntityBuilder extends AbstractBuilder
         return UStr::create($fileDefinition->configuration()->voRelatedToAnEntityWithRootNamespace());
     }
 
+    /**
+     * @param array{type: string, fieldName: string}[] $property
+     * @param FileDefinition $fileDefinition
+     * @return Method
+     */
     private static function defineGetter(array $property, FileDefinition $fileDefinition): Method
     {
         $propertyType = self::correspondingTypes($fileDefinition)[$property['type']];
 
+        $body = 'return $this->__FIELD_NAME__;';
+        $body = Str::replace($body, '__FIELD_NAME__', $property['fieldName']);
+
         return (new Method(Str::getter($property['fieldName'])))
             ->setPublic()
             ->setReturnType($propertyType)
-            ->setBody('return $this->' . $property['fieldName'] . ';');
+            ->setBody($body);
     }
 
+    /**
+     * @param array{type: string, fieldName: string}[] $property
+     * @param FileDefinition $fileDefinition
+     * @return Property
+     */
     private static function defineProperty(array $property, FileDefinition $fileDefinition): Property
     {
         $type = $property['type'];
@@ -73,6 +86,11 @@ class VoForEntityBuilder extends AbstractBuilder
         return $property;
     }
 
+    /**
+     * @param array{type: string, fieldName: string}[] $voProperties
+     * @param UnicodeString $entityNamespace
+     * @return Method
+     */
     private static function namedConstructor(array $voProperties, UnicodeString $entityNamespace): Method
     {
         $method = new Method('create');
@@ -98,6 +116,9 @@ class VoForEntityBuilder extends AbstractBuilder
         return $method;
     }
 
+    /**
+     * @return string[]
+     */
     private static function comment(): array
     {
         return [

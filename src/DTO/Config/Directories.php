@@ -13,6 +13,9 @@ final class Directories
     {
     }
 
+    /**
+     * @param array<string, string> $directories
+     */
     public static function fromArray(array $directories): self
     {
         return new self(

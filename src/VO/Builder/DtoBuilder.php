@@ -13,7 +13,7 @@ use Webmozart\Assert\Assert;
 
 class DtoBuilder extends AbstractBuilder
 {
-    public static function build(FileDefinition $fileDefinition): self
+    public static function build(FileDefinition $fileDefinition): static
     {
         $dtoProperties = $fileDefinition->configuration()->dtoProperties();
 
@@ -24,7 +24,7 @@ class DtoBuilder extends AbstractBuilder
 
         $nullableTrait = MakeHelper::nullableTrait($fileDefinition);
 
-        return (new self($fileDefinition))
+        return static::create($fileDefinition)
             ->createFile()
             ->withProperties($properties)
             ->addMember(self::namedConstructorFromArray($dtoProperties))
@@ -34,18 +34,25 @@ class DtoBuilder extends AbstractBuilder
         ;
     }
 
+    /**
+     * @param array{fieldName: string, type: string, nullable: bool}[] $propertyDatas
+     * @param FileDefinition $fileDefinition
+     * @return Property
+     */
     private static function property(array $propertyDatas, FileDefinition $fileDefinition): Property
     {
+        /** @var string $type */
+        $type = $propertyDatas['type'];
         Assert::inArray(
-            $propertyDatas['type'],
+            $type,
             array_keys(self::correspondingTypes($fileDefinition)),
-            Str::sprintf('Property "%s" should be of type %s; %s given', $propertyDatas['fieldName'], Str::implode(', ', array_keys(self::correspondingTypes($fileDefinition))), $propertyDatas['type'])
+            Str::sprintf('Property "%s" should be of type %s; %s given', $propertyDatas['fieldName'], Str::implode(', ', array_keys(self::correspondingTypes($fileDefinition))), $type)
         );
 
         $property = new Property($propertyDatas['fieldName']);
-        $property->setVisibility('public')->setType(self::correspondingTypes($fileDefinition)[$propertyDatas['type']]);
+        $property->setVisibility('public')->setType(self::correspondingTypes($fileDefinition)[$type]);
 
-        $defaultValue = match ($propertyDatas['type']) {
+        $defaultValue = match ($type) {
             'string' => '',
             'integer' => 0,
             'float' => 0.0,
@@ -66,6 +73,10 @@ class DtoBuilder extends AbstractBuilder
         return $property;
     }
 
+    /**
+     * @param array{fieldName: string, type: string}[] $dtoPoperties
+     * @return Method
+     */
     private static function namedConstructorFromArray(array $dtoPoperties): Method
     {
         $bodyParts = [];
@@ -87,6 +98,11 @@ class DtoBuilder extends AbstractBuilder
         return $method;
     }
 
+    /**
+     * @param array{fieldName: string, type: string}[] $dtoPoperties
+     * @param FileDefinition $fileDefinition
+     * @return Method
+     */
     private static function methodValidate(array $dtoPoperties, FileDefinition $fileDefinition): Method
     {
         $className = $fileDefinition->classname();

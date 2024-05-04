@@ -11,11 +11,11 @@ use Nette\PhpGenerator\Method;
 
 class EventBuilder extends AbstractBuilder
 {
-    public static function build(FileDefinition $fileDefinition): self
+    public static function build(FileDefinition $fileDefinition): static
     {
         $eventProperties = $fileDefinition->configuration()->getExtraProperty('eventProperties') ?? [];
 
-        return (new self($fileDefinition))
+        return static::create($fileDefinition)
             ->createFile()
             ->extends(\Symfony\Contracts\EventDispatcher\Event::class)
             ->withUse(\Symfony\Contracts\EventDispatcher\Event::class)
@@ -28,6 +28,11 @@ class EventBuilder extends AbstractBuilder
         ;
     }
 
+    /**
+     * @param array{fieldName: string, type: string}[] $voProperties
+     * @param FileDefinition $fileDefinition
+     * @return Method
+     */
     private static function constructor(array $voProperties, FileDefinition $fileDefinition): Method
     {
         $method = new Method('__construct');

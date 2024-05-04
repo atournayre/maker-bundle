@@ -11,13 +11,13 @@ use Webmozart\Assert\Assert;
 
 class CollectionBuilder extends AbstractBuilder
 {
-    public static function build(FileDefinition $fileDefinition): self|FromTemplateBuilder
+    public static function build(FileDefinition $fileDefinition): static
     {
         $extends = self::extendsClass($fileDefinition);
         $type = self::collectionType($fileDefinition);
         $property = self::propertyType($fileDefinition);
 
-        return (new self($fileDefinition))
+        return static::create($fileDefinition)
             ->createFile()
             ->extends($extends)
             ->withUse($extends)
