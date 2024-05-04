@@ -20,7 +20,7 @@ class FileDefinition
         private readonly string $classname,
         private readonly string $absolutePath,
         private readonly string $builder,
-        private readonly MakerConfig $configuration,
+        private MakerConfig $configuration,
     )
     {
     }
@@ -152,5 +152,12 @@ class FileDefinition
     public function fullName(): string
     {
         return $this->namespace() . '\\' . $this->classname();
+    }
+
+    public function withConfiguration(MakerConfig $config): self
+    {
+        $fileDefinition = clone $this;
+        $fileDefinition->configuration = $config;
+        return $fileDefinition;
     }
 }
