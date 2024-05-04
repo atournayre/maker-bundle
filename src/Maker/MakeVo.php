@@ -67,13 +67,12 @@ class MakeVo extends AbstractMaker
             return null;
         }
 
-        $defaultType = MakeHelper::fieldDefaultType($fieldName);
-        $allowedTypes = $this->allowedTypes();
+        $allowedTypes = $this->allowedTypes($this->configResources->valueObject);
 
         $type = null;
 
         while (null === $type) {
-            $question = new ChoiceQuestion('Field type (enter <comment>?</comment> to see all types)', $allowedTypes, $defaultType);
+            $question = new ChoiceQuestion('Field type', $allowedTypes);
             $type = $io->askQuestion($question);
 
             if ('?' === $type) {
@@ -91,19 +90,6 @@ class MakeVo extends AbstractMaker
         }
 
         return ['fieldName' => $fieldName, 'type' => $type];
-    }
-
-    private function allowedTypes(): array
-    {
-        return array_values(
-            array_merge(
-                $this->configResources->valueObject->primitivesMapping,
-                MakeHelper::findFilesInDirectory(
-                    $this->configResources->valueObject->resources,
-                    $this->configResources->valueObject->exclude
-                )
-            )
-        );
     }
 
     public function interact(InputInterface $input, ConsoleStyle $io, Command $command): void
@@ -159,7 +145,7 @@ class MakeVo extends AbstractMaker
                 namespacePrefix: $this->configNamespaces->vo
             ))
                 ->withVoEntityNamespace()
-                ->withExtraProperty('allowedTypes', $this->allowedTypes())
+                ->withExtraProperty('allowedTypes', $this->allowedTypes($this->configResources->valueObject))
             ;
         } else {
             $configurations[] = (new MakerConfig(
@@ -168,7 +154,7 @@ class MakeVo extends AbstractMaker
                 voProperties: $this->voProperties,
                 namespacePrefix: $this->configNamespaces->vo,
             ))
-                ->withExtraProperty('allowedTypes', $this->allowedTypes())
+                ->withExtraProperty('allowedTypes', $this->allowedTypes($this->configResources->valueObject))
             ;
         }
 

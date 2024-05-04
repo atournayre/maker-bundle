@@ -18,7 +18,7 @@ class DtoBuilder extends AbstractBuilder
         $dtoProperties = $fileDefinition->configuration()->dtoProperties();
 
         $properties = array_map(
-            fn (array $propertyDatas) => self::property($propertyDatas),
+            fn (array $propertyDatas) => self::property($propertyDatas, $fileDefinition),
             $dtoProperties
         );
 
@@ -34,23 +34,23 @@ class DtoBuilder extends AbstractBuilder
         ;
     }
 
-    private static function property(array $propertyDatas): Property
+    private static function property(array $propertyDatas, FileDefinition $fileDefinition): Property
     {
         Assert::inArray(
             $propertyDatas['type'],
-            array_keys(self::correspondingTypes()),
-            Str::sprintf('Property "%s" should be of type %s; %s given', $propertyDatas['fieldName'], Str::implode(', ', array_keys(self::correspondingTypes())), $propertyDatas['type'])
+            array_keys(self::correspondingTypes($fileDefinition)),
+            Str::sprintf('Property "%s" should be of type %s; %s given', $propertyDatas['fieldName'], Str::implode(', ', array_keys(self::correspondingTypes($fileDefinition))), $propertyDatas['type'])
         );
 
         $property = new Property($propertyDatas['fieldName']);
-        $property->setVisibility('public')->setType(self::correspondingTypes()[$propertyDatas['type']]);
+        $property->setVisibility('public')->setType(self::correspondingTypes($fileDefinition)[$propertyDatas['type']]);
 
         $defaultValue = match ($propertyDatas['type']) {
             'string' => '',
             'integer' => 0,
             'float' => 0.0,
             'bool' => false,
-            'datetime' => null,
+            default => null,
         };
 
         $property->setValue($defaultValue);
@@ -64,17 +64,6 @@ class DtoBuilder extends AbstractBuilder
         }
 
         return $property;
-    }
-
-    private static function correspondingTypes(): array
-    {
-        return [
-            'string' => 'string',
-            'integer' => 'int',
-            'float' => 'float',
-            'boolean' => 'bool',
-            'datetime' => '\DateTimeInterface',
-        ];
     }
 
     private static function namedConstructorFromArray(array $dtoPoperties): Method

@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
-use Atournayre\Bundle\MakerBundle\Helper\MakeHelper;
 use Atournayre\Bundle\MakerBundle\VO\Builder\DtoBuilder;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
@@ -12,7 +11,7 @@ use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('maker.command')]
@@ -39,7 +38,7 @@ class MakeDto extends AbstractMaker
 
     private function askForNextField(ConsoleStyle $io, array $fields, bool $isFirstField): ?array
     {
-        $io->writeln('');
+        $io->newLine();
 
         if ($isFirstField) {
             $questionText = 'New property name (press <return> to stop adding fields)';
@@ -64,22 +63,21 @@ class MakeDto extends AbstractMaker
             return null;
         }
 
-        $defaultType = MakeHelper::fieldDefaultType($fieldName);
+        $allowedTypes = $this->allowedTypes($this->configResources->dto);
 
         $type = null;
 
         while (null === $type) {
-            $question = new Question('Field type (enter <comment>?</comment> to see all types)', $defaultType);
-            $question->setAutocompleterValues(MakeHelper::allowedTypes());
+            $question = new ChoiceQuestion('Field type', $allowedTypes);
             $type = $io->askQuestion($question);
 
             if ('?' === $type) {
-                $io->writeln(MakeHelper::allowedTypes());
+                $io->writeln($allowedTypes);
                 $io->writeln('');
 
                 $type = null;
-            } elseif (!\in_array($type, MakeHelper::allowedTypes())) {
-                $io->writeln(MakeHelper::allowedTypes());
+            } elseif (!\in_array($type, $allowedTypes)) {
+                $io->writeln($allowedTypes);
                 $io->error(sprintf('Invalid type "%s".', $type));
                 $io->writeln('');
 
@@ -94,7 +92,7 @@ class MakeDto extends AbstractMaker
             return $data;
         }
 
-        if ($io->confirm('Can this field be null in the DTO (nullable)', false)) {
+        if ($io->confirm('Can this field be null (nullable)', false)) {
             $data['nullable'] = true;
         }
 
@@ -127,12 +125,13 @@ class MakeDto extends AbstractMaker
     protected function configurations(string $namespace): array
     {
         return [
-            new MakerConfig(
+            (new MakerConfig(
                 namespace: $namespace,
                 builder: DtoBuilder::class,
                 dtoProperties: $this->dtoProperties,
                 namespacePrefix: $this->configNamespaces->dto,
-            ),
+            ))
+                ->withExtraProperty('allowedTypes', $this->allowedTypes($this->configResources->dto)),
         ];
     }
 

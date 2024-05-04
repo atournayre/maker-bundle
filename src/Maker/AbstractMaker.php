@@ -6,8 +6,10 @@ namespace Atournayre\Bundle\MakerBundle\Maker;
 use Atournayre\Bundle\MakerBundle\Collection\FileDefinitionCollection;
 use Atournayre\Bundle\MakerBundle\DTO\Config\BundleConfiguration;
 use Atournayre\Bundle\MakerBundle\DTO\Config\Namespaces;
+use Atournayre\Bundle\MakerBundle\DTO\Config\Resource;
 use Atournayre\Bundle\MakerBundle\DTO\Config\Resources;
 use Atournayre\Bundle\MakerBundle\Generator\FileGenerator;
+use Atournayre\Bundle\MakerBundle\Helper\MakeHelper;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
@@ -66,5 +68,15 @@ abstract class AbstractMaker extends \Symfony\Bundle\MakerBundle\Maker\AbstractM
     protected function updateConfig(ConsoleStyle $io): void
     {
         // no-op
+    }
+
+    protected function allowedTypes(Resource $resource): array
+    {
+        return array_values(
+            array_merge(
+                $resource->primitivesMapping,
+                MakeHelper::findFilesInDirectory($resource->resources, $resource->exclude)
+            )
+        );
     }
 }

@@ -136,13 +136,13 @@ class Configuration implements ConfigurationInterface
                                         ->scalarNode('integer')->defaultValue('int')->end()
                                         ->scalarNode('float')->defaultValue('float')->end()
                                         ->scalarNode('string')->defaultValue('string')->end()
-                                        ->scalarNode('array')->defaultValue('array')->end()
                                         ->scalarNode('datetime')->defaultValue('\DateTimeInterface')->end()
                                     ->end()
                                 ->end()
                                 ->arrayNode('resources')
                                     ->beforeNormalization()->castToArray()->end()
                                     ->defaultValue([
+                                        '%kernel.project_dir%/src/Collection',
                                         '%kernel.project_dir%/src/DTO',
                                         '%kernel.project_dir%/src/Types',
                                     ])
@@ -164,7 +164,6 @@ class Configuration implements ConfigurationInterface
                                         ->scalarNode('integer')->defaultValue('int')->end()
                                         ->scalarNode('float')->defaultValue('float')->end()
                                         ->scalarNode('string')->defaultValue('string')->end()
-                                        ->scalarNode('array')->defaultValue('array')->end()
                                         ->scalarNode('datetime')->defaultValue('\DateTimeInterface')->end()
                                     ->end()
                                 ->end()
