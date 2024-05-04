@@ -204,7 +204,7 @@ abstract class AbstractBuilder
         $class = $clone->getClass();
 
         foreach ($members as $member) {
-            $class->addMember($member);
+            $class->addMember($member, true);
         }
 
         return $clone;

@@ -5,7 +5,6 @@ namespace Atournayre\Bundle\MakerBundle\Maker;
 
 use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 use Atournayre\Bundle\MakerBundle\Helper\MakeHelper;
-use Atournayre\Bundle\MakerBundle\Helper\UStr;
 use Atournayre\Bundle\MakerBundle\VO\Builder\TraitForEntityBuilder;
 use Atournayre\Bundle\MakerBundle\VO\Builder\TraitForObjectBuilder;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
@@ -15,6 +14,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
@@ -47,29 +47,27 @@ class MakeTrait extends AbstractMaker
 
     protected function configurations(string $namespace): array
     {
-        $namespace = UStr::trimNamespaceEnd($namespace, 'Trait');
-
         if ($this->traitIsUsedByEntity) {
-            $suffix = 'EntityTrait';
-            $configurations[] = new MakerConfig(
-                namespace: $namespace->ensureEnd($suffix)->toString(),
+            $configurations[] = (new MakerConfig(
+                namespace: $namespace,
                 builder: TraitForEntityBuilder::class,
                 enableApiPlatform: $this->enableApiPlatform,
                 traitProperties: $this->traitProperties,
                 traitIsUsedByEntity: true,
-                classnameSuffix: $suffix,
-                namespacePrefix: $this->configNamespaces->trait,
-            );
+                classnameSuffix: 'EntityTrait',
+                namespacePrefix: $this->configNamespaces->traitEntity
+            ))
+                ->withExtraProperty('allowedTypes', $this->allowedTypes($this->configResources->trait));
         } else {
-            $suffix = 'Trait';
-            $configurations[] = new MakerConfig(
-                namespace: $namespace->ensureEnd($suffix)->toString(),
+            $configurations[] = (new MakerConfig(
+                namespace: $namespace,
                 builder: TraitForObjectBuilder::class,
                 enableApiPlatform: $this->enableApiPlatform,
                 traitProperties: $this->traitProperties,
-                classnameSuffix: $suffix,
+                classnameSuffix: 'Trait',
                 namespacePrefix: $this->configNamespaces->trait,
-            );
+            ))
+                ->withExtraProperty('allowedTypes', $this->allowedTypes($this->configResources->trait));
         }
 
         return $configurations ?? [];
@@ -105,7 +103,7 @@ class MakeTrait extends AbstractMaker
 
     private function askForNextField(ConsoleStyle $io, array $fields, bool $isFirstField): ?array
     {
-        $io->writeln('');
+        $io->newLine();
 
         if ($isFirstField) {
             $questionText = 'New property name (press <return> to stop adding fields)';
@@ -130,22 +128,21 @@ class MakeTrait extends AbstractMaker
             return null;
         }
 
-        $defaultType = MakeHelper::fieldDefaultType($fieldName);
+        $allowedTypes = $this->allowedTypes($this->configResources->trait);
 
         $type = null;
 
         while (null === $type) {
-            $question = new Question('Field type (enter <comment>?</comment> to see all types)', $defaultType);
-            $question->setAutocompleterValues(MakeHelper::allowedTypes());
+            $question = new ChoiceQuestion('Field type', $allowedTypes);
             $type = $io->askQuestion($question);
 
             if ('?' === $type) {
-                $io->writeln(MakeHelper::allowedTypes());
+                $io->writeln($allowedTypes);
                 $io->writeln('');
 
                 $type = null;
-            } elseif (!\in_array($type, MakeHelper::allowedTypes())) {
-                $io->writeln(MakeHelper::allowedTypes());
+            } elseif (!\in_array($type, $allowedTypes)) {
+                $io->writeln($allowedTypes);
                 $io->error(sprintf('Invalid type "%s".', $type));
                 $io->writeln('');
 
@@ -160,7 +157,7 @@ class MakeTrait extends AbstractMaker
             return $data;
         }
 
-        if ($io->confirm('Can this field be null in the Trait (nullable)', false)) {
+        if ($io->confirm('Can this field be null (nullable)', false)) {
             $data['nullable'] = true;
         }
 

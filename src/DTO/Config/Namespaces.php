@@ -26,6 +26,7 @@ final class Namespaces
     public readonly ?string $serviceCommand;
     public readonly ?string $serviceQuery;
     public readonly ?string $trait;
+    public readonly ?string $traitEntity;
     public readonly ?string $type;
     public readonly ?string $vo;
 
@@ -53,6 +54,7 @@ final class Namespaces
         $instance->serviceCommand = $namespaces['service_command'] ?? null;
         $instance->serviceQuery = $namespaces['service_query'] ?? null;
         $instance->trait = $namespaces['trait'] ?? null;
+        $instance->traitEntity = $namespaces['trait_entity'] ?? null;
         $instance->type = $namespaces['type'] ?? null;
         $instance->vo = $namespaces['vo'] ?? null;
 

@@ -66,6 +66,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('service_command')->defaultValue('App\Service\Command')->end()
                         ->scalarNode('service_query')->defaultValue('App\Service\Query')->end()
                         ->scalarNode('trait')->defaultValue('App\Trait')->end()
+                        ->scalarNode('trait_entity')->defaultValue('App\Trait\Entity')->end()
                         ->scalarNode('type')->defaultValue('App\Type')->end()
                         ->scalarNode('vo')->defaultValue('App\VO')->end()
                     ->end()
@@ -171,6 +172,36 @@ class Configuration implements ConfigurationInterface
                                     ->beforeNormalization()->castToArray()->end()
                                     ->defaultValue([
                                         '%kernel.project_dir%/src/Contracts/VO',
+                                    ])
+                                    ->prototype('scalar')->end()
+                                ->end()
+                                ->arrayNode('exclude')
+                                    ->beforeNormalization()->castToArray()->end()
+                                    ->prototype('scalar')->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                        ->arrayNode('trait')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->arrayNode('primitives_mapping')
+                                    ->addDefaultsIfNotSet()
+                                    ->children()
+                                        ->scalarNode('boolean')->defaultValue('boolean')->end()
+                                        ->scalarNode('integer')->defaultValue('int')->end()
+                                        ->scalarNode('float')->defaultValue('float')->end()
+                                        ->scalarNode('string')->defaultValue('string')->end()
+                                        ->scalarNode('datetime')->defaultValue('\DateTimeInterface')->end()
+                                    ->end()
+                                ->end()
+                                ->arrayNode('resources')
+                                    ->beforeNormalization()->castToArray()->end()
+                                    ->defaultValue([
+                                        '%kernel.project_dir%/src/Collection',
+                                        '%kernel.project_dir%/src/DTO',
+                                        '%kernel.project_dir%/src/Entity',
+                                        '%kernel.project_dir%/src/Type',
+                                        '%kernel.project_dir%/src/VO',
                                     ])
                                     ->prototype('scalar')->end()
                                 ->end()

@@ -5,8 +5,8 @@ namespace Atournayre\Bundle\MakerBundle\VO\Builder;
 
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
+use Nette\PhpGenerator\Literal;
 use Nette\PhpGenerator\Method;
-use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\Property;
 use Webmozart\Assert\Assert;
 
@@ -32,7 +32,7 @@ class TraitForEntityBuilder extends AbstractBuilder
         }
 
         $properties = array_map(
-            fn(array $propertyDatas) => self::defineProperty($propertyDatas),
+            fn(array $propertyDatas) => self::defineProperty($propertyDatas, $fileDefinition),
             $traitProperties
         );
 
@@ -96,18 +96,18 @@ class TraitForEntityBuilder extends AbstractBuilder
         return $methods ?? [];
     }
 
-    private static function defineProperty(array $propertyDatas): Property
+    private static function defineProperty(array $propertyDatas, FileDefinition $fileDefinition): Property
     {
         $type = $propertyDatas['type'];
         $fieldNameRaw = $propertyDatas['fieldName'];
 
         Assert::inArray(
             $type,
-            array_keys(self::correspondingTypes()),
-            Str::sprintf('Property "%s" should be of type %s; %s given', $fieldNameRaw, Str::implode(', ', array_keys(self::correspondingTypes())), $type)
+            array_keys(self::correspondingTypes($fileDefinition)),
+            Str::sprintf('Property "%s" should be of type %s; %s given', $fieldNameRaw, Str::implode(', ', array_keys(self::correspondingTypes($fileDefinition))), $type)
         );
 
-        $propertyType = self::correspondingTypes()[$type];
+        $propertyType = self::correspondingTypes($fileDefinition)[$type];
 
         $fieldName = Str::property($fieldNameRaw);
 
@@ -119,17 +119,6 @@ class TraitForEntityBuilder extends AbstractBuilder
         ;
 
         return self::propertyUsedByEntity($property);
-    }
-
-    private static function correspondingTypes(): array
-    {
-        return [
-            'string' => 'string',
-            'integer' => 'int',
-            'float' => 'float',
-            'boolean' => 'bool',
-            'datetime' => '\DateTimeInterface',
-        ];
     }
 
     private static function propertyUsedByEntity(Property $property): Property
@@ -157,7 +146,9 @@ class TraitForEntityBuilder extends AbstractBuilder
             'int' => null,
             'float' => null,
             'bool' => null,
-            '\DateTimeInterface' => class_exists(\Doctrine\DBAL\Types\Types::class) ? \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE : null,
+            '\DateTimeInterface' => class_exists(\Doctrine\DBAL\Types\Types::class)
+                ? new Literal('Types::DATETIME_MUTABLE')
+                : null,
         ];
     }
 }

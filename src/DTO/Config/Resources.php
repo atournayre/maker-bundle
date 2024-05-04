@@ -11,6 +11,7 @@ final class Resources
         public readonly Resource $event,
         public readonly Resource $valueObject,
         public readonly Resource $service,
+        public readonly Resource $trait,
     )
     {
     }
@@ -23,6 +24,7 @@ final class Resources
             Resource::fromArray($resources['event'] ?? []),
             Resource::fromArray($resources['value_object'] ?? []),
             Resource::fromArray($resources['service'] ?? []),
+            Resource::fromArray($resources['trait'] ?? []),
         );
     }
 }

@@ -38,12 +38,20 @@ class MakerConfig
         }
 
         if (null === $classnameSuffix) {
-            return $this->namespace;
+            return $this->normalizeNamespace($this->namespace);
         }
 
-        return UStr::create($namespace)
+        $namespace = UStr::create($namespace)
             ->ensureEnd($classnameSuffix)
             ->toString();
+        return $this->normalizeNamespace($namespace);
+    }
+
+    private function normalizeNamespace(string $namespace): string
+    {
+        $parts = explode('\\', $namespace);
+        $parts = array_map(fn(string $part): string => ucfirst($part), $parts);
+        return implode('\\', $parts);
     }
 
     public function rootNamespace(): string

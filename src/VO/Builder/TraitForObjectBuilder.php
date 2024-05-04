@@ -16,22 +16,22 @@ class TraitForObjectBuilder extends AbstractBuilder
         $traitProperties = $fileDefinition->configuration()->traitProperties();
 
         $properties = array_map(
-            fn(array $propertyDatas) => self::defineProperty($propertyDatas),
+            fn(array $propertyDatas) => self::defineProperty($propertyDatas, $fileDefinition),
             $traitProperties
         );
 
         return (new self($fileDefinition))
             ->createFileAsTrait()
             ->withProperties($properties)
-            ->addMembers(self::gettersForObject($traitProperties))
-            ->addMembers(self::withersForObject($traitProperties));
+            ->addMembers(self::gettersForObject($traitProperties, $fileDefinition))
+            ->addMembers(self::withersForObject($traitProperties, $fileDefinition));
     }
 
-    private static function gettersForObject(array $traitProperties): array
+    private static function gettersForObject(array $traitProperties, FileDefinition $fileDefinition): array
     {
         foreach ($traitProperties as $property) {
-            $fieldName = Str::gett($property['fieldName']);
-            $propertyType = self::correspondingTypes()[$property['type']];
+            $fieldName = Str::getter($property['fieldName']);
+            $propertyType = self::correspondingTypes($fileDefinition)[$property['type']];
 
             $method = new Method($fieldName);
             $method->setPublic()
@@ -45,20 +45,17 @@ class TraitForObjectBuilder extends AbstractBuilder
         return $methods ?? [];
     }
 
-    private static function withersForObject(array $traitProperties): array
+    private static function withersForObject(array $traitProperties, FileDefinition $fileDefinition): array
     {
         foreach ($traitProperties as $property) {
             $fieldName = Str::property($property['fieldName']);
-            $propertyType = self::correspondingTypes()[$property['type']];
+            $propertyType = self::correspondingTypes($fileDefinition)[$property['type']];
 
             $method = new Method(Str::wither($fieldName));
             $method->setPublic()
                 ->setReturnType('self')
                 ->addParameter($property['fieldName'])
                 ->setType($propertyType);
-
-            $method->getParameter($property['fieldName'])
-                ->setNullable($property['nullable']);
 
             $method->addBody('$clone = clone $this;')
                 ->addBody('$clone->' . $property['fieldName'] . ' = $' . $property['fieldName'] . ';')
@@ -70,7 +67,7 @@ class TraitForObjectBuilder extends AbstractBuilder
         return $methods ?? [];
     }
 
-    private static function defineProperty(array $propertyDatas): Property
+    private static function defineProperty(array $propertyDatas, FileDefinition $fileDefinition): Property
     {
         $type = $propertyDatas['type'];
         $fieldNameRaw = $propertyDatas['fieldName'];
@@ -78,11 +75,11 @@ class TraitForObjectBuilder extends AbstractBuilder
 
         Assert::inArray(
             $type,
-            array_keys(self::correspondingTypes()),
-            Str::sprintf('Property "%s" should be of type %s; %s given', $fieldNameRaw, Str::implode(', ', array_keys(self::correspondingTypes())), $type)
+            array_keys(self::correspondingTypes($fileDefinition)),
+            Str::sprintf('Property "%s" should be of type %s; %s given', $fieldNameRaw, Str::implode(', ', array_keys(self::correspondingTypes($fileDefinition))), $type)
         );
 
-        $propertyType = self::correspondingTypes()[$type];
+        $propertyType = self::correspondingTypes($fileDefinition)[$type];
 
         $property = new Property(Str::property($fieldNameRaw));
         $property->setPrivate()->setType($propertyType)->setNullable($nullable);
@@ -92,16 +89,5 @@ class TraitForObjectBuilder extends AbstractBuilder
         }
 
         return $property;
-    }
-
-    private static function correspondingTypes(): array
-    {
-        return [
-            'string' => 'string',
-            'integer' => 'int',
-            'float' => 'float',
-            'boolean' => 'bool',
-            'datetime' => '\DateTimeInterface',
-        ];
     }
 }
