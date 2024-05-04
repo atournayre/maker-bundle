@@ -106,7 +106,6 @@ class Configuration implements ConfigurationInterface
                                     ->children()
                                         ->scalarNode('boolean')->defaultValue('boolean')->end()
                                         ->scalarNode('integer')->defaultValue('int')->end()
-                                        ->scalarNode('float')->defaultValue('float')->end()
                                         ->scalarNode('string')->defaultValue('string')->end()
                                         ->scalarNode('array')->defaultValue('array')->end()
                                         ->scalarNode('datetime')->defaultValue('\DateTimeInterface')->end()
@@ -117,6 +116,7 @@ class Configuration implements ConfigurationInterface
                                     ->defaultValue([
                                         '%kernel.project_dir%/src/Entity',
                                         '%kernel.project_dir%/src/DTO',
+                                        '%kernel.project_dir%/src/Type',
                                         '%kernel.project_dir%/src/VO/Entity',
                                     ])
                                     ->prototype('scalar')->end()
@@ -145,7 +145,7 @@ class Configuration implements ConfigurationInterface
                                     ->defaultValue([
                                         '%kernel.project_dir%/src/Collection',
                                         '%kernel.project_dir%/src/DTO',
-                                        '%kernel.project_dir%/src/Types',
+                                        '%kernel.project_dir%/src/Type',
                                     ])
                                     ->prototype('scalar')->end()
                                 ->end()
@@ -229,7 +229,7 @@ class Configuration implements ConfigurationInterface
                                     ->defaultValue([
                                         '%kernel.project_dir%/src/Collection',
                                         '%kernel.project_dir%/src/Entity',
-                                        '%kernel.project_dir%/src/Types',
+                                        '%kernel.project_dir%/src/Type',
                                         '%kernel.project_dir%/src/VO',
                                     ])
                                     ->prototype('scalar')->end()
