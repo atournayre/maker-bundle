@@ -5,6 +5,7 @@ namespace Atournayre\Bundle\MakerBundle\VO\Builder;
 
 use App\Contracts\VO\ContextInterface;
 use App\Trait\ContextTrait;
+use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
 use Nette\PhpGenerator\Method;
 
@@ -22,12 +23,12 @@ class EventBuilder extends AbstractBuilder
             ->withUse(ContextTrait::class)
             ->withUse(ContextInterface::class)
             ->addTrait(ContextTrait::class)
-            ->addMember(self::constructor($eventProperties))
-            ->addMember(self::namedConstructor($eventProperties))
+            ->addMember(self::constructor($eventProperties, $fileDefinition))
+            ->addMember(self::namedConstructor($eventProperties, $fileDefinition))
         ;
     }
 
-    private static function constructor(array $voProperties): Method
+    private static function constructor(array $voProperties, FileDefinition $fileDefinition): Method
     {
         $method = new Method('__construct');
         $method->setPrivate();
@@ -36,26 +37,14 @@ class EventBuilder extends AbstractBuilder
             $method->addPromotedParameter($property['fieldName'])
                 ->setPublic()
                 ->setReadOnly()
-                ->setType(self::correspondingTypes()[$property['type']])
+                ->setType(self::correspondingTypes($fileDefinition)[$property['type']])
             ;
         }
 
         return $method;
     }
 
-    private static function correspondingTypes(): array
-    {
-        return [
-            'string' => 'string',
-            'integer' => 'int',
-            'float' => 'float',
-            'boolean' => 'bool',
-            'datetime' => '\DateTimeInterface',
-            'context' => ContextInterface::class,
-        ];
-    }
-
-    private static function namedConstructor(array $eventProperties): Method
+    private static function namedConstructor(array $eventProperties, FileDefinition $fileDefinition): Method
     {
         $method = new Method('create');
         $method->setStatic()
@@ -65,12 +54,12 @@ class EventBuilder extends AbstractBuilder
 
         $properties = array_merge(
             $eventProperties,
-            [['fieldName' => 'context', 'type' => 'context']]
+            [['fieldName' => 'context', 'type' => Str::absolutePathFromNamespace(ContextInterface::class, $fileDefinition->configuration()->rootNamespace(), $fileDefinition->configuration()->rootDir())]]
         );
 
         foreach ($properties as $property) {
             $method->addParameter($property['fieldName'])
-                ->setType(self::correspondingTypes()[$property['type']])
+                ->setType(self::correspondingTypes($fileDefinition)[$property['type']])
             ;
         }
 

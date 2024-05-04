@@ -72,11 +72,10 @@ abstract class AbstractMaker extends \Symfony\Bundle\MakerBundle\Maker\AbstractM
 
     protected function allowedTypes(Resource $resource): array
     {
-        return array_values(
-            array_merge(
-                $resource->primitivesMapping,
-                MakeHelper::findFilesInDirectory($resource->resources, $resource->exclude)
-            )
+        $primitivesAndResources = array_merge(
+            $resource->primitivesMapping,
+            MakeHelper::findFilesInDirectory($resource->resources, $resource->exclude)
         );
+        return array_unique(array_values($primitivesAndResources));
     }
 }

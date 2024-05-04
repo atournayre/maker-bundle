@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Atournayre\Bundle\MakerBundle\Config;
 
 use Atournayre\Bundle\MakerBundle\Helper\Str;
+use Atournayre\Bundle\MakerBundle\Helper\UStr;
 use Webmozart\Assert\Assert;
 
 class MakerConfig
@@ -27,10 +28,23 @@ class MakerConfig
         private readonly ?string $namespacePrefix = null,
     )
     {
-        $this->namespace = null === $this->namespacePrefix
-            ? $this->namespace
-            : sprintf('%s\%s', $this->namespacePrefix, $this->namespace);
+        $this->namespace = $this->buildNamespace($this->namespace, $this->namespacePrefix, $this->classnameSuffix);
    }
+
+    private function buildNamespace(string $namespace, ?string $prefix = null, ?string $classnameSuffix = null): string
+    {
+        if (null !== $prefix) {
+            $namespace = sprintf('%s\%s', $prefix, $namespace);
+        }
+
+        if (null === $classnameSuffix) {
+            return $this->namespace;
+        }
+
+        return UStr::create($namespace)
+            ->ensureEnd($classnameSuffix)
+            ->toString();
+    }
 
     public function rootNamespace(): string
     {

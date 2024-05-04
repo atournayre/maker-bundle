@@ -14,7 +14,7 @@ use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('maker.command')]
@@ -41,7 +41,7 @@ class MakeEvent extends AbstractMaker
 
     private function askForNextField(ConsoleStyle $io, array $fields, bool $isFirstField): ?array
     {
-        $io->writeln('');
+        $io->newLine();
 
         if ($isFirstField) {
             $questionText = 'New property name (press <return> to stop adding fields)';
@@ -66,22 +66,21 @@ class MakeEvent extends AbstractMaker
             return null;
         }
 
-        $defaultType = MakeHelper::fieldDefaultType($fieldName);
+        $allowedTypes = $this->allowedTypes($this->configResources->event);
 
         $type = null;
 
         while (null === $type) {
-            $question = new Question('Field type (enter <comment>?</comment> to see all types)', $defaultType);
-            $question->setAutocompleterValues(MakeHelper::allowedTypes());
+            $question = new ChoiceQuestion('Field type', $allowedTypes);
             $type = $io->askQuestion($question);
 
             if ('?' === $type) {
-                $io->writeln(MakeHelper::allowedTypes());
+                $io->writeln($allowedTypes);
                 $io->writeln('');
 
                 $type = null;
-            } elseif (!\in_array($type, MakeHelper::allowedTypes())) {
-                $io->writeln(MakeHelper::allowedTypes());
+            } elseif (!\in_array($type, $allowedTypes)) {
+                $io->writeln($allowedTypes);
                 $io->error(sprintf('Invalid type "%s".', $type));
                 $io->writeln('');
 
@@ -117,22 +116,30 @@ class MakeEvent extends AbstractMaker
 
     protected function configurations(string $namespace): array
     {
+        $makerConfigEvent = (new MakerConfig(
+            namespace: $namespace,
+            builder: EventBuilder::class,
+            classnameSuffix: 'Event',
+            namespacePrefix: $this->configNamespaces->event,
+        ))
+            ->withExtraProperty('eventProperties', $this->eventProperties)
+            ->withExtraProperty('allowedTypes', $this->allowedTypes($this->configResources->event));
+
         $listenerNamespace = Str::replace($namespace, 'Event', 'Listener');
         $listenerNamespace = Str::replace($listenerNamespace, '\Listener\\', '\EventListener\\');
 
+        $makerConfigListener = (new MakerConfig(
+            namespace: $listenerNamespace,
+            builder: ListenerBuilder::class,
+            classnameSuffix: 'Listener',
+            namespacePrefix: $this->configNamespaces->eventListener,
+        ))
+            ->withExtraProperty('eventNamespace', $makerConfigEvent->namespace())
+            ->withExtraProperty('allowedTypes', $this->allowedTypes($this->configResources->event));
+
         return [
-            (new MakerConfig(
-                namespace: $namespace,
-                builder: EventBuilder::class,
-                classnameSuffix: 'Event',
-                namespacePrefix: $this->configNamespaces->event,
-            ))->withExtraProperty('eventProperties', $this->eventProperties),
-            (new MakerConfig(
-                namespace: $listenerNamespace,
-                builder: ListenerBuilder::class,
-                classnameSuffix: 'Listener',
-                namespacePrefix: $this->configNamespaces->eventListener,
-            ))->withExtraProperty('eventNamespace', $namespace),
+            $makerConfigEvent,
+            $makerConfigListener,
         ];
     }
 
