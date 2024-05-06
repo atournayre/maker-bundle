@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\DTO\Config;
 
+use Atournayre\Bundle\MakerBundle\VO\Config\Resource;
+
 final class Resources
 {
     public function __construct(

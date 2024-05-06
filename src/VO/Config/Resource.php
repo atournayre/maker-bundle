@@ -1,7 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace Atournayre\Bundle\MakerBundle\DTO\Config;
+namespace Atournayre\Bundle\MakerBundle\VO\Config;
+
+use Aimeos\Map;
+use Atournayre\Bundle\MakerBundle\Service\FilesystemService;
 
 final class Resource
 {
@@ -27,5 +30,17 @@ final class Resource
             $resource['resources'] ?? [],
             $resource['exclude'] ?? [],
         );
+    }
+
+    /**
+     * @return string[]
+     */
+    public function allowedTypes(FilesystemService $filesystem): array
+    {
+        return Map::from($this->primitivesMapping)
+            ->merge($filesystem->findFilesInDirectory($this->resources, $this->exclude))
+            ->values()
+            ->unique()
+            ->toArray();
     }
 }

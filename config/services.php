@@ -2,6 +2,7 @@
 
 use Atournayre\Bundle\MakerBundle\DTO\Config\BundleConfiguration;
 use Atournayre\Bundle\MakerBundle\Generator\FileGenerator;
+use Atournayre\Bundle\MakerBundle\Service\FilesystemService;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\abstract_arg;
 
@@ -16,7 +17,9 @@ return static function (ContainerConfigurator $container): void {
     ;
 
     $services
-        ->alias(Generator::class, 'maker.generator');
+        ->alias(Generator::class, 'maker.generator')
+        ->set(FilesystemService::class)
+    ;
 
     $services
         ->set(FileGenerator::class)
