@@ -35,7 +35,7 @@ class DtoBuilder extends AbstractBuilder
     }
 
     /**
-     * @param array{fieldName: string, type: string, nullable: bool}[] $propertyDatas
+     * @param array{fieldName: string, type: string, nullable: bool} $propertyDatas
      * @param FileDefinition $fileDefinition
      * @return Property
      */
@@ -74,7 +74,7 @@ class DtoBuilder extends AbstractBuilder
     }
 
     /**
-     * @param array{fieldName: string, type: string}[] $dtoPoperties
+     * @param array<array{fieldName: string, type: string, nullable: bool}> $dtoPoperties
      * @return Method
      */
     private static function namedConstructorFromArray(array $dtoPoperties): Method
@@ -99,7 +99,7 @@ class DtoBuilder extends AbstractBuilder
     }
 
     /**
-     * @param array{fieldName: string, type: string}[] $dtoPoperties
+     * @param array<array{fieldName: string, type: string, nullable: bool}> $dtoPoperties
      * @param FileDefinition $fileDefinition
      * @return Method
      */

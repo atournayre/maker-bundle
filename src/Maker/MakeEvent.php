@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 class MakeEvent extends AbstractMaker
 {
     /**
-     * @var array<int|string, array>
+     * @var array<array{fieldName: string, type: string}> $eventProperties
      */
     private array $eventProperties = [];
 
@@ -42,6 +42,12 @@ class MakeEvent extends AbstractMaker
         return 'Create a new Event (and Listener)';
     }
 
+    /**
+     * @param ConsoleStyle $io
+     * @param array<array{fieldName: string, type: string}> $fields
+     * @param bool $isFirstField
+     * @return array{fieldName: string, type: string}|null
+     */
     private function askForNextField(ConsoleStyle $io, array $fields, bool $isFirstField): ?array
     {
         $io->newLine();

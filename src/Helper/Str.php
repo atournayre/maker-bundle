@@ -65,11 +65,21 @@ class Str
         return UStr::asCamelCase($string)->toString();
     }
 
+    /**
+     * @param string $format
+     * @param string ...$args
+     * @return string
+     */
     public static function sprintf(string $format, ...$args): string
     {
         return UStr::sprintf($format, ...$args)->toString();
     }
 
+    /**
+     * @param string $glue
+     * @param array<string> $pieces
+     * @return string
+     */
     public static function implode(string $glue, array $pieces): string
     {
         return UStr::implode($glue, $pieces)->toString();

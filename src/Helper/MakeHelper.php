@@ -12,6 +12,9 @@ use Symfony\Component\Finder\Finder;
 
 final class MakeHelper
 {
+    /**
+     * @return string[]
+     */
     public static function allowedTypes(): array
     {
         return [
@@ -23,6 +26,11 @@ final class MakeHelper
         ];
     }
 
+    /**
+     * @param string|array<string> $includedDirectory
+     * @param string|array<string>|null $excludedDirectory
+     * @return string[]
+     */
     public static function findFilesInDirectory(
         string|array $includedDirectory,
         string|array|null $excludedDirectory = null
@@ -77,6 +85,11 @@ final class MakeHelper
         return $defaultType;
     }
 
+    /**
+     * @param DependencyBuilder $dependencyBuilder
+     * @param array<string, string> $dependencies
+     * @return void
+     */
     public static function configureDependencies(DependencyBuilder $dependencyBuilder, array $dependencies): void
     {
         foreach ($dependencies as $class => $package) {

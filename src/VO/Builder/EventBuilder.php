@@ -49,6 +49,11 @@ class EventBuilder extends AbstractBuilder
         return $method;
     }
 
+    /**
+     * @param array{fieldName: string, type: string}[] $eventProperties
+     * @param FileDefinition $fileDefinition
+     * @return Method
+     */
     private static function namedConstructor(array $eventProperties, FileDefinition $fileDefinition): Method
     {
         $method = new Method('create');

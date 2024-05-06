@@ -95,6 +95,9 @@ class MakeService extends AbstractMaker
         };
     }
 
+    /**
+     * @return array<string>
+     */
     private function availableVOs(): array
     {
         $serviceConfiguration = $this->bundleConfiguration->resources->service;

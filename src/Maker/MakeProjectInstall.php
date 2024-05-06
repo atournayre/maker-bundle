@@ -57,6 +57,9 @@ class MakeProjectInstall extends AbstractMaker
         return $configurations;
     }
 
+    /**
+     * @return array<string>
+     */
     private function getTemplates(): array
     {
         $templateDirectory = __DIR__.'/../Resources/templates';

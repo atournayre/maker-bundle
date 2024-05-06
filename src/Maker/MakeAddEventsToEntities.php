@@ -48,6 +48,9 @@ class MakeAddEventsToEntities extends AbstractMaker
         );
     }
 
+    /**
+     * @return string[]
+     */
     private function entitiesWithoutEvents(): array
     {
         $entityDirectory = $this->configNamespaces->entity;

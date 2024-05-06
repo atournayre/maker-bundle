@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 class MakeDto extends AbstractMaker
 {
     /**
-     * @var array<int|string, array>
+     * @var array<array{fieldName: string, type: string, nullable: bool}> $dtoProperties
      */
     private array $dtoProperties = [];
 
@@ -39,6 +39,12 @@ class MakeDto extends AbstractMaker
         return 'Create a new DTO';
     }
 
+    /**
+     * @param ConsoleStyle $io
+     * @param array<array{fieldName: string, type: string, nullable: bool}> $fields
+     * @param bool $isFirstField
+     * @return array{fieldName: string, type: string, nullable: bool}|null
+     */
     private function askForNextField(ConsoleStyle $io, array $fields, bool $isFirstField): ?array
     {
         $io->newLine();

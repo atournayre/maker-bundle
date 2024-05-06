@@ -64,6 +64,9 @@ class MakeCollection extends AbstractMaker
         $this->collectionRelatedObject = $io->askQuestion($questionCollectionRelatedObject);
     }
 
+    /**
+     * @return array<string>
+     */
     private function relatedObjects(): array
     {
         $directories = $this->bundleConfiguration->resources->collection->resources;

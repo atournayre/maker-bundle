@@ -149,6 +149,9 @@ class TraitForEntityBuilder extends AbstractBuilder
         return $clone;
     }
 
+    /**
+     * @return array<string, string|Literal|null>
+     */
     private static function doctrineCorrespondingTypes(): array
     {
         return [

@@ -84,11 +84,21 @@ class UStr
         return self::create($string)->camel();
     }
 
+    /**
+     * @param string $format
+     * @param string ...$args
+     * @return UnicodeString
+     */
     public static function sprintf(string $format, ...$args): UnicodeString
     {
         return self::create(sprintf($format, ...$args));
     }
 
+    /**
+     * @param string $glue
+     * @param array<string> $pieces
+     * @return UnicodeString
+     */
     public static function implode(string $glue, array $pieces): UnicodeString
     {
         return self::create(implode($glue, $pieces));

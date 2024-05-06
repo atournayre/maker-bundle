@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 class MakeVo extends AbstractMaker
 {
     /**
-     * @var array<int|string, array>
+     * @var array<array{fieldName: string, type: string}> $voProperties
      */
     private array $voProperties = [];
     private ?string $voRelatedEntity = null;
@@ -43,6 +43,12 @@ class MakeVo extends AbstractMaker
         return 'Create a new VO';
     }
 
+    /**
+     * @param ConsoleStyle $io
+     * @param array<array{fieldName: string, type: string}> $fields
+     * @param bool $isFirstField
+     * @return array{fieldName: string, type: string}|null
+     */
     private function askForNextField(ConsoleStyle $io, array $fields, bool $isFirstField): ?array
     {
         $io->newLine();
@@ -130,6 +136,9 @@ class MakeVo extends AbstractMaker
         $this->voProperties = $currentFields;
     }
 
+    /**
+     * @return array<string>
+     */
     private function entities(): array
     {
         return MakeHelper::findFilesInDirectory(

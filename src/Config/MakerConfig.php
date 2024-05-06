@@ -16,16 +16,16 @@ class MakerConfig
         private string           $rootDir = '',
         private readonly bool    $enableApiPlatform = false,
         private readonly bool    $traitsCreateEntityId = false,
-        /** @var array<string, string> */
+        /** @var array<array{fieldName: string, type: string, nullable: bool}> */
         private readonly array   $dtoProperties = [],
-        /** @var array<string, string> */
+        /** @var array<array{fieldName: string, type: string}> */
         private readonly array   $voProperties = [],
         private readonly ?string $voRelatedToAnEntity = null,
-        /** @var array<string, string> */
+        /** @var array<array{fieldName: string, type: string, nullable: bool}> */
         private readonly array   $traitProperties = [],
         private readonly bool    $traitIsUsedByEntity = false,
         private readonly bool    $traitSeparateAccessors = false,
-        /** @var array */
+        /** @var array<string, string|int|bool> */
         private array            $extraProperties = [],
         private readonly ?string $classnameSuffix = null,
         private ?string          $templatePath = null,
@@ -87,7 +87,7 @@ class MakerConfig
     }
 
     /**
-     * @return array{fieldName: string, type: string, nullable: bool}[]
+     * @return array<array{fieldName: string, type: string, nullable: bool}>
      */
     public function dtoProperties(): array
     {
@@ -95,7 +95,7 @@ class MakerConfig
     }
 
     /**
-     * @return array<string, string>
+     * @return array<array{fieldName: string, type: string}>
      */
     public function voProperties(): array
     {
@@ -107,6 +107,9 @@ class MakerConfig
         return $this->voRelatedToAnEntity;
     }
 
+    /**
+     * @return array<array{fieldName: string, type: string, nullable: bool}>
+     */
     public function traitProperties(): array
     {
         return $this->traitProperties;
@@ -122,6 +125,9 @@ class MakerConfig
         return $this->traitSeparateAccessors;
     }
 
+    /**
+     * @return array<string, string|int|bool>
+     */
     public function extraProperties(): array
     {
         return $this->extraProperties;

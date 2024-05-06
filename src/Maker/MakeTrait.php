@@ -21,8 +21,11 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 #[AutoconfigureTag('maker.command')]
 class MakeTrait extends AbstractMaker
 {
-    private bool $enableApiPlatform = false;
+    /**
+     * @var array<array{fieldName: string, type: string, nullable: bool}> $traitProperties
+     */
     private array $traitProperties = [];
+    private bool $enableApiPlatform = false;
     private bool $traitIsUsedByEntity = false;
 
 
@@ -107,6 +110,12 @@ class MakeTrait extends AbstractMaker
         $this->traitIsUsedByEntity = $isUsedByEntity;
     }
 
+    /**
+     * @param ConsoleStyle $io
+     * @param array<array{fieldName: string, type: string, nullable: bool}> $fields
+     * @param bool $isFirstField
+     * @return array{fieldName: string, type: string, nullable: bool}|null
+     */
     private function askForNextField(ConsoleStyle $io, array $fields, bool $isFirstField): ?array
     {
         $io->newLine();

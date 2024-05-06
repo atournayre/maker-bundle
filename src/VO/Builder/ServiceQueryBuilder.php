@@ -11,7 +11,6 @@ use App\Exception\FailFast;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
 use Nette\PhpGenerator\Attribute;
-use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\InterfaceType;
 use Nette\PhpGenerator\Literal;
 use Nette\PhpGenerator\Method;
@@ -61,9 +60,14 @@ class ServiceQueryBuilder extends AbstractBuilder
             ->setBody('throw new \RuntimeException(\'This service is not meant to be used directly\');');
     }
 
+    /**
+     * @param string $interface
+     * @param string $objectType
+     * @return array<Method>
+     */
     private static function implementationOfInterface(string $interface, string $objectType): array
     {
-        /** @var ClassType $sourceInterface */
+        /** @var InterfaceType $sourceInterface */
         $sourceInterface = InterfaceType::from($interface);
 
         foreach ($sourceInterface->getMethods() as $method) {
@@ -73,7 +77,7 @@ class ServiceQueryBuilder extends AbstractBuilder
         return $methods ?? [];
     }
 
-    private static function implementMethod(string $method, $sourceInterface, string $objectType): Method
+    private static function implementMethod(string $method, InterfaceType $sourceInterface, string $objectType): Method
     {
         $sourceMethod = $sourceInterface->getMethod($method);
         return (new Method($sourceMethod->getName()))

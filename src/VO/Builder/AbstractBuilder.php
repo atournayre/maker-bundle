@@ -53,6 +53,9 @@ abstract class AbstractBuilder
         return $instance;
     }
 
+    /**
+     * @param array<string, string> $uses
+     */
     protected function withUses(array $uses): self
     {
         $clone = clone $this;
@@ -84,6 +87,9 @@ abstract class AbstractBuilder
         return $this->file->getClasses()[$this->fileDefinition->fullName()];
     }
 
+    /**
+     * @param Attribute[] $attributes
+     */
     protected function setAttributes(array $attributes): self
     {
         Assert::allIsInstanceOf($attributes, Attribute::class);
@@ -114,6 +120,10 @@ abstract class AbstractBuilder
         return $clone;
     }
 
+    /**
+     * @param string|array<string> $comment
+     * @return self
+     */
     protected function addComment(string|array $comment): self
     {
         $clone = clone $this;
@@ -137,6 +147,10 @@ abstract class AbstractBuilder
         return $clone;
     }
 
+    /**
+     * @param Property[] $properties
+     * @return self
+     */
     protected function withProperties(array $properties): self
     {
         Assert::allIsInstanceOf($properties, Property::class);
@@ -151,7 +165,11 @@ abstract class AbstractBuilder
         return $clone;
     }
 
-    protected function addMember($member = null): self
+    /**
+     * @param Method|Method[]|Property|Property[]|null $member
+     * @return self
+     */
+    protected function addMember(array|Method|Property $member = null): self
     {
         if (null === $member) {
             return $this;
@@ -204,6 +222,10 @@ abstract class AbstractBuilder
             ->withUse($interface);
     }
 
+    /**
+     * @param array<Method|Property> $members
+     * @return $this
+     */
     protected function addMembers(array $members): self
     {
         Assert::allIsInstanceOfAny($members, [

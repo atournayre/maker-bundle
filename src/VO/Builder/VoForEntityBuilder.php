@@ -21,8 +21,8 @@ class VoForEntityBuilder extends AbstractBuilder
         $entityNamespace = self::entityNamespace($fileDefinition);
         $voProperties = $fileDefinition->configuration()->voProperties();
 
-        $properties = array_map(fn($property) => self::defineProperty($property, $fileDefinition), $voProperties);
-        $getters = array_map(fn($property) => self::defineGetter($property, $fileDefinition), $voProperties);
+        $properties = array_map(fn(array $property): Property => self::defineProperty($property, $fileDefinition), $voProperties);
+        $getters = array_map(fn(array $property): Method => self::defineGetter($property, $fileDefinition), $voProperties);
         $nullableTrait = MakeHelper::nullableTrait($fileDefinition);
 
         return static::create($fileDefinition)
@@ -45,7 +45,7 @@ class VoForEntityBuilder extends AbstractBuilder
     }
 
     /**
-     * @param array{type: string, fieldName: string}[] $property
+     * @param array{fieldName: string, type: string} $property
      * @param FileDefinition $fileDefinition
      * @return Method
      */
@@ -63,7 +63,7 @@ class VoForEntityBuilder extends AbstractBuilder
     }
 
     /**
-     * @param array{type: string, fieldName: string}[] $property
+     * @param array{fieldName: string, type: string} $property
      * @param FileDefinition $fileDefinition
      * @return Property
      */
@@ -87,7 +87,7 @@ class VoForEntityBuilder extends AbstractBuilder
     }
 
     /**
-     * @param array{type: string, fieldName: string}[] $voProperties
+     * @param array{fieldName: string, type: string}[] $voProperties
      * @param UnicodeString $entityNamespace
      * @return Method
      */

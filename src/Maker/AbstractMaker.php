@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
 use Atournayre\Bundle\MakerBundle\Collection\FileDefinitionCollection;
+use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
 use Atournayre\Bundle\MakerBundle\DTO\Config\BundleConfiguration;
 use Atournayre\Bundle\MakerBundle\DTO\Config\Namespaces;
 use Atournayre\Bundle\MakerBundle\DTO\Config\Resource;
@@ -63,6 +64,10 @@ abstract class AbstractMaker extends \Symfony\Bundle\MakerBundle\Maker\AbstractM
         $this->updateConfig($io);
     }
 
+    /**
+     * @param string $namespace
+     * @return MakerConfig[]
+     */
     abstract protected function configurations(string $namespace): array;
 
     protected function updateConfig(ConsoleStyle $io): void
@@ -70,6 +75,10 @@ abstract class AbstractMaker extends \Symfony\Bundle\MakerBundle\Maker\AbstractM
         // no-op
     }
 
+    /**
+     * @param Resource $resource
+     * @return string[]
+     */
     protected function allowedTypes(Resource $resource): array
     {
         $primitivesAndResources = array_merge(
