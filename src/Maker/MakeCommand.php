@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
-use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
-use Atournayre\Bundle\MakerBundle\VO\Builder\CommandBuilder;
+use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
+use Atournayre\Bundle\MakerBundle\Config\CommandMakerConfiguration;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
@@ -16,7 +16,7 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('maker.command')]
-class MakeCommand extends AbstractMaker
+class MakeCommand extends NewAbstractMaker
 {
     private string $commandTitle = '';
     private string $commandDescription = '';
@@ -55,22 +55,23 @@ class MakeCommand extends AbstractMaker
 
     /**
      * @param string $namespace
-     * @return MakerConfig[]
+     * @return MakerConfigurationCollection
+     * @throws \Throwable
      */
-    protected function configurations(string $namespace): array
+    protected function configurations(string $namespace): MakerConfigurationCollection
     {
-        return [
-            (new MakerConfig(
-                namespace: $namespace,
-                builder: CommandBuilder::class,
-                classnameSuffix: 'Command',
-                namespacePrefix: $this->configNamespaces->command,
-            ))
-                ->withExtraProperty('title', $this->commandTitle)
-                ->withExtraProperty('description', $this->commandDescription)
-                ->withExtraProperty('commandName', $this->commandName)
+        return MakerConfigurationCollection::createAsList([
+            CommandMakerConfiguration::fromNamespace(
+                rootDir: $this->rootDir,
+                rootNamespace: $this->rootNamespace,
+                namespace: $this->configNamespaces->command,
+                className: $namespace,
+            )
+                ->withTitle($this->commandTitle)
+                ->withDescription($this->commandDescription)
+                ->withCommandName($this->commandName)
             ,
-        ];
+        ]);
     }
 
     public function configureDependencies(DependencyBuilder $dependencies): void

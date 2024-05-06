@@ -30,6 +30,7 @@ final class Namespaces
         public readonly ?string $traitEntity = null,
         public readonly ?string $type = null,
         public readonly ?string $vo = null,
+        public readonly ?string $voEntity = null,
     )
     {
     }
@@ -65,6 +66,7 @@ final class Namespaces
             $namespaces['trait_entity'] ?? null,
             $namespaces['type'] ?? null,
             $namespaces['vo'] ?? null,
+            $namespaces['vo_entity'] ?? null,
         );
     }
 }

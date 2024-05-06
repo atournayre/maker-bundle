@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
-use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
+use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
+use Atournayre\Bundle\MakerBundle\Config\TraitForEntityMakerConfiguration;
+use Atournayre\Bundle\MakerBundle\Config\TraitForObjectMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\Helper\MakeHelper;
-use Atournayre\Bundle\MakerBundle\VO\Builder\TraitForEntityBuilder;
-use Atournayre\Bundle\MakerBundle\VO\Builder\TraitForObjectBuilder;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
@@ -19,7 +19,7 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('maker.command')]
-class MakeTrait extends AbstractMaker
+class MakeTrait extends NewAbstractMaker
 {
     /**
      * @var array<array{fieldName: string, type: string, nullable: bool}> $traitProperties
@@ -50,36 +50,38 @@ class MakeTrait extends AbstractMaker
 
     /**
      * @param string $namespace
-     * @return MakerConfig[]
+     * @return MakerConfigurationCollection
+     * @throws \Throwable
      */
-    protected function configurations(string $namespace): array
+    protected function configurations(string $namespace): MakerConfigurationCollection
     {
         if ($this->traitIsUsedByEntity) {
-            return [
-                (new MakerConfig(
-                    namespace: $namespace,
-                    builder: TraitForEntityBuilder::class,
-                    enableApiPlatform: $this->enableApiPlatform,
-                    traitProperties: $this->traitProperties,
-                    traitIsUsedByEntity: true,
-                    classnameSuffix: 'EntityTrait',
-                    namespacePrefix: $this->configNamespaces->traitEntity
-                ))
-                    ->withExtraProperty('allowedTypes', $this->allowedTypes($this->configResources->trait)),
-            ];
+            return MakerConfigurationCollection::createAsList([
+                TraitForEntityMakerConfiguration::fromNamespace(
+                    rootDir: $this->rootDir,
+                    rootNamespace: $this->rootNamespace,
+                    namespace: $this->configNamespaces->traitEntity,
+                    className: $namespace,
+                )
+                    ->withIsUsedByEntity()
+                    ->withProperties($this->traitProperties)
+                    ->withEnableApiPlatform($this->enableApiPlatform)
+                    ->withPropertiesAllowedTypes($this->configResources->trait->allowedTypes($this->filesystem)
+                )
+            ]);
         }
 
-        return [
-            (new MakerConfig(
-                namespace: $namespace,
-                builder: TraitForObjectBuilder::class,
-                enableApiPlatform: $this->enableApiPlatform,
-                traitProperties: $this->traitProperties,
-                classnameSuffix: 'Trait',
-                namespacePrefix: $this->configNamespaces->trait,
-            ))
-                ->withExtraProperty('allowedTypes', $this->allowedTypes($this->configResources->trait)),
-        ];
+        return MakerConfigurationCollection::createAsList([
+            TraitForObjectMakerConfiguration::fromNamespace(
+                rootDir: $this->rootDir,
+                rootNamespace: $this->rootNamespace,
+                namespace: $this->configNamespaces->trait,
+                className: $namespace,
+            )
+                ->withProperties($this->traitProperties)
+                ->withEnableApiPlatform($this->enableApiPlatform)
+                ->withPropertiesAllowedTypes($this->configResources->trait->allowedTypes($this->filesystem))
+        ]);
     }
 
     public function interact(InputInterface $input, ConsoleStyle $io, Command $command): void
@@ -143,7 +145,7 @@ class MakeTrait extends AbstractMaker
             return null;
         }
 
-        $allowedTypes = $this->allowedTypes($this->configResources->trait);
+        $allowedTypes = $this->configResources->trait->allowedTypes($this->filesystem);
 
         $type = null;
 

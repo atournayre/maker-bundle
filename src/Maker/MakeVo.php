@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
-use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
+use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
+use Atournayre\Bundle\MakerBundle\Config\VoForEntityMakerConfiguration;
+use Atournayre\Bundle\MakerBundle\Config\VoForObjectMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\Helper\MakeHelper;
-use Atournayre\Bundle\MakerBundle\VO\Builder\VoForEntityBuilder;
-use Atournayre\Bundle\MakerBundle\VO\Builder\VoForObjectBuilder;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
@@ -18,7 +18,7 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('maker.command')]
-class MakeVo extends AbstractMaker
+class MakeVo extends NewAbstractMaker
 {
     /**
      * @var array<array{fieldName: string, type: string}> $voProperties
@@ -76,7 +76,7 @@ class MakeVo extends AbstractMaker
             return null;
         }
 
-        $allowedTypes = $this->allowedTypes($this->configResources->valueObject);
+        $allowedTypes = $this->configResources->valueObject->allowedTypes($this->filesystem);
 
         $type = null;
 
@@ -148,33 +148,37 @@ class MakeVo extends AbstractMaker
 
     /**
      * @param string $namespace
-     * @return MakerConfig[]
+     * @return MakerConfigurationCollection
+     * @throws \Throwable
      */
-    protected function configurations(string $namespace): array
+    protected function configurations(string $namespace): MakerConfigurationCollection
     {
         if ($this->voRelatedEntity) {
-            return [
-                (new MakerConfig(
-                    namespace: $namespace,
-                    builder: VoForEntityBuilder::class,
-                    voProperties: $this->voProperties,
-                    voRelatedToAnEntity: $this->voRelatedEntity,
-                    namespacePrefix: $this->configNamespaces->vo
-                ))
-                    ->withVoEntityNamespace()
-                    ->withExtraProperty('allowedTypes', $this->allowedTypes($this->configResources->valueObject)),
-            ];
+            return MakerConfigurationCollection::createAsList([
+                VoForEntityMakerConfiguration::fromNamespace(
+                    rootDir: $this->rootDir,
+                    rootNamespace: $this->rootNamespace,
+                    namespace: $this->configNamespaces->voEntity,
+                    className: $namespace,
+                )
+                    ->withRelatedEntity($this->voRelatedEntity)
+                    ->withProperties($this->voProperties)
+                    ->withPropertiesAllowedTypes($this->configResources->valueObject->allowedTypes($this->filesystem)
+                )
+            ]);
         }
 
-        return [
-            (new MakerConfig(
-                namespace: $namespace,
-                builder: VoForObjectBuilder::class,
-                voProperties: $this->voProperties,
-                namespacePrefix: $this->configNamespaces->vo,
-            ))
-                ->withExtraProperty('allowedTypes', $this->allowedTypes($this->configResources->valueObject)),
-        ];
+        return MakerConfigurationCollection::createAsList([
+            VoForObjectMakerConfiguration::fromNamespace(
+                rootDir: $this->rootDir,
+                rootNamespace: $this->rootNamespace,
+                namespace: $this->configNamespaces->vo,
+                className: $namespace,
+            )
+                ->withProperties($this->voProperties)
+                ->withPropertiesAllowedTypes($this->configResources->valueObject->allowedTypes($this->filesystem)
+            )
+        ]);
     }
 
     public function configureDependencies(DependencyBuilder $dependencies): void

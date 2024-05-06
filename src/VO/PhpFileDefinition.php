@@ -43,9 +43,10 @@ final class PhpFileDefinition
         return $this->strictTypes;
     }
 
-    public function setStrictTypes(bool $strictTypes): void
+    public function setStrictTypes(bool $strictTypes): self
     {
         $this->strictTypes = $strictTypes;
+        return $this;
     }
 
     public function getComments(): array
@@ -53,10 +54,11 @@ final class PhpFileDefinition
         return $this->comments;
     }
 
-    public function setComments(array $comments): void
+    public function setComments(array $comments): self
     {
         Assert::allString($comments, 'Comments must be an array of strings');
         $this->comments = $comments;
+        return $this;
     }
 
     public function getUses(): array
@@ -64,9 +66,10 @@ final class PhpFileDefinition
         return $this->uses;
     }
 
-    public function setUses(array $uses): void
+    public function setUses(array $uses): self
     {
         $this->uses = $uses;
+        return $this;
     }
 
     public function getAttributes(): array
@@ -74,10 +77,11 @@ final class PhpFileDefinition
         return $this->attributes;
     }
 
-    public function setAttributes(array $attributes): void
+    public function setAttributes(array $attributes): self
     {
         Assert::allIsInstanceOf($attributes, Attribute::class, 'Attributes must be an array of Attribute');
         $this->attributes = $attributes;
+        return $this;
     }
 
     public function isInterface(): bool
@@ -85,9 +89,10 @@ final class PhpFileDefinition
         return $this->interface;
     }
 
-    public function setInterface(bool $interface): void
+    public function setInterface(bool $interface = true): self
     {
         $this->interface = $interface;
+        return $this;
     }
 
     public function isTrait(): bool
@@ -95,9 +100,10 @@ final class PhpFileDefinition
         return $this->trait;
     }
 
-    public function setTrait(bool $trait): void
+    public function setTrait(bool $trait = true): self
     {
         $this->trait = $trait;
+        return $this;
     }
 
     public function isReadonly(): bool
@@ -105,9 +111,10 @@ final class PhpFileDefinition
         return $this->readonly;
     }
 
-    public function setReadonly(bool $readonly): void
+    public function setReadonly(bool $readonly = true): self
     {
         $this->readonly = $readonly;
+        return $this;
     }
 
     public function isFinal(): bool
@@ -115,9 +122,10 @@ final class PhpFileDefinition
         return $this->final;
     }
 
-    public function setFinal(bool $final): void
+    public function setFinal(bool $final = true): self
     {
         $this->final = $final;
+        return $this;
     }
 
     public function getExtends(): ?string
@@ -125,14 +133,15 @@ final class PhpFileDefinition
         return $this->extends;
     }
 
-    public function setExtends(?string $extends): void
+    public function setExtends(?string $extends): self
     {
         if (null === $extends) {
-            return;
+            return $this;
         }
 
         Assert::classExists($extends, 'Class %s does not exist');
         $this->extends = $extends;
+        return $this;
     }
 
     public function getImplements(): array
@@ -140,10 +149,11 @@ final class PhpFileDefinition
         return $this->implements;
     }
 
-    public function setImplements(array $implements): void
+    public function setImplements(array $implements): self
     {
         Assert::allClassExists($implements, 'Class %s does not exist');
         $this->implements = $implements;
+        return $this;
     }
 
     public function getConstants(): array
@@ -151,10 +161,11 @@ final class PhpFileDefinition
         return $this->constants;
     }
 
-    public function setConstants(array $constants): void
+    public function setConstants(array $constants): self
     {
         Assert::allIsInstanceOf($constants, Constant::class, 'Constants must be an array of Constant');
         $this->constants = $constants;
+        return $this;
     }
 
     public function getTraits(): array
@@ -162,11 +173,12 @@ final class PhpFileDefinition
         return $this->traits;
     }
 
-    public function setTraits(array $traits): void
+    public function setTraits(array $traits): self
     {
         Assert::allString($traits, 'Traits must be an array of strings');
         Assert::allClassExists($traits, 'Trait %s does not exist');
         $this->traits = $traits;
+        return $this;
     }
 
     public function getProperties(): array
@@ -174,10 +186,11 @@ final class PhpFileDefinition
         return $this->properties;
     }
 
-    public function setProperties(array $properties): void
+    public function setProperties(array $properties): self
     {
         Assert::allIsInstanceOf($properties, Property::class, 'Properties must be an array of Property');
         $this->properties = $properties;
+        return $this;
     }
 
     public function getMethods(): array
@@ -185,10 +198,11 @@ final class PhpFileDefinition
         return $this->methods;
     }
 
-    public function setMethods(array $methods): void
+    public function setMethods(array $methods): self
     {
         Assert::allIsInstanceOf($methods, Method::class, 'Methods must be an array of Method');
         $this->methods = $methods;
+        return $this;
     }
 
     public function fqcn(): string

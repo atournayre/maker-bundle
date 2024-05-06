@@ -4,12 +4,12 @@ declare(strict_types=1);
 namespace Atournayre\Bundle\MakerBundle\Config;
 
 use Aimeos\Map;
+use Atournayre\Bundle\MakerBundle\Contracts\MakerConfigurationInterface;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\Helper\UStr;
 
-abstract class MakerConfiguration
+abstract class MakerConfiguration implements MakerConfigurationInterface
 {
-    protected string $builder;
     protected string $absolutePath;
     protected ?string $sourceCode = null;
 
@@ -21,7 +21,6 @@ abstract class MakerConfiguration
         public readonly string $fqcn,
     )
     {
-        $this->builder = $this->builder();
         $this->absolutePath = Str::absolutePathFromNamespace($fqcn, $this->rootNamespace, $this->rootDir);
     }
 
@@ -73,8 +72,6 @@ abstract class MakerConfiguration
         );
     }
 
-    abstract public function builder(): string;
-
     public function namespace(): string
     {
         return $this->namespace;
@@ -102,11 +99,6 @@ abstract class MakerConfiguration
         return $clone;
     }
 
-    public function supportsBuilder(string $builder): bool
-    {
-        return $this->builder() === $builder;
-    }
-
     public function absolutePath(): string
     {
         return $this->absolutePath;
@@ -115,5 +107,10 @@ abstract class MakerConfiguration
     public function sourceCode(): string
     {
         return $this->sourceCode ?? '';
+    }
+
+    public function allowedTypes(): array
+    {
+        return [];
     }
 }

@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
-use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
-use Atournayre\Bundle\MakerBundle\VO\Builder\DtoBuilder;
+use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
+use Atournayre\Bundle\MakerBundle\Config\DtoMakerConfiguration;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
@@ -15,7 +15,7 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('maker.command')]
-class MakeDto extends AbstractMaker
+class MakeDto extends NewAbstractMaker
 {
     /**
      * @var array<array{fieldName: string, type: string, nullable: bool}> $dtoProperties
@@ -72,7 +72,7 @@ class MakeDto extends AbstractMaker
             return null;
         }
 
-        $allowedTypes = $this->allowedTypes($this->configResources->dto);
+        $allowedTypes = $this->configResources->dto->allowedTypes($this->filesystem);
 
         $type = null;
 
@@ -133,19 +133,21 @@ class MakeDto extends AbstractMaker
 
     /**
      * @param string $namespace
-     * @return MakerConfig[]
+     * @return MakerConfigurationCollection
+     * @throws \Throwable
      */
-    protected function configurations(string $namespace): array
+    protected function configurations(string $namespace): MakerConfigurationCollection
     {
-        return [
-            (new MakerConfig(
-                namespace: $namespace,
-                builder: DtoBuilder::class,
-                dtoProperties: $this->dtoProperties,
-                namespacePrefix: $this->configNamespaces->dto,
-            ))
-                ->withExtraProperty('allowedTypes', $this->allowedTypes($this->configResources->dto)),
-        ];
+        return MakerConfigurationCollection::createAsList([
+            DtoMakerConfiguration::fromNamespace(
+                rootDir: $this->rootDir,
+                rootNamespace: $this->rootNamespace,
+                namespace: $this->configNamespaces->dto,
+                className: $namespace,
+            )
+                ->withProperties($this->dtoProperties)
+                ->withPropertiesAllowedTypes($this->configResources->dto->allowedTypes($this->filesystem)),
+        ]);
     }
 
     public function configureDependencies(DependencyBuilder $dependencies): void

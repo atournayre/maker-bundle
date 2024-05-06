@@ -5,12 +5,11 @@ namespace Atournayre\Bundle\MakerBundle\Maker;
 
 use App\Attribute\CommandService;
 use App\Attribute\QueryService;
-use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
+use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
+use Atournayre\Bundle\MakerBundle\Config\AddAttributeMakerConfiguration;
+use Atournayre\Bundle\MakerBundle\Config\ServiceCommandMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\Helper\MakeHelper;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
-use Atournayre\Bundle\MakerBundle\VO\Builder\AddAttributeBuilder;
-use Atournayre\Bundle\MakerBundle\VO\Builder\ServiceCommandBuilder;
-use Atournayre\Bundle\MakerBundle\VO\Builder\ServiceQueryBuilder;
 use Nette\PhpGenerator\Attribute;
 use Nette\PhpGenerator\Literal;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
@@ -24,15 +23,14 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('maker.command')]
-class MakeService extends AbstractMaker
+class MakeService extends NewAbstractMaker
 {
     private const COMMAND = 'Command';
     private const QUERY = 'Query';
 
     private string $vo;
-    private string $builder;
+    private string $serviceType;
     private string $attributeName;
-    private string $namespacePrefix;
 
     public static function getCommandName(): string
     {
@@ -69,28 +67,16 @@ class MakeService extends AbstractMaker
             self::COMMAND,
             self::QUERY,
         ], $input->getOption('command') ?? $input->getOption('query'));
-        $commandOrQuery = $io->askQuestion($questionCommandOrQuery);
+        $this->serviceType = $io->askQuestion($questionCommandOrQuery);
 
         $vo = new ChoiceQuestion('Choose the VO', $availableVOs);
         $voName = $io->askQuestion($vo);
 
         $this->vo = $voName;
 
-        $this->builder = match ($commandOrQuery) {
-            self::COMMAND => ServiceCommandBuilder::class,
-            self::QUERY => ServiceQueryBuilder::class,
-            default => throw new \InvalidArgumentException('Invalid command or query'),
-        };
-
-        $this->attributeName = match ($commandOrQuery) {
+        $this->attributeName = match ($this->serviceType) {
             self::COMMAND => CommandService::class,
             self::QUERY => QueryService::class,
-            default => throw new \InvalidArgumentException('Invalid command or query'),
-        };
-
-        $this->namespacePrefix = match ($commandOrQuery) {
-            self::COMMAND => $this->configNamespaces->serviceCommand,
-            self::QUERY => $this->configNamespaces->serviceQuery,
             default => throw new \InvalidArgumentException('Invalid command or query'),
         };
     }
@@ -100,46 +86,49 @@ class MakeService extends AbstractMaker
      */
     private function availableVOs(): array
     {
-        $serviceConfiguration = $this->bundleConfiguration->resources->service;
         return array_map(
             fn(string $file) => Str::namespaceFromPath($file, $this->rootDir),
-            MakeHelper::findFilesInDirectory(
-                $serviceConfiguration->resources,
-                $serviceConfiguration->exclude,
-            )
+            $this->bundleConfiguration->resources->service->allowedTypes($this->filesystem)
         );
     }
 
     /**
      * @param string $namespace
-     * @return MakerConfig[]
+     * @return MakerConfigurationCollection
+     * @throws \Throwable
      */
-    protected function configurations(string $namespace): array
+    protected function configurations(string $namespace): MakerConfigurationCollection
     {
         $vo = Str::prefixByRootNamespace($this->vo, $this->rootNamespace);
 
-        return [
-            (new MakerConfig(
-                namespace: $namespace,
-                builder: $this->builder,
-                namespacePrefix: $this->namespacePrefix,
-            ))->withExtraProperty('vo', $vo),
-            (new MakerConfig(
-                namespace: $vo,
-                builder: AddAttributeBuilder::class,
-                extraProperties: [
-                    'serviceNamespace' => $namespace,
-                    'attributes' => [
-                        new Attribute($this->attributeName, [
-                            'serviceName' => new Literal(Str::classNameSemiColonFromNamespace($namespace))
-                        ])
-                    ],
-                ],
-                namespacePrefix: $this->configNamespaces->vo,
-            ))
-                ->withRoot($this->rootNamespace, $this->rootDir)
-                ->withTemplatePathFromNamespace(),
-        ];
+        $configurations = MakerConfigurationCollection::createAsList([
+            AddAttributeMakerConfiguration::fromNamespace(
+                rootDir: $this->rootDir,
+                rootNamespace: $this->rootNamespace,
+                namespace: $this->configNamespaces->vo,
+                className: $vo,
+            )
+                ->withServiceNamespace($namespace)
+                ->withAttributes([
+                    new Attribute($this->attributeName, [
+                        'serviceName' => new Literal(Str::classNameSemiColonFromNamespace($namespace))
+                    ])
+                ]),
+        ]);
+
+        $serviceNamespace = $this->serviceType === self::COMMAND
+            ? $this->configNamespaces->serviceCommand
+            : $this->configNamespaces->serviceQuery;
+
+        $configurations[] = ServiceCommandMakerConfiguration::fromNamespace(
+            rootDir: $this->rootDir,
+            rootNamespace: $this->rootNamespace,
+            namespace: $serviceNamespace,
+            className: $namespace,
+        )
+            ->withVo($vo);
+
+        return $configurations;
     }
 
     public function configureDependencies(DependencyBuilder $dependencies): void

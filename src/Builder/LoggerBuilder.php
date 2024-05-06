@@ -1,40 +1,52 @@
 <?php
 declare(strict_types=1);
 
-namespace Atournayre\Bundle\MakerBundle\VO\Builder;
+namespace Atournayre\Bundle\MakerBundle\Builder;
 
-use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
-use Nette\PhpGenerator\Method;
 use App\Contracts\Logger\LoggerInterface;
 use App\Logger\AbstractLogger;
+use Atournayre\Bundle\MakerBundle\Config\LoggerMakerConfiguration;
+use Atournayre\Bundle\MakerBundle\Contracts\MakerConfigurationInterface;
+use Atournayre\Bundle\MakerBundle\VO\PhpFileDefinition;
+use Nette\PhpGenerator\Method;
 
-class LoggerBuilder extends AbstractBuilder
+final class LoggerBuilder extends AbstractBuilder
 {
-    public static function build(FileDefinition $fileDefinition): static
+    public function supports(string $makerConfigurationClassName): bool
     {
-        return static::create($fileDefinition)
-            ->createFile()
-            ->extends(AbstractLogger::class)
-            ->addImplement(LoggerInterface::class)
-            ->withUse(LoggerInterface::class)
-            ->addMember(self::methodException())
-            ->addMember(self::methodByName('error'))
-            ->addMember(self::methodByName('emergency'))
-            ->addMember(self::methodByName('alert'))
-            ->addMember(self::methodByName('critical'))
-            ->addMember(self::methodByName('warning'))
-            ->addMember(self::methodByName('notice'))
-            ->addMember(self::methodByName('info'))
-            ->addMember(self::methodByName('debug'))
-            ->addMember(self::methodLog())
-            ->addMember(self::methodWithInfoLog('start', 'start'))
-            ->addMember(self::methodWithInfoLog('end', 'end'))
-            ->addMember(self::methodWithInfoLog('success', 'success'))
-            ->addMember(self::methodWithInfoLog('failFast', 'fail fast'))
+        return $makerConfigurationClassName === LoggerMakerConfiguration::class;
+    }
+
+    public function createInstance(MakerConfigurationInterface|LoggerMakerConfiguration $makerConfiguration): PhpFileDefinition
+    {
+        return parent::createInstance($makerConfiguration)
+            ->setExtends(AbstractLogger::class)
+            ->setImplements([
+                LoggerInterface::class,
+            ])
+            ->setUses([
+                LoggerInterface::class,
+            ])
+            ->setMethods([
+                $this->methodException(),
+                $this->methodByName('error'),
+                $this->methodByName('emergency'),
+                $this->methodByName('alert'),
+                $this->methodByName('critical'),
+                $this->methodByName('warning'),
+                $this->methodByName('notice'),
+                $this->methodByName('info'),
+                $this->methodByName('debug'),
+                $this->methodLog(),
+                $this->methodWithInfoLog('start', 'start'),
+                $this->methodWithInfoLog('end', 'end'),
+                $this->methodWithInfoLog('success', 'success'),
+                $this->methodWithInfoLog('failFast', 'fail fast'),
+            ])
         ;
     }
 
-    private static function methodException(): Method
+    private function methodException(): Method
     {
         $method = new Method('exception');
         $method->setPublic();
@@ -52,7 +64,7 @@ PHP;
         return $method;
     }
 
-    private static function methodByName(string $name): Method
+    private function methodByName(string $name): Method
     {
         $method = new Method($name);
         $method->setPublic()->addParameter('message')->setType('\Stringable|string');
@@ -66,7 +78,7 @@ PHP;
         return $method;
     }
 
-    private static function methodLog(): Method
+    private function methodLog(): Method
     {
         $method = new Method('log');
         $method->setPublic();
@@ -82,7 +94,7 @@ PHP;
         return $method;
     }
 
-    private static function methodWithInfoLog(string $name, string $message): Method
+    private function methodWithInfoLog(string $name, string $message): Method
     {
         $methodBody = '$this->logger->info($this->prefixMessage($this->getLoggerIdentifier(), \''.$message.'\'), $context);';
 

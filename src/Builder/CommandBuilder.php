@@ -1,58 +1,64 @@
 <?php
 declare(strict_types=1);
 
-namespace Atournayre\Bundle\MakerBundle\VO\Builder;
+namespace Atournayre\Bundle\MakerBundle\Builder;
 
 use App\Command\AbstractCommand;
-use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
+use Atournayre\Bundle\MakerBundle\Config\CommandMakerConfiguration;
+use Atournayre\Bundle\MakerBundle\Contracts\MakerConfigurationInterface;
+use Atournayre\Bundle\MakerBundle\VO\PhpFileDefinition;
 use Nette\PhpGenerator\Attribute;
 use Nette\PhpGenerator\Method;
-use Webmozart\Assert\Assert;
 
-class CommandBuilder extends AbstractBuilder
+final class CommandBuilder extends AbstractBuilder
 {
-    public static function build(FileDefinition $fileDefinition): static
+    public function supports(string $makerConfigurationClassName): bool
     {
-        $config = $fileDefinition->configuration();
+        return $makerConfigurationClassName === CommandMakerConfiguration::class;
+    }
 
-        Assert::true($config->hasExtraProperty('title'), 'The configuration should have a title property');
-        Assert::true($config->hasExtraProperty('description'), 'The configuration should have a description property');
-        Assert::true($config->hasExtraProperty('commandName'), 'The configuration should have a commandName property');
-
-        $attributes = [
-            new Attribute(\Symfony\Component\Console\Attribute\AsCommand::class, [
-                'name' => $config->getExtraProperty('commandName'),
-                'description' => $config->getExtraProperty('description'),
-            ]),
-        ];
-
-        return static::create($fileDefinition)
-            ->createFile()
-            ->withUse(\Symfony\Component\Console\Attribute\AsCommand::class)
-            ->withUse(\Symfony\Component\Console\Input\InputInterface::class)
-            ->withUse(\Symfony\Component\Console\Style\SymfonyStyle::class)
-            ->setAttributes($attributes)
-            ->extends(AbstractCommand::class)
-            ->addMember(self::titleMethod($fileDefinition))
-            ->addMember(self::doExecuteMethod())
-            ->addMember(self::preConditionsChecks())
-            ->addMember(self::failFast())
-            ->addMember(self::postConditionsChecks())
+    public function createInstance(MakerConfigurationInterface|CommandMakerConfiguration $makerConfiguration): PhpFileDefinition
+    {
+        return parent::createInstance($makerConfiguration)
+            ->setUses([
+                \Symfony\Component\Console\Attribute\AsCommand::class,
+                \Symfony\Component\Console\Input\InputInterface::class,
+                \Symfony\Component\Console\Style\SymfonyStyle::class,
+            ])
+            ->setAttributes($this->attributes($makerConfiguration))
+            ->setExtends(AbstractCommand::class)
+            ->setMethods([
+                $this->titleMethod($makerConfiguration),
+                $this->doExecuteMethod(),
+                $this->preConditionsChecks(),
+                $this->failFast(),
+                $this->postConditionsChecks(),
+            ])
         ;
     }
 
-    private static function titleMethod(FileDefinition $fileDefinition): Method
+    private function attributes(MakerConfigurationInterface|CommandMakerConfiguration $makerConfiguration): array
     {
-        $title = $fileDefinition->configuration()->getExtraProperty('title');
+        return [
+            new Attribute(\Symfony\Component\Console\Attribute\AsCommand::class, [
+                'name' => $makerConfiguration->commandName(),
+                'description' => $makerConfiguration->description(),
+            ]),
+        ];
+    }
+
+    private function titleMethod(MakerConfigurationInterface|CommandMakerConfiguration $makerConfiguration): Method
+    {
+        $title = $makerConfiguration->title();
 
         return (new Method('title'))
             ->setPublic()
             ->setReturnType('string')
             ->setBody('return \''.$title.'\';')
-        ;
+            ;
     }
 
-    private static function doExecuteMethod(): Method
+    private function doExecuteMethod(): Method
     {
         $method = new Method('doExecute');
         $method->setPublic()->setReturnType('void');
@@ -62,7 +68,7 @@ class CommandBuilder extends AbstractBuilder
         return $method;
     }
 
-    private static function preConditionsChecks(): Method
+    private function preConditionsChecks(): Method
     {
         $method = new Method('preConditionsChecks');
         $method->setProtected()->setReturnType('void');
@@ -72,7 +78,7 @@ class CommandBuilder extends AbstractBuilder
         return $method;
     }
 
-    private static function failFast(): Method
+    private function failFast(): Method
     {
         $method = new Method('failFast');
         $method->setProtected()->setReturnType('void');
@@ -82,7 +88,7 @@ class CommandBuilder extends AbstractBuilder
         return $method;
     }
 
-    private static function postConditionsChecks(): Method
+    private function postConditionsChecks(): Method
     {
         $method = new Method('postConditionsChecks');
         $method->setProtected()->setReturnType('void');

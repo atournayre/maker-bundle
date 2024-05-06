@@ -69,6 +69,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('trait_entity')->defaultValue('App\Trait\Entity')->end()
                         ->scalarNode('type')->defaultValue('App\Type')->end()
                         ->scalarNode('vo')->defaultValue('App\VO')->end()
+                        ->scalarNode('vo_entity')->defaultValue('App\VO\Entity')->end()
                     ->end()
                 ->end()
             ->end()

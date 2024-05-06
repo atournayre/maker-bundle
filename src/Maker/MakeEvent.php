@@ -3,11 +3,10 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
-use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
-use Atournayre\Bundle\MakerBundle\Helper\MakeHelper;
+use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
+use Atournayre\Bundle\MakerBundle\Config\EventMakerConfiguration;
+use Atournayre\Bundle\MakerBundle\Config\ListenerMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
-use Atournayre\Bundle\MakerBundle\VO\Builder\EventBuilder;
-use Atournayre\Bundle\MakerBundle\VO\Builder\ListenerBuilder;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
@@ -18,7 +17,7 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('maker.command')]
-class MakeEvent extends AbstractMaker
+class MakeEvent extends NewAbstractMaker
 {
     /**
      * @var array<array{fieldName: string, type: string}> $eventProperties
@@ -75,7 +74,7 @@ class MakeEvent extends AbstractMaker
             return null;
         }
 
-        $allowedTypes = $this->allowedTypes($this->configResources->event);
+        $allowedTypes = $this->configResources->event->allowedTypes($this->filesystem);
 
         $type = null;
 
@@ -125,35 +124,38 @@ class MakeEvent extends AbstractMaker
 
     /**
      * @param string $namespace
-     * @return MakerConfig[]
+     * @return MakerConfigurationCollection
+     * @throws \Throwable
      */
-    protected function configurations(string $namespace): array
+    protected function configurations(string $namespace): MakerConfigurationCollection
     {
-        $makerConfigEvent = (new MakerConfig(
-            namespace: $namespace,
-            builder: EventBuilder::class,
-            classnameSuffix: 'Event',
-            namespacePrefix: $this->configNamespaces->event,
-        ))
-            ->withExtraProperty('eventProperties', $this->eventProperties)
-            ->withExtraProperty('allowedTypes', $this->allowedTypes($this->configResources->event));
+        $makerConfigEvent = EventMakerConfiguration::fromNamespace(
+            rootDir: $this->rootDir,
+            rootNamespace: $this->rootNamespace,
+            namespace: $this->configNamespaces->event,
+            className: $namespace,
+        )
+            ->withProperties($this->eventProperties)
+            ->withPropertiesAllowedTypes($this->configResources->event->allowedTypes($this->filesystem))
+        ;
 
         $listenerNamespace = Str::replace($namespace, 'Event', 'Listener');
         $listenerNamespace = Str::replace($listenerNamespace, '\Listener\\', '\EventListener\\');
 
-        $makerConfigListener = (new MakerConfig(
-            namespace: $listenerNamespace,
-            builder: ListenerBuilder::class,
-            classnameSuffix: 'Listener',
-            namespacePrefix: $this->configNamespaces->eventListener,
-        ))
-            ->withExtraProperty('eventNamespace', $makerConfigEvent->namespace())
-            ->withExtraProperty('allowedTypes', $this->allowedTypes($this->configResources->event));
+        $makerConfigListener = ListenerMakerConfiguration::fromNamespace(
+            rootDir: $this->rootDir,
+            rootNamespace: $this->rootNamespace,
+            namespace: $this->configNamespaces->eventListener,
+            className: $listenerNamespace,
+        )
+            ->withEventNamespace($makerConfigEvent->namespace())
+            ->withPropertiesAllowedTypes($this->configResources->event->allowedTypes($this->filesystem))
+        ;
 
-        return [
+        return MakerConfigurationCollection::createAsList([
             $makerConfigEvent,
             $makerConfigListener,
-        ];
+        ]);
     }
 
     public function configureDependencies(DependencyBuilder $dependencies): void

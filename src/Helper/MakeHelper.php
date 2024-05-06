@@ -13,20 +13,7 @@ use Symfony\Component\Finder\Finder;
 final class MakeHelper
 {
     /**
-     * @return string[]
-     */
-    public static function allowedTypes(): array
-    {
-        return [
-            'string',
-            'integer',
-            'float',
-            'boolean',
-            'datetime',
-        ];
-    }
-
-    /**
+     * @deprecated
      * @param string|array<string> $includedDirectory
      * @param string|array<string>|null $excludedDirectory
      * @return string[]
@@ -64,25 +51,6 @@ final class MakeHelper
             $files[] = $file->getRealPath();
         }
         return $files;
-    }
-    public static function fieldDefaultType(string $fieldName): string
-    {
-        $defaultType = 'string';
-        // try to guess the type by the field name prefix/suffix
-        // convert to snake case for simplicity
-        $snakeCasedField = Str::asSnakeCase($fieldName);
-
-        if ('_at' === $suffix = substr($snakeCasedField, -3)) {
-            $defaultType = 'datetime';
-        } elseif ('_id' === $suffix) {
-            $defaultType = 'integer';
-        } elseif (0 === strpos($snakeCasedField, 'is_')) {
-            $defaultType = 'boolean';
-        } elseif (0 === strpos($snakeCasedField, 'has_')) {
-            $defaultType = 'boolean';
-        }
-
-        return $defaultType;
     }
 
     /**

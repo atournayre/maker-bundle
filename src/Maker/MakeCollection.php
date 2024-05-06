@@ -3,10 +3,9 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
-use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
-use Atournayre\Bundle\MakerBundle\Helper\MakeHelper;
+use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
+use Atournayre\Bundle\MakerBundle\Config\CollectionMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
-use Atournayre\Bundle\MakerBundle\VO\Builder\CollectionBuilder;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
@@ -18,7 +17,7 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('maker.command')]
-class MakeCollection extends AbstractMaker
+class MakeCollection extends NewAbstractMaker
 {
     private ?string $collectionRelatedObject = null;
     private bool $collectionIsImmutable = true;
@@ -74,37 +73,40 @@ class MakeCollection extends AbstractMaker
 
         return array_map(
             fn(string $file) => Str::namespaceFromPath($file, $this->rootDir),
-            MakeHelper::findFilesInDirectory($directories, $exclude)
+            $this->filesystem->findFilesInDirectory($directories, $exclude)
         );
     }
 
     /**
      * @param string $namespace
-     * @return MakerConfig[]
+     * @return MakerConfigurationCollection
+     * @throws \Throwable
      */
-    protected function configurations(string $namespace): array
+    protected function configurations(string $namespace): MakerConfigurationCollection
     {
         if ($this->collectionOfDecimals) {
-            return [
-                (new MakerConfig(
-                    namespace: $namespace,
-                    builder: CollectionBuilder::class,
-                    classnameSuffix: 'Collection',
-                    namespacePrefix: $this->configNamespaces->collection,
-                ))->withExtraProperty('collectionOfDecimals', $this->collectionOfDecimals)
-            ];
+            return MakerConfigurationCollection::createAsList([
+                CollectionMakerConfiguration::fromNamespace(
+                    $this->rootDir,
+                    $this->rootNamespace,
+                    $this->configNamespaces->collection,
+                    $namespace,
+                )
+                    ->withOfDecimals()
+                    ->withIsImmutable($this->collectionIsImmutable)
+            ]);
         }
 
-        return [
-            (new MakerConfig(
-                namespace: $namespace,
-                builder: CollectionBuilder::class,
-                classnameSuffix: 'Collection',
-                namespacePrefix: $this->configNamespaces->collection,
-            ))
-            ->withExtraProperty('collectionRelatedObject', Str::prefixByRootNamespace($this->collectionRelatedObject, $this->rootNamespace))
-            ->withExtraProperty('collectionIsImmutable', $this->collectionIsImmutable)
-        ];
+        return MakerConfigurationCollection::createAsList([
+            CollectionMakerConfiguration::fromNamespace(
+                $this->rootDir,
+                $this->rootNamespace,
+                $this->configNamespaces->collection,
+                $namespace,
+            )
+                ->withIsImmutable($this->collectionIsImmutable)
+                ->withRelatedObject(Str::prefixByRootNamespace($this->collectionRelatedObject, $this->rootNamespace))
+        ]);
     }
 
     public function configureDependencies(DependencyBuilder $dependencies): void

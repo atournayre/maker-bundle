@@ -3,8 +3,9 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Builder;
 
-use Atournayre\Bundle\MakerBundle\Config\MakerConfiguration;
+use Atournayre\Bundle\MakerBundle\Contracts\MakerConfigurationInterface;
 use Atournayre\Bundle\MakerBundle\Contracts\PhpFileBuilderInterface;
+use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\Printer\Printer;
 use Atournayre\Bundle\MakerBundle\VO\PhpFileDefinition;
 use Nette\PhpGenerator\PhpFile;
@@ -16,7 +17,9 @@ abstract class AbstractBuilder implements PhpFileBuilderInterface
     protected PhpFileDefinition $phpFileDefinition;
     private bool $created = false;
 
-    public function create(MakerConfiguration $makerConfiguration): void
+    abstract public function supports(string $makerConfigurationClassName): bool;
+
+    public function create(MakerConfigurationInterface $makerConfiguration): void
     {
         $this->phpFileDefinition = PhpFileDefinition::create(
             $makerConfiguration->namespace(),
@@ -35,74 +38,84 @@ abstract class AbstractBuilder implements PhpFileBuilderInterface
         $this->created = true;
     }
 
-    public function setStrictTypes(MakerConfiguration $makerConfiguration): void
+    public function createInstance(MakerConfigurationInterface $makerConfiguration): PhpFileDefinition
+    {
+        $this->created = true;
+
+        return PhpFileDefinition::create(
+            $makerConfiguration->namespace(),
+            $makerConfiguration->classname()
+        );
+    }
+
+    public function setStrictTypes(MakerConfigurationInterface $makerConfiguration): void
     {
         $this->phpFileDefinition->setStrictTypes(true);
     }
 
-    public function setComments(MakerConfiguration $makerConfiguration): void
+    public function setComments(MakerConfigurationInterface $makerConfiguration): void
     {
         $this->phpFileDefinition->setComments([
             'This file has been auto-generated',
         ]);
     }
 
-    public function addUses(MakerConfiguration $makerConfiguration): void
+    public function addUses(MakerConfigurationInterface $makerConfiguration): void
     {
         $this->phpFileDefinition->setUses([]);
     }
 
-    public function addAttributes(MakerConfiguration $makerConfiguration): void
+    public function addAttributes(MakerConfigurationInterface $makerConfiguration): void
     {
         $this->phpFileDefinition->setAttributes([]);
     }
 
-    public function setInterface(MakerConfiguration $makerConfiguration): void
+    public function setInterface(MakerConfigurationInterface $makerConfiguration): void
     {
         $this->phpFileDefinition->setInterface(false);
     }
 
-    public function setTrait(MakerConfiguration $makerConfiguration): void
+    public function setTrait(MakerConfigurationInterface $makerConfiguration): void
     {
         $this->phpFileDefinition->setTrait(false);
     }
 
-    public function setReadonly(MakerConfiguration $makerConfiguration): void
+    public function setReadonly(MakerConfigurationInterface $makerConfiguration): void
     {
         $this->phpFileDefinition->setReadonly(true);
     }
 
-    public function setFinal(MakerConfiguration $makerConfiguration): void
+    public function setFinal(MakerConfigurationInterface $makerConfiguration): void
     {
         $this->phpFileDefinition->setFinal(true);
     }
 
-    public function setExtends(MakerConfiguration $makerConfiguration): void
+    public function setExtends(MakerConfigurationInterface $makerConfiguration): void
     {
         $this->phpFileDefinition->setExtends(null);
     }
 
-    public function addImplements(MakerConfiguration $makerConfiguration): void
+    public function addImplements(MakerConfigurationInterface $makerConfiguration): void
     {
         $this->phpFileDefinition->setImplements([]);
     }
 
-    public function addConstants(MakerConfiguration $makerConfiguration): void
+    public function addConstants(MakerConfigurationInterface $makerConfiguration): void
     {
         $this->phpFileDefinition->setConstants([]);
     }
 
-    public function addTraits(MakerConfiguration $makerConfiguration): void
+    public function addTraits(MakerConfigurationInterface $makerConfiguration): void
     {
         $this->phpFileDefinition->setTraits([]);
     }
 
-    public function addProperties(MakerConfiguration $makerConfiguration): void
+    public function addProperties(MakerConfigurationInterface $makerConfiguration): void
     {
         $this->phpFileDefinition->setProperties([]);
     }
 
-    public function addMethods(MakerConfiguration $makerConfiguration): void
+    public function addMethods(MakerConfigurationInterface $makerConfiguration): void
     {
         $this->phpFileDefinition->setMethods([]);
     }
@@ -110,7 +123,7 @@ abstract class AbstractBuilder implements PhpFileBuilderInterface
     /**
      * @throws \Exception
      */
-    public function setNamespace(MakerConfiguration $makerConfiguration): void
+    public function setNamespace(MakerConfigurationInterface $makerConfiguration): void
     {
         throw new \Exception('Use constructor to set namespace');
     }
@@ -118,7 +131,7 @@ abstract class AbstractBuilder implements PhpFileBuilderInterface
     /**
      * @throws \Exception
      */
-    public function setClassName(MakerConfiguration $makerConfiguration): void
+    public function setClassName(MakerConfigurationInterface $makerConfiguration): void
     {
         throw new \Exception('Use constructor to set class name');
     }
@@ -175,7 +188,7 @@ abstract class AbstractBuilder implements PhpFileBuilderInterface
         return $phpFile;
     }
 
-    public function printPhpFile(?MakerConfiguration $makerConfiguration = null): string
+    public function printPhpFile(?MakerConfigurationInterface $makerConfiguration = null): string
     {
         if (null === $makerConfiguration) {
             Assert::true($this->created, 'You must create the file before printing it or provide a MakerConfiguration to print it directly.');
@@ -188,5 +201,28 @@ abstract class AbstractBuilder implements PhpFileBuilderInterface
 
         return (new Printer())
             ->printFile($phpFile);
+    }
+
+    /**
+     * @param MakerConfigurationInterface $makerConfiguration
+     * @return array<string, string>
+     */
+    protected function correspondingTypes(MakerConfigurationInterface $makerConfiguration): array
+    {
+        $rootDir = $makerConfiguration->rootDir();
+        $allowedTypes = $makerConfiguration->propertiesAllowedTypes();
+
+        $allowedTypesMapping = [];
+        foreach ($allowedTypes as $allowedType) {
+            if (!str_contains($allowedType, '/')) {
+                $allowedTypesMapping[$allowedType] = $allowedType;
+                continue;
+            }
+            $namespaceFromPath = Str::namespaceFromPath($allowedType, $rootDir);
+            $rootNamespace = $makerConfiguration->rootNamespace();
+            $namespace = Str::prefixByRootNamespace($namespaceFromPath, $rootNamespace);
+            $allowedTypesMapping[$allowedType] = $namespace;
+        }
+        return $allowedTypesMapping;
     }
 }

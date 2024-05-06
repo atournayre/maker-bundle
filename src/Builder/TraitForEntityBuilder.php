@@ -1,21 +1,27 @@
 <?php
 declare(strict_types=1);
 
-namespace Atournayre\Bundle\MakerBundle\VO\Builder;
+namespace Atournayre\Bundle\MakerBundle\Builder;
 
+use Atournayre\Bundle\MakerBundle\Config\TraitForEntityMakerConfiguration;
+use Atournayre\Bundle\MakerBundle\Contracts\MakerConfigurationInterface;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
-use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
+use Atournayre\Bundle\MakerBundle\VO\PhpFileDefinition;
 use Nette\PhpGenerator\Literal;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\Property;
 use Webmozart\Assert\Assert;
 
-class TraitForEntityBuilder extends AbstractBuilder
+final class TraitForEntityBuilder extends AbstractBuilder
 {
-    public static function build(FileDefinition $fileDefinition): static
+    public function supports(string $makerConfigurationClassName): bool
     {
-        $config = $fileDefinition->configuration();
-        $traitProperties = $config->traitProperties();
+        return $makerConfigurationClassName === TraitForEntityMakerConfiguration::class;
+    }
+
+    public function createInstance(MakerConfigurationInterface|TraitForEntityMakerConfiguration $makerConfiguration): PhpFileDefinition
+    {
+        $traitProperties = $makerConfiguration->properties();
 
         $uses = [
             \Doctrine\ORM\Mapping::class => 'ORM',
@@ -32,23 +38,26 @@ class TraitForEntityBuilder extends AbstractBuilder
         }
 
         $properties = array_map(
-            fn(array $propertyDatas) => self::defineProperty($propertyDatas, $fileDefinition),
+            fn(array $propertyDatas) => self::defineProperty($propertyDatas, $makerConfiguration),
             $traitProperties
         );
 
-        return static::create($fileDefinition)
-            ->createFileAsTrait()
-            ->withUses($uses)
-            ->withProperties($properties)
-            ->addMembers(self::gettersForEntity($traitProperties))
-            ->addMembers(self::settersForEntity($traitProperties));
+        return parent::createInstance($makerConfiguration)
+            ->setTrait()
+            ->setUses($uses)
+            ->setProperties($properties)
+            ->setMethods([
+                ...$this->gettersForEntity($traitProperties),
+                ...$this->settersForEntity($traitProperties),
+            ])
+        ;
     }
 
     /**
      * @param array{fieldName: string, type: string, nullable: bool}[] $traitProperties
      * @return Method[]
      */
-    private static function settersForEntity(array $traitProperties): array
+    private function settersForEntity(array $traitProperties): array
     {
         foreach ($traitProperties as $property) {
             $method = new Method(Str::setter($property['fieldName']));
@@ -73,7 +82,7 @@ class TraitForEntityBuilder extends AbstractBuilder
      * @param array{fieldName: string, type: string, nullable: bool}[] $traitProperties
      * @return Method[]
      */
-    private static function gettersForEntity(array $traitProperties): array
+    private function gettersForEntity(array $traitProperties): array
     {
         foreach ($traitProperties as $property) {
             if (!$property['nullable']) {
@@ -103,21 +112,21 @@ class TraitForEntityBuilder extends AbstractBuilder
 
     /**
      * @param array{fieldName: string, type: string, nullable: bool} $propertyDatas
-     * @param FileDefinition $fileDefinition
+     * @param MakerConfigurationInterface|TraitForEntityMakerConfiguration $makerConfiguration
      * @return Property
      */
-    private static function defineProperty(array $propertyDatas, FileDefinition $fileDefinition): Property
+    private function defineProperty(array $propertyDatas, MakerConfigurationInterface|TraitForEntityMakerConfiguration $makerConfiguration): Property
     {
         $type = $propertyDatas['type'];
         $fieldNameRaw = $propertyDatas['fieldName'];
 
         Assert::inArray(
             $type,
-            array_keys(self::correspondingTypes($fileDefinition)),
-            Str::sprintf('Property "%s" should be of type %s; %s given', $fieldNameRaw, Str::implode(', ', array_keys(self::correspondingTypes($fileDefinition))), $type)
+            array_keys(self::correspondingTypes($makerConfiguration)),
+            Str::sprintf('Property "%s" should be of type %s; %s given', $fieldNameRaw, Str::implode(', ', array_keys(self::correspondingTypes($makerConfiguration))), $type)
         );
 
-        $propertyType = self::correspondingTypes($fileDefinition)[$type];
+        $propertyType = self::correspondingTypes($makerConfiguration)[$type];
 
         $fieldName = Str::property($fieldNameRaw);
 
@@ -131,7 +140,7 @@ class TraitForEntityBuilder extends AbstractBuilder
         return self::propertyUsedByEntity($property);
     }
 
-    private static function propertyUsedByEntity(Property $property): Property
+    private function propertyUsedByEntity(Property $property): Property
     {
         $clone = clone $property;
 
@@ -152,7 +161,7 @@ class TraitForEntityBuilder extends AbstractBuilder
     /**
      * @return array<string, string|Literal|null>
      */
-    private static function doctrineCorrespondingTypes(): array
+    private function doctrineCorrespondingTypes(): array
     {
         return [
             'string' => null,
