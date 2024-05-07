@@ -45,7 +45,11 @@ class MakeCommand extends NewAbstractMaker
         parent::interact($input, $io, $command);
 
         $title = new Question('Choose a title for your command?');
-        $this->commandTitle = $io->askQuestion($title);
+        try {
+            $this->commandTitle = $io->askQuestion($title);
+        } catch (\Throwable $e) {
+            throw new \RuntimeException('A title is required.', 0, $e);
+        }
 
         $description = new Question('Choose a description for your command. Press <Enter> to skip.');
         $this->commandDescription = $io->askQuestion($description) ?? '';

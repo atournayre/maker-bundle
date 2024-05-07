@@ -3,21 +3,35 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Config;
 
+use function Symfony\Component\String\u;
+
 class CommandMakerConfiguration extends MakerConfiguration
 {
     private string $title = '';
     private string $description = '';
     private string $commandName = '';
 
+    public static function fromFqcn(string $rootDir, string $rootNamespace, string $fqcn,): static
+    {
+        $fqcn = u($fqcn)->ensureEnd('Command')->toString();
+
+        return parent::fromFqcn($rootDir, $rootNamespace, $fqcn);
+    }
+
     public function title(): string
     {
         return $this->title;
     }
 
+    private function sanitizeTitle(string $title): string
+    {
+        return addslashes($title);
+    }
+
     public function withTitle(string $title): self
     {
         $config = clone $this;
-        $config->title = $title;
+        $config->title = $this->sanitizeTitle($title);
         return $config;
     }
 
@@ -38,10 +52,19 @@ class CommandMakerConfiguration extends MakerConfiguration
         return $this->commandName;
     }
 
+    private function sanitizeCommandName(string $commandName): string
+    {
+        return u($commandName)
+            ->trim()
+            ->lower()
+            ->ensureStart('app:')
+            ->toString();
+    }
+
     public function withCommandName(string $commandName): self
     {
         $config = clone $this;
-        $config->commandName = $commandName;
+        $config->commandName = $this->sanitizeCommandName($commandName);
         return $config;
     }
 }

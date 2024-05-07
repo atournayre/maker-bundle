@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Atournayre\Bundle\MakerBundle\Printer;
 
 use Atournayre\Bundle\MakerBundle\VO\PhpFileDefinition;
+use Nette\PhpGenerator\Attribute;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\Property;
 use Webmozart\Assert\Assert;
@@ -62,9 +63,10 @@ final class PhpFilePrinter
             $namespace->addUse($use);
         }
 
+        /** @var Attribute $attribute */
         foreach ($phpFileDefinition->getAttributes() as $attribute) {
-            $namespace->addUse($attribute);
-            $class->addAttribute($attribute);
+            $namespace->addUse($attribute->getName());
+            $class->addAttribute($attribute->getName(), $attribute->getArguments());
         }
 
         foreach ($phpFileDefinition->getImplements() as $implement) {
