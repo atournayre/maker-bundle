@@ -142,6 +142,8 @@ class MakeProjectInstall extends AbstractMaker
 
         $services['services']['App\Contracts\Logger\LoggerInterface'] = '@App\Logger\DefaultLogger';
         $services['services']['App\Contracts\Session\FlashBagInterface'] = '@App\Service\Session\SymfonyFlashBagService';
+        $services['services']['App\Contracts\Service\CommandServiceInterface'] = '@App\Service\CommandService';
+        $services['services']['App\Contracts\Service\QueryServiceInterface'] = '@App\Service\QueryService';
         $services['services'][\Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface::class] = [
             'class' => \Symfony\Component\HttpFoundation\Session\Flash\FlashBag::class,
             'public' => true

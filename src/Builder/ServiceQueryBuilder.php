@@ -6,7 +6,9 @@ namespace Atournayre\Bundle\MakerBundle\Builder;
 use App\Contracts\Service\FailFastInterface;
 use App\Contracts\Service\PostConditionsChecksInterface;
 use App\Contracts\Service\PreConditionsChecksInterface;
+use App\Contracts\Service\QueryServiceInterface;
 use App\Contracts\Service\TagQueryServiceInterface;
+use App\Contracts\VO\ContextInterface;
 use App\Exception\FailFast;
 use Atournayre\Bundle\MakerBundle\Config\ServiceQueryMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\Contracts\MakerConfigurationInterface;
@@ -41,22 +43,25 @@ final class ServiceQueryBuilder extends AbstractBuilder
                 \Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag::class,
                 \App\Contracts\Service\TagQueryServiceInterface::class,
                 $voParameter,
+                QueryServiceInterface::class,
                 PreConditionsChecksInterface::class,
                 FailFastInterface::class,
                 TagQueryServiceInterface::class,
                 PostConditionsChecksInterface::class,
-                \App\VO\Context::class,
+                ContextInterface::class,
             ])
             ->setAttributes($attributes)
             ->setImplements([
+                QueryServiceInterface::class,
                 PreConditionsChecksInterface::class,
                 FailFastInterface::class,
                 PostConditionsChecksInterface::class,
             ])
             ->setMethods([
-                $this->implementationOfInterface(PreConditionsChecksInterface::class, $voParameter),
-                $this->implementationOfInterface(FailFastInterface::class, $voParameter),
-                $this->implementationOfInterface(PostConditionsChecksInterface::class, $voParameter),
+                ...$this->implementationOfInterface(QueryServiceInterface::class, $voParameter),
+                ...$this->implementationOfInterface(PreConditionsChecksInterface::class, $voParameter),
+                ...$this->implementationOfInterface(FailFastInterface::class, $voParameter),
+                ...$this->implementationOfInterface(PostConditionsChecksInterface::class, $voParameter),
                 $this->invoke(),
             ])
         ;
