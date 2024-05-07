@@ -32,12 +32,13 @@ final class ExceptionBuilder extends AbstractBuilder
         }
 
         $methodName = $makerConfiguration->namedConstructor();
+        $fqcn = $makerConfiguration->fqcn;
         $className = $makerConfiguration->classname();
 
         return (new Method($methodName))
             ->setStatic()
             ->setPublic()
-            ->setReturnType($className)
+            ->setReturnType($fqcn)
             ->addBody("return new {$className}('Oops, an error occured.');");
     }
 }
