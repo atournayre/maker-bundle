@@ -38,14 +38,23 @@ final class PhpFilePrinter
         Assert::allNullOrIsInstanceOf($phpFileDefinition->getProperties(), Property::class);
 
         $class = $classes[$classNameIdentifier];
+
+        if (null !== $phpFileDefinition->getExtends()) {
+            $class->setExtends($phpFileDefinition->getExtends());
+        }
+
         $class
-            ->setFinal($phpFileDefinition->isFinal())
-            ->setReadOnly($phpFileDefinition->isReadonly())
-            ->setExtends($phpFileDefinition->getExtends())
             ->setConstants($phpFileDefinition->getConstants())
-            ->setProperties($phpFileDefinition->getProperties())
             ->setMethods($phpFileDefinition->getMethods())
         ;
+
+        if ($class->isClass()) {
+            $class
+                ->setFinal($phpFileDefinition->isFinal())
+                ->setReadOnly($phpFileDefinition->isReadonly())
+                ->setProperties($phpFileDefinition->getProperties())
+            ;
+        }
 
         $namespace = $class->getNamespace();
 
