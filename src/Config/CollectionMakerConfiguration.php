@@ -13,7 +13,7 @@ class CollectionMakerConfiguration extends MakerConfiguration
 
     public static function fromFqcn(string $rootDir, string $rootNamespace, string $fqcn,): static
     {
-        u($fqcn)->ensureEnd('Collection');
+        $fqcn = u($fqcn)->ensureEnd('Collection')->toString();
 
         return parent::fromFqcn($rootDir, $rootNamespace, $fqcn);
     }
