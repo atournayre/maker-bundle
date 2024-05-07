@@ -26,7 +26,7 @@ final class ListenerBuilder extends AbstractBuilder
             ->setUses([$eventNamespace])
             ->setAttributes($this->attributes($makerConfiguration))
             ->setMethods([
-                $this->invoke($eventNamespace),
+                $this->invoke($makerConfiguration),
             ])
         ;
     }

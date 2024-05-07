@@ -148,7 +148,7 @@ class MakeEvent extends NewAbstractMaker
             namespace: $this->configNamespaces->eventListener,
             className: $listenerNamespace,
         )
-            ->withEventNamespace($makerConfigEvent->namespace())
+            ->withEventNamespace($makerConfigEvent->fqcn)
             ->withPropertiesAllowedTypes($this->configResources->event->allowedTypes($this->filesystem))
         ;
 
