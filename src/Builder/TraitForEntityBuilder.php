@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Builder;
 
+use Aimeos\Map;
 use Atournayre\Bundle\MakerBundle\Config\TraitForEntityMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\Contracts\MakerConfigurationInterface;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
@@ -21,7 +22,22 @@ final class TraitForEntityBuilder extends AbstractBuilder
 
     public function createInstance(MakerConfigurationInterface|TraitForEntityMakerConfiguration $makerConfiguration): PhpFileDefinition
     {
-        $traitProperties = $makerConfiguration->properties();
+        $traitProperties = Map::from($makerConfiguration->properties())
+            ->map(function (array $propertyDatas) use ($makerConfiguration): array {
+                $type = $propertyDatas['type'];
+
+                if (!str_contains($type, '/')) {
+                    return $propertyDatas;
+                }
+
+                $namespaceFromPath = Str::namespaceFromPath($type, $makerConfiguration->rootDir());
+                $rootNamespace = $makerConfiguration->rootNamespace();
+                $propertyDatas['type'] = Str::prefixByRootNamespace($namespaceFromPath, $rootNamespace);
+
+                return $propertyDatas;
+            })
+            ->toArray();
+        ;
 
         $uses = [
             \Doctrine\ORM\Mapping::class => 'ORM',
@@ -38,7 +54,7 @@ final class TraitForEntityBuilder extends AbstractBuilder
         }
 
         $properties = array_map(
-            fn(array $propertyDatas) => self::defineProperty($propertyDatas, $makerConfiguration),
+            fn(array $propertyDatas) => $this->defineProperty($propertyDatas, $makerConfiguration),
             $traitProperties
         );
 
@@ -119,14 +135,16 @@ final class TraitForEntityBuilder extends AbstractBuilder
     {
         $type = $propertyDatas['type'];
         $fieldNameRaw = $propertyDatas['fieldName'];
+        $correspondingTypes = $this->correspondingTypes($makerConfiguration);
+        $correspondingTypes = array_combine(array_values($correspondingTypes), array_values($correspondingTypes));
 
         Assert::inArray(
             $type,
-            array_keys(self::correspondingTypes($makerConfiguration)),
-            Str::sprintf('Property "%s" should be of type %s; %s given', $fieldNameRaw, Str::implode(', ', array_keys(self::correspondingTypes($makerConfiguration))), $type)
+            $correspondingTypes,
+            Str::sprintf('Property "%s" should be of type %s; %s given', $fieldNameRaw, Str::implode(', ', $correspondingTypes), $type)
         );
 
-        $propertyType = self::correspondingTypes($makerConfiguration)[$type];
+        $propertyType = $correspondingTypes[$type];
 
         $fieldName = Str::property($fieldNameRaw);
 
@@ -137,7 +155,7 @@ final class TraitForEntityBuilder extends AbstractBuilder
             ->setValue(null)
         ;
 
-        return self::propertyUsedByEntity($property);
+        return $this->propertyUsedByEntity($property);
     }
 
     private function propertyUsedByEntity(Property $property): Property
@@ -148,7 +166,7 @@ final class TraitForEntityBuilder extends AbstractBuilder
             'nullable' => true, // By default, all properties are nullable, not to break schema
         ];
 
-        $propertyType = self::doctrineCorrespondingTypes()[$clone->getType()];
+        $propertyType = $this->matchDoctrineType($clone->getType());
         if (null !== $propertyType) {
             $columnArgs['type'] = $propertyType;
         }
@@ -158,19 +176,13 @@ final class TraitForEntityBuilder extends AbstractBuilder
         return $clone;
     }
 
-    /**
-     * @return array<string, string|Literal|null>
-     */
-    private function doctrineCorrespondingTypes(): array
+    private function matchDoctrineType(string $type): string|Literal|null
     {
-        return [
-            'string' => null,
-            'int' => null,
-            'float' => null,
-            'bool' => null,
+        return match ($type) {
             '\DateTimeInterface' => class_exists(\Doctrine\DBAL\Types\Types::class)
                 ? new Literal('Types::DATETIME_MUTABLE')
                 : null,
-        ];
+            default => null,
+        };
     }
 }

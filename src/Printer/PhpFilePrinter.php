@@ -52,6 +52,11 @@ final class PhpFilePrinter
             $class
                 ->setFinal($phpFileDefinition->isFinal())
                 ->setReadOnly($phpFileDefinition->isReadonly())
+            ;
+        }
+
+        if (!$class->isInterface()) {
+            $class
                 ->setProperties($phpFileDefinition->getProperties())
             ;
         }
@@ -68,8 +73,8 @@ final class PhpFilePrinter
             $phpFile->addComment($comment);
         }
 
-        foreach ($phpFileDefinition->getUses() as $use) {
-            $namespace->addUse($use);
+        foreach ($phpFileDefinition->getUses() as $use => $alias) {
+            $namespace->addUse($use, $alias);
         }
 
         /** @var Attribute $attribute */

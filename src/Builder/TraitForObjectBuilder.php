@@ -23,7 +23,7 @@ final class TraitForObjectBuilder extends AbstractBuilder
         $traitProperties = $makerConfiguration->properties();
 
         $properties = array_map(
-            fn(array $propertyDatas) => self::defineProperty($propertyDatas, $makerConfiguration),
+            fn(array $propertyDatas) => $this->defineProperty($propertyDatas, $makerConfiguration),
             $traitProperties
         );
 
@@ -31,8 +31,8 @@ final class TraitForObjectBuilder extends AbstractBuilder
             ->setTrait()
             ->setProperties($properties)
             ->setMethods([
-                self::gettersForObject($traitProperties, $makerConfiguration),
-                self::withersForObject($traitProperties, $makerConfiguration),
+                ...$this->gettersForObject($traitProperties, $makerConfiguration),
+                ...$this->withersForObject($traitProperties, $makerConfiguration),
             ])
         ;
     }
