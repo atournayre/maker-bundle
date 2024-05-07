@@ -11,7 +11,7 @@ class ServiceCommandMakerConfiguration extends MakerConfiguration
 
     public static function fromFqcn(string $rootDir, string $rootNamespace, string $fqcn,): static
     {
-        u($fqcn)->ensureEnd('CommandService');
+        $fqcn = u($fqcn)->ensureEnd('CommandService')->toString();
 
         return parent::fromFqcn($rootDir, $rootNamespace, $fqcn);
     }

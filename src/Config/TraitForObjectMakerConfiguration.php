@@ -14,7 +14,7 @@ class TraitForObjectMakerConfiguration extends MakerConfiguration
 
     public static function fromFqcn(string $rootDir, string $rootNamespace, string $fqcn,): static
     {
-        u($fqcn)->ensureEnd('Trait');
+        $fqcn = u($fqcn)->ensureEnd('Trait')->toString();
 
         return parent::fromFqcn($rootDir, $rootNamespace, $fqcn);
     }

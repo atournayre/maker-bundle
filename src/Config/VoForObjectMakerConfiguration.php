@@ -3,20 +3,11 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Config;
 
-use function Symfony\Component\String\u;
-
 class VoForObjectMakerConfiguration extends MakerConfiguration
 {
     /** @var array<array{fieldName: string, type: string, nullable: bool}> */
     private array $properties = [];
     private array $propertiesAllowedTypes = [];
-
-    public static function fromFqcn(string $rootDir, string $rootNamespace, string $fqcn,): static
-    {
-        u($fqcn)->ensureEnd('Trait');
-
-        return parent::fromFqcn($rootDir, $rootNamespace, $fqcn);
-    }
 
     public function properties(): array
     {

@@ -12,7 +12,7 @@ class ListenerMakerConfiguration extends MakerConfiguration
 
     public static function fromFqcn(string $rootDir, string $rootNamespace, string $fqcn,): static
     {
-        u($fqcn)->ensureEnd('Listener');
+        $fqcn = u($fqcn)->ensureEnd('Listener')->toString();
 
         return parent::fromFqcn($rootDir, $rootNamespace, $fqcn);
     }

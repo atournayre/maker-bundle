@@ -13,7 +13,7 @@ class EventMakerConfiguration extends MakerConfiguration
 
     public static function fromFqcn(string $rootDir, string $rootNamespace, string $fqcn,): static
     {
-        u($fqcn)->ensureEnd('Event');
+        $fqcn = u($fqcn)->ensureEnd('Event')->toString();
 
         return parent::fromFqcn($rootDir, $rootNamespace, $fqcn);
     }

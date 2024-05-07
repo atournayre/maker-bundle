@@ -9,7 +9,7 @@ class InterfaceMakerConfiguration extends MakerConfiguration
 {
     public static function fromFqcn(string $rootDir, string $rootNamespace, string $fqcn,): static
     {
-        u($fqcn)->ensureEnd('Interface');
+        $fqcn = u($fqcn)->ensureEnd('Interface')->toString();
 
         return parent::fromFqcn($rootDir, $rootNamespace, $fqcn);
     }

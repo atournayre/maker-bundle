@@ -11,7 +11,7 @@ class ServiceQueryMakerConfiguration extends MakerConfiguration
 
     public static function fromFqcn(string $rootDir, string $rootNamespace, string $fqcn,): static
     {
-        u($fqcn)->ensureEnd('QueryService');
+        $fqcn = u($fqcn)->ensureEnd('QueryService')->toString();
 
         return parent::fromFqcn($rootDir, $rootNamespace, $fqcn);
     }

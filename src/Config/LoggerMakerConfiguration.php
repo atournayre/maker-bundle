@@ -9,7 +9,7 @@ class LoggerMakerConfiguration extends MakerConfiguration
 {
     public static function fromFqcn(string $rootDir, string $rootNamespace, string $fqcn,): static
     {
-        u($fqcn)->ensureEnd('Logger');
+        $fqcn = u($fqcn)->ensureEnd('Logger')->toString();
 
         return parent::fromFqcn($rootDir, $rootNamespace, $fqcn);
     }
