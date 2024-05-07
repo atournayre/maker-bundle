@@ -6,16 +6,11 @@ namespace Atournayre\Bundle\MakerBundle\Builder;
 use Atournayre\Bundle\MakerBundle\Contracts\MakerConfigurationInterface;
 use Atournayre\Bundle\MakerBundle\Contracts\PhpFileBuilderInterface;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
-use Atournayre\Bundle\MakerBundle\Printer\Printer;
 use Atournayre\Bundle\MakerBundle\VO\PhpFileDefinition;
-use Nette\PhpGenerator\PhpFile;
-use Nette\PhpGenerator\Property;
-use Webmozart\Assert\Assert;
 
 abstract class AbstractBuilder implements PhpFileBuilderInterface
 {
     protected PhpFileDefinition $phpFileDefinition;
-    private bool $created = false;
 
     abstract public function supports(string $makerConfigurationClassName): bool;
 
@@ -35,17 +30,16 @@ abstract class AbstractBuilder implements PhpFileBuilderInterface
         $this->addTraits($makerConfiguration);
         $this->addProperties($makerConfiguration);
         $this->addMethods($makerConfiguration);
-        $this->created = true;
     }
 
     public function createInstance(MakerConfigurationInterface $makerConfiguration): PhpFileDefinition
     {
-        $this->created = true;
-
         return PhpFileDefinition::create(
             $makerConfiguration->namespace(),
             $makerConfiguration->classname()
-        );
+        )->setComments([
+            'This file has been auto-generated',
+        ]);
     }
 
     public function setStrictTypes(MakerConfigurationInterface $makerConfiguration): void
@@ -134,73 +128,6 @@ abstract class AbstractBuilder implements PhpFileBuilderInterface
     public function setClassName(MakerConfigurationInterface $makerConfiguration): void
     {
         throw new \Exception('Use constructor to set class name');
-    }
-
-    public function phpFile(): PhpFile
-    {
-        $phpFile = new PhpFile();
-        $phpFile->setStrictTypes($this->phpFileDefinition->isStrictTypes());
-
-        $fqcn = $this->phpFileDefinition->fqcn();
-        if ($this->phpFileDefinition->isInterface()) {
-            $phpFile->addInterface($fqcn);
-        } elseif ($this->phpFileDefinition->isTrait()) {
-            $phpFile->addTrait($fqcn);
-        } else {
-            $phpFile->addClass($fqcn);
-        }
-
-        $classes = $phpFile->getClasses();
-        $classNameIdentifier = array_key_first($classes);
-        Assert::keyExists($classes, $classNameIdentifier, 'No class found in PhpFile');
-
-        Assert::allNullOrIsInstanceOf($this->phpFileDefinition->getProperties(), Property::class);
-
-        $class = $classes[$classNameIdentifier];
-        $class
-            ->setFinal($this->phpFileDefinition->isFinal())
-            ->setReadOnly($this->phpFileDefinition->isReadonly())
-            ->setExtends($this->phpFileDefinition->getExtends())
-            ->setConstants($this->phpFileDefinition->getConstants())
-            ->setTraits($this->phpFileDefinition->getTraits())
-            ->setProperties($this->phpFileDefinition->getProperties())
-            ->setMethods($this->phpFileDefinition->getMethods())
-        ;
-
-        foreach ($this->phpFileDefinition->getComments() as $comment) {
-            $phpFile->addComment($comment);
-        }
-
-        foreach ($this->phpFileDefinition->getUses() as $use) {
-            $phpFile->addUse($use);
-        }
-
-        foreach ($this->phpFileDefinition->getAttributes() as $attribute) {
-            $phpFile->addUse($attribute);
-            $class->addAttribute($attribute);
-        }
-
-        foreach ($this->phpFileDefinition->getImplements() as $implement) {
-            $phpFile->addUse($implement);
-            $class->addImplement($implement);
-        }
-
-        return $phpFile;
-    }
-
-    public function printPhpFile(?MakerConfigurationInterface $makerConfiguration = null): string
-    {
-        if (null === $makerConfiguration) {
-            Assert::true($this->created, 'You must create the file before printing it or provide a MakerConfiguration to print it directly.');
-        }
-
-        if (!$this->created) {
-            $this->create($makerConfiguration);
-        }
-        $phpFile = $this->phpFile();
-
-        return (new Printer())
-            ->printFile($phpFile);
     }
 
     /**

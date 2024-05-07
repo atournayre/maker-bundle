@@ -40,8 +40,4 @@ interface PhpFileBuilderInterface
     public function addProperties(MakerConfigurationInterface $makerConfiguration): void;
 
     public function addMethods(MakerConfigurationInterface $makerConfiguration): void;
-
-    public function phpFile(): PhpFile;
-
-    public function printPhpFile(?MakerConfigurationInterface $makerConfiguration = null): string;
 }

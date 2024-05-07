@@ -19,12 +19,15 @@ final class CollectionBuilder extends AbstractBuilder
 
     public function createInstance(MakerConfigurationInterface|CollectionMakerConfiguration $makerConfiguration): PhpFileDefinition
     {
+        $extends = $this->extendsClass($makerConfiguration);
+        $collectionType = $this->collectionType($makerConfiguration);
+
         return parent::createInstance($makerConfiguration)
+            ->setExtends($extends)
             ->setUses([
-                $this->extendsClass($makerConfiguration),
-                $this->collectionType($makerConfiguration),
+                $extends,
+                $collectionType
             ])
-            ->setExtends($this->extendsClass($makerConfiguration))
             ->setProperties([
                 $this->propertyType($makerConfiguration),
             ])
@@ -48,7 +51,6 @@ final class CollectionBuilder extends AbstractBuilder
             return \Atournayre\Types\DecimalValue::class;
         }
 
-        // TODO Rootnamespace
         return $makerConfiguration->relatedObject();
     }
 

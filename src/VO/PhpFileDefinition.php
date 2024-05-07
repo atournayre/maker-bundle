@@ -4,9 +4,6 @@ declare(strict_types=1);
 namespace Atournayre\Bundle\MakerBundle\VO;
 
 use Nette\PhpGenerator\Attribute;
-use Nette\PhpGenerator\Constant;
-use Nette\PhpGenerator\Method;
-use Nette\PhpGenerator\Property;
 use Webmozart\Assert\Assert;
 
 final class PhpFileDefinition
@@ -139,7 +136,6 @@ final class PhpFileDefinition
             return $this;
         }
 
-        Assert::classExists($extends, 'Class %s does not exist');
         $this->extends = $extends;
         return $this;
     }
@@ -151,7 +147,6 @@ final class PhpFileDefinition
 
     public function setImplements(array $implements): self
     {
-        Assert::allClassExists($implements, 'Class %s does not exist');
         $this->implements = $implements;
         return $this;
     }
@@ -163,7 +158,6 @@ final class PhpFileDefinition
 
     public function setConstants(array $constants): self
     {
-        Assert::allIsInstanceOf($constants, Constant::class, 'Constants must be an array of Constant');
         $this->constants = $constants;
         return $this;
     }
@@ -175,8 +169,6 @@ final class PhpFileDefinition
 
     public function setTraits(array $traits): self
     {
-        Assert::allString($traits, 'Traits must be an array of strings');
-        Assert::allClassExists($traits, 'Trait %s does not exist');
         $this->traits = $traits;
         return $this;
     }
@@ -188,7 +180,6 @@ final class PhpFileDefinition
 
     public function setProperties(array $properties): self
     {
-        Assert::allIsInstanceOf($properties, Property::class, 'Properties must be an array of Property');
         $this->properties = $properties;
         return $this;
     }
@@ -200,7 +191,6 @@ final class PhpFileDefinition
 
     public function setMethods(array $methods): self
     {
-        Assert::allIsInstanceOf($methods, Method::class, 'Methods must be an array of Method');
         $this->methods = $methods;
         return $this;
     }
