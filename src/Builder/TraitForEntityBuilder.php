@@ -37,7 +37,6 @@ final class TraitForEntityBuilder extends AbstractBuilder
                 return $propertyDatas;
             })
             ->toArray();
-        ;
 
         $uses = [
             \Doctrine\ORM\Mapping::class => 'ORM',

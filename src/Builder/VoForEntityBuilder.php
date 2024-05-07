@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Builder;
 
+use Aimeos\Map;
+use App\Contracts\Null\NullableInterface;
 use App\Trait\IsTrait;
 use App\Trait\NotNullableTrait;
 use App\Trait\NullableTrait;
@@ -26,10 +28,24 @@ final class VoForEntityBuilder extends AbstractBuilder
     public function createInstance(MakerConfigurationInterface|VoForEntityMakerConfiguration $makerConfiguration): PhpFileDefinition
     {
         $entityNamespace = self::entityNamespace($makerConfiguration);
-        $voProperties = $makerConfiguration->properties();
+        $voProperties = Map::from($makerConfiguration->properties())
+            ->map(function (array $propertyDatas) use ($makerConfiguration): array {
+                $type = $propertyDatas['type'];
 
-        $properties = array_map(fn(array $property): Property => self::defineProperty($property, $makerConfiguration), $voProperties);
-        $getters = array_map(fn(array $property): Method => self::defineGetter($property, $makerConfiguration), $voProperties);
+                if (!str_contains($type, '/')) {
+                    return $propertyDatas;
+                }
+
+                $namespaceFromPath = Str::namespaceFromPath($type, $makerConfiguration->rootDir());
+                $rootNamespace = $makerConfiguration->rootNamespace();
+                $propertyDatas['type'] = Str::prefixByRootNamespace($namespaceFromPath, $rootNamespace);
+
+                return $propertyDatas;
+            })
+            ->toArray();
+
+        $properties = array_map(fn(array $property): Property => $this->defineProperty($property, $makerConfiguration), $voProperties);
+        $getters = array_map(fn(array $property): Method => $this->defineGetter($property, $makerConfiguration), $voProperties);
         $nullableTrait = $this->nullableTrait($makerConfiguration);
 
         return parent::createInstance($makerConfiguration)
@@ -40,18 +56,17 @@ final class VoForEntityBuilder extends AbstractBuilder
             ->setComments($this->comment())
             ->setProperties($properties)
             ->setMethods(array_merge([$this->namedConstructor($voProperties, $entityNamespace)], $getters))
-            ->setImplements([$nullableTrait])
+            ->setImplements([NullableInterface::class])
             ->setTraits([
                 $nullableTrait,
                 IsTrait::class,
             ])
-
         ;
     }
 
     private function entityNamespace(MakerConfigurationInterface|VoForEntityMakerConfiguration $makerConfiguration): UnicodeString
     {
-        return UStr::create($makerConfiguration->voRelatedToAnEntityWithRootNamespace());
+        return UStr::create($makerConfiguration->relatedEntity());
     }
 
     /**
@@ -61,7 +76,8 @@ final class VoForEntityBuilder extends AbstractBuilder
      */
     private function defineGetter(array $property, MakerConfigurationInterface|VoForEntityMakerConfiguration $makerConfiguration): Method
     {
-        $propertyType = $this->correspondingTypes($makerConfiguration)[$property['type']];
+        $correspondingTypes = $this->correspondingTypes($makerConfiguration);
+        $propertyType = $correspondingTypes[$property['type']];
 
         $body = 'return $this->__FIELD_NAME__;';
         $body = Str::replace($body, '__FIELD_NAME__', $property['fieldName']);
@@ -81,14 +97,16 @@ final class VoForEntityBuilder extends AbstractBuilder
     {
         $type = $property['type'];
         $fieldNameRaw = $property['fieldName'];
+        $correspondingTypes = $this->correspondingTypes($makerConfiguration);
+        $correspondingTypes = array_combine(array_values($correspondingTypes), array_values($correspondingTypes));
 
         Assert::inArray(
             $type,
-            array_keys($this->correspondingTypes($makerConfiguration)),
-            Str::sprintf('Property "%s" should be of type %s; %s given', $fieldNameRaw, Str::implode(', ', array_keys($this->correspondingTypes($makerConfiguration))), $type)
+            $correspondingTypes,
+            Str::sprintf('Property "%s" should be of type %s; %s given', $fieldNameRaw, Str::implode(', ', $correspondingTypes), $type)
         );
 
-        $propertyType = $this->correspondingTypes($makerConfiguration)[$type];
+        $propertyType = $correspondingTypes[$type];
 
         $property = new Property(Str::property($fieldNameRaw));
         $property->setPrivate()->setType($propertyType);

@@ -7,6 +7,7 @@ use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
 use Atournayre\Bundle\MakerBundle\Config\VoForEntityMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\Config\VoForObjectMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\Helper\MakeHelper;
+use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
@@ -161,7 +162,7 @@ class MakeVo extends NewAbstractMaker
                     namespace: $this->configNamespaces->voEntity,
                     className: $namespace,
                 )
-                    ->withRelatedEntity($this->voRelatedEntity)
+                    ->withRelatedEntity(Str::prefixByRootNamespace(Str::namespaceFromPath($this->voRelatedEntity, $this->rootDir), $this->rootNamespace))
                     ->withProperties($this->voProperties)
                     ->withPropertiesAllowedTypes($this->configResources->valueObject->allowedTypes($this->filesystem)
                 )

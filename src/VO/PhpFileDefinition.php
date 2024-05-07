@@ -65,7 +65,17 @@ final class PhpFileDefinition
 
     public function setUses(array $uses): self
     {
-        $this->uses = $uses;
+        $usesWithAlias = [];
+        foreach ($uses as $use => $alias) {
+            if (is_int($use)) {
+                $use = $alias;
+                $alias = null;
+            }
+
+            $usesWithAlias[$use] = $alias;
+        }
+
+        $this->uses = $usesWithAlias;
         return $this;
     }
 
