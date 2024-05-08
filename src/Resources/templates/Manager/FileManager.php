@@ -152,7 +152,6 @@ final class FileManager implements FileManagerInterface
     }
 
     /**
-     * @return SplFileInfoCollection
      * @throws \Exception
      */
     public function listFiles(): SplFileInfoCollection
@@ -171,7 +170,6 @@ final class FileManager implements FileManagerInterface
     }
 
     /**
-     * @return SplFileInfoCollection
      * @throws \Exception
      */
     public function listDirectories(): SplFileInfoCollection

@@ -30,7 +30,6 @@ final class SymfonySendMailService implements SendMailInterface
 
     /**
      * @param $message
-     * @return RawMessage
      * @throws \InvalidArgumentException
      */
     private function adaptMessage($message): RawMessage

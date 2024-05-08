@@ -15,7 +15,6 @@ class AddAttributeBuilder extends AbstractBuilder
 
     /**
      * @param AddAttributeMakerConfiguration $makerConfiguration
-     * @return PhpFileDefinition
      */
     public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {

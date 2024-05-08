@@ -9,6 +9,7 @@ use App\Trait\IsTrait;
 use App\Trait\NotNullableTrait;
 use App\Trait\NullableTrait;
 use Atournayre\Bundle\MakerBundle\Config\VoForEntityMakerConfiguration;
+use Atournayre\Bundle\MakerBundle\DTO\PropertyDefinition;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\Helper\UStr;
 use Atournayre\Bundle\MakerBundle\VO\PhpFileDefinition;
@@ -26,22 +27,21 @@ final class VoForEntityBuilder extends AbstractBuilder
 
     /**
      * @param VoForEntityMakerConfiguration $makerConfiguration
-     * @return PhpFileDefinition
      */
     public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {
         $entityNamespace = self::entityNamespace($makerConfiguration);
         $voProperties = Map::from($makerConfiguration->properties())
-            ->map(function (array $propertyDatas) use ($makerConfiguration): array {
-                $type = $propertyDatas['type'];
+            ->map(function (PropertyDefinition $propertyDatas) use ($makerConfiguration): PropertyDefinition {
+                $type = $propertyDatas->type;
 
-                if (!str_contains($type, '/')) {
+                if ($propertyDatas->typeIsPrimitive()) {
                     return $propertyDatas;
                 }
 
                 $namespaceFromPath = Str::namespaceFromPath($type, $makerConfiguration->rootDir());
                 $rootNamespace = $makerConfiguration->rootNamespace();
-                $propertyDatas['type'] = Str::prefixByRootNamespace($namespaceFromPath, $rootNamespace);
+                $propertyDatas->type = Str::prefixByRootNamespace($namespaceFromPath, $rootNamespace);
 
                 return $propertyDatas;
             })
@@ -72,34 +72,24 @@ final class VoForEntityBuilder extends AbstractBuilder
         return UStr::create($makerConfiguration->relatedEntity());
     }
 
-    /**
-     * @param array{fieldName: string, type: string} $property
-     * @param VoForEntityMakerConfiguration $makerConfiguration
-     * @return Method
-     */
-    private function defineGetter(array $property, VoForEntityMakerConfiguration $makerConfiguration): Method
+    private function defineGetter(PropertyDefinition $property, VoForEntityMakerConfiguration $makerConfiguration): Method
     {
         $correspondingTypes = $this->correspondingTypes($makerConfiguration);
-        $propertyType = $correspondingTypes[$property['type']];
+        $propertyType = $correspondingTypes[$property->type];
 
         $body = 'return $this->__FIELD_NAME__;';
-        $body = Str::replace($body, '__FIELD_NAME__', $property['fieldName']);
+        $body = Str::replace($body, '__FIELD_NAME__', $property->fieldName);
 
-        return (new Method(Str::getter($property['fieldName'])))
+        return (new Method(Str::getter($property->fieldName)))
             ->setPublic()
             ->setReturnType($propertyType)
             ->setBody($body);
     }
 
-    /**
-     * @param array{fieldName: string, type: string} $property
-     * @param VoForEntityMakerConfiguration $makerConfiguration
-     * @return Property
-     */
-    private function defineProperty(array $property, VoForEntityMakerConfiguration $makerConfiguration): Property
+    private function defineProperty(PropertyDefinition $property, VoForEntityMakerConfiguration $makerConfiguration): Property
     {
-        $type = $property['type'];
-        $fieldNameRaw = $property['fieldName'];
+        $type = $property->type;
+        $fieldNameRaw = $property->fieldName;
         $correspondingTypes = $this->correspondingTypes($makerConfiguration);
         $correspondingTypes = array_combine(array_values($correspondingTypes), array_values($correspondingTypes));
 
@@ -118,9 +108,7 @@ final class VoForEntityBuilder extends AbstractBuilder
     }
 
     /**
-     * @param array{fieldName: string, type: string}[] $voProperties
-     * @param UnicodeString $entityNamespace
-     * @return Method
+     * @param PropertyDefinition[] $voProperties
      */
     private function namedConstructor(array $voProperties, UnicodeString $entityNamespace): Method
     {
@@ -138,7 +126,7 @@ final class VoForEntityBuilder extends AbstractBuilder
 
         foreach ($voProperties as $property) {
             $linePattern = '// $self->%s = $%s->%s();';
-            $line = Str::sprintf($linePattern, $property['fieldName'], $entityName, Str::getter($property['fieldName']));
+            $line = Str::sprintf($linePattern, $property->fieldName, $entityName, Str::getter($property->fieldName));
             $method->addBody($line);
         }
 

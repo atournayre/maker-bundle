@@ -37,7 +37,6 @@ final class Namespaces
 
     /**
      * @param array<string, string|null> $namespaces
-     * @return self
      */
     public static function fromArray(array $namespaces): self
     {

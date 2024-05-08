@@ -18,7 +18,6 @@ final class LoggerBuilder extends AbstractBuilder
 
     /**
      * @param LoggerMakerConfiguration $makerConfiguration
-     * @return PhpFileDefinition
      */
     public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {

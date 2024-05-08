@@ -19,7 +19,6 @@ class AddEventsToEntityBuilder extends FromTemplateBuilder
 
     /**
      * @param AddEventsToEntitiesMakerConfiguration $makerConfiguration
-     * @return PhpFileDefinition
      */
     public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {

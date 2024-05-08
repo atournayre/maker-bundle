@@ -38,10 +38,7 @@ class MakeDto extends AbstractMaker
     }
 
     /**
-     * @param ConsoleStyle $io
      * @param array<string, PropertyDefinition> $fields
-     * @param bool $isFirstField
-     * @return ?PropertyDefinition
      */
     private function askForNextField(ConsoleStyle $io, array $fields, bool $isFirstField): ?PropertyDefinition
     {
@@ -130,8 +127,6 @@ class MakeDto extends AbstractMaker
     }
 
     /**
-     * @param string $namespace
-     * @return MakerConfigurationCollection
      * @throws \Throwable
      */
     protected function configurations(string $namespace): MakerConfigurationCollection

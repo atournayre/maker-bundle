@@ -73,10 +73,6 @@ abstract class AbstractMaker extends \Symfony\Bundle\MakerBundle\Maker\AbstractM
         $this->updateConfig($io);
     }
 
-    /**
-     * @param string $namespace
-     * @return MakerConfigurationCollection
-     */
     abstract protected function configurations(string $namespace): MakerConfigurationCollection;
 
     protected function updateConfig(ConsoleStyle $io): void

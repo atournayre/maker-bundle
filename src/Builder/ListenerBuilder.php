@@ -19,7 +19,6 @@ final class ListenerBuilder extends AbstractBuilder
 
     /**
      * @param ListenerMakerConfiguration $makerConfiguration
-     * @return PhpFileDefinition
      */
     public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {
@@ -35,7 +34,6 @@ final class ListenerBuilder extends AbstractBuilder
     }
 
     /**
-     * @param ListenerMakerConfiguration $makerConfiguration
      * @return array<Attribute>
      */
     private function attributes(ListenerMakerConfiguration $makerConfiguration): array

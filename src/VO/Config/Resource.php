@@ -21,7 +21,6 @@ final class Resource
 
     /**
      * @param array<string, array<string, string>> $resource
-     * @return self
      */
     public static function fromArray(array $resource): self
     {

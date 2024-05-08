@@ -16,7 +16,6 @@ final class BundleConfiguration
 
     /**
      * @param array{root_namespace: string, namespaces: array<string, string|null>, resources: array<string, array<string, array<string, string>>>, directories: array<string, string>} $data
-     * @return self
      */
     public static function fromArray(array $data): self
     {

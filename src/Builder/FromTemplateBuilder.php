@@ -16,7 +16,6 @@ class FromTemplateBuilder extends AbstractBuilder
     }
 
     /**
-     * @param string|null $comment
      * @return string[]
      */
     private function comments(?string $comment): array
@@ -38,7 +37,6 @@ class FromTemplateBuilder extends AbstractBuilder
 
     /**
      * @param FromTemplateMakerConfiguration $makerConfiguration
-     * @return PhpFileDefinition
      */
     public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {

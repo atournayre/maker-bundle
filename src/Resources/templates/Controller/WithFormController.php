@@ -32,7 +32,6 @@ final class WithFormController extends AbstractControllerWithForm
 
     /**
      * @param EntityNamespace $entity
-     * @param ContextInterface $context
      * @return mixed
      */
     protected function createVo($entity, ContextInterface $context)

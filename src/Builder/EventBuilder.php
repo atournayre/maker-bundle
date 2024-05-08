@@ -20,7 +20,6 @@ final class EventBuilder extends AbstractBuilder
 
     /**
      * @param EventMakerConfiguration $makerConfiguration
-     * @return PhpFileDefinition
      */
     public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {
@@ -44,8 +43,6 @@ final class EventBuilder extends AbstractBuilder
 
     /**
      * @param PropertyDefinition[] $properties
-     * @param EventMakerConfiguration $makerConfiguration
-     * @return Method
      */
     private function constructor(array $properties, EventMakerConfiguration $makerConfiguration): Method
     {
@@ -65,8 +62,6 @@ final class EventBuilder extends AbstractBuilder
 
     /**
      * @param PropertyDefinition[] $eventProperties
-     * @param EventMakerConfiguration $makerConfiguration
-     * @return Method
      */
     private function namedConstructor(array $eventProperties, EventMakerConfiguration $makerConfiguration): Method
     {

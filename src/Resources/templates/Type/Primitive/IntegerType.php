@@ -29,8 +29,6 @@ class IntegerType implements ScalarObjectInterface
 
     /**
      * @param int|string|float $value
-     * @param int|null $precision
-     * @return self
      */
     public static function create($value, ?int $precision = null): self
     {

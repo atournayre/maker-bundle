@@ -12,8 +12,6 @@ use Webmozart\Assert\Assert;
 class SymfonyEmailAdapter
 {
     /**
-     * @param Email $email
-     * @return SymfonyEmail
      * @throws \InvalidArgumentException
      */
     public static function fromMessage(Email $email): SymfonyEmail
@@ -50,7 +48,6 @@ class SymfonyEmailAdapter
     }
 
     /**
-     * @param EmailAddressCollection $emailAddressCollection
      * @return array|Address[]
      */
     private static function collectionToAddresses(EmailAddressCollection $emailAddressCollection): array

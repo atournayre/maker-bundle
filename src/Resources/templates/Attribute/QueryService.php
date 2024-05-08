@@ -7,9 +7,4 @@ namespace App\Attribute;
 class QueryService
 {
 	public readonly string $serviceName;
-
-
-	function __construct(string $serviceName)
-	{
-	}
 }

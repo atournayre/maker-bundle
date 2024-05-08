@@ -17,7 +17,6 @@ class ControllerBuilder extends FromTemplateBuilder
 
     /**
      * @param ControllerMakerConfiguration $makerConfiguration
-     * @return PhpFileDefinition
      */
     public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {

@@ -85,9 +85,7 @@ class UStr
     }
 
     /**
-     * @param string $format
      * @param string ...$args
-     * @return UnicodeString
      */
     public static function sprintf(string $format, ...$args): UnicodeString
     {
@@ -95,9 +93,7 @@ class UStr
     }
 
     /**
-     * @param string $glue
      * @param array<string> $pieces
-     * @return UnicodeString
      */
     public static function implode(string $glue, array $pieces): UnicodeString
     {

@@ -15,7 +15,6 @@ final class InterfaceBuilder extends AbstractBuilder
 
     /**
      * @param InterfaceMakerConfiguration $makerConfiguration
-     * @return PhpFileDefinition
      */
     public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {

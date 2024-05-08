@@ -27,7 +27,6 @@ final class ServiceQueryBuilder extends AbstractBuilder
 
     /**
      * @param ServiceQueryMakerConfiguration $makerConfiguration
-     * @return PhpFileDefinition
      */
     public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {
@@ -80,8 +79,6 @@ final class ServiceQueryBuilder extends AbstractBuilder
     }
 
     /**
-     * @param string $interface
-     * @param string $objectType
      * @return array<Method>
      */
     private function implementationOfInterface(string $interface, string $objectType): array

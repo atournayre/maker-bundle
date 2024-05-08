@@ -23,7 +23,6 @@ final class DtoBuilder extends AbstractBuilder
 
     /**
      * @param DtoMakerConfiguration $makerConfiguration
-     * @return PhpFileDefinition
      */
     public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {
@@ -45,11 +44,6 @@ final class DtoBuilder extends AbstractBuilder
             ;
     }
 
-    /**
-     * @param PropertyDefinition $propertyDatas
-     * @param DtoMakerConfiguration $configuration
-     * @return Property
-     */
     private function property(PropertyDefinition $propertyDatas, DtoMakerConfiguration $configuration): Property
     {
         $type = $propertyDatas->type;

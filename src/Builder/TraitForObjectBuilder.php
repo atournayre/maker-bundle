@@ -20,7 +20,6 @@ final class TraitForObjectBuilder extends AbstractBuilder
 
     /**
      * @param TraitForObjectMakerConfiguration $makerConfiguration
-     * @return PhpFileDefinition
      */
     public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {
@@ -43,7 +42,6 @@ final class TraitForObjectBuilder extends AbstractBuilder
 
     /**
      * @param PropertyDefinition[] $traitProperties
-     * @param TraitForObjectMakerConfiguration $makerConfiguration
      * @return Method[]
      */
     private function gettersForObject(array $traitProperties, TraitForObjectMakerConfiguration $makerConfiguration): array
@@ -66,7 +64,6 @@ final class TraitForObjectBuilder extends AbstractBuilder
 
     /**
      * @param PropertyDefinition[] $traitProperties
-     * @param TraitForObjectMakerConfiguration $makerConfiguration
      * @return Method[]
      */
     private function withersForObject(array $traitProperties, TraitForObjectMakerConfiguration $makerConfiguration): array
@@ -91,11 +88,6 @@ final class TraitForObjectBuilder extends AbstractBuilder
         return $methods ?? [];
     }
 
-    /**
-     * @param PropertyDefinition $propertyDatas
-     * @param TraitForObjectMakerConfiguration $makerConfiguration
-     * @return Property
-     */
     private function defineProperty(PropertyDefinition $propertyDatas, TraitForObjectMakerConfiguration $makerConfiguration): Property
     {
         $type = $propertyDatas->type;

@@ -34,10 +34,6 @@ class MakeAddEventsToEntities extends AbstractMaker
         return 'Add events to entities';
     }
 
-    /**
-     * @param string $namespace
-     * @return MakerConfigurationCollection
-     */
     protected function configurations(string $namespace): MakerConfigurationCollection
     {
         $configurations = $this->entitiesWithoutEvents()
@@ -56,9 +52,6 @@ class MakeAddEventsToEntities extends AbstractMaker
         return MakerConfigurationCollection::createAsList($configurations);
     }
 
-    /**
-     * @return SplFileInfoCollection
-     */
     private function entitiesWithoutEvents(): SplFileInfoCollection
     {
         $entityDirectory = $this->bundleConfiguration->directories->entity;

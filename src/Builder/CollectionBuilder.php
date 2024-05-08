@@ -18,7 +18,6 @@ final class CollectionBuilder extends AbstractBuilder
 
     /**
      * @param CollectionMakerConfiguration $makerConfiguration
-     * @return PhpFileDefinition
      */
     public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {

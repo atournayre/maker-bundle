@@ -93,8 +93,6 @@ class MakeController extends AbstractMaker
     }
 
     /**
-     * @param string $namespace
-     * @return MakerConfigurationCollection
      * @throws \Throwable
      */
     protected function configurations(string $namespace): MakerConfigurationCollection

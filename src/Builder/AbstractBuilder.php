@@ -14,7 +14,6 @@ abstract class AbstractBuilder implements PhpFileBuilderInterface
 
     /**
      * @param MakerConfigurationInterface $makerConfiguration
-     * @return PhpFileDefinition
      */
     public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {
@@ -27,7 +26,6 @@ abstract class AbstractBuilder implements PhpFileBuilderInterface
     }
 
     /**
-     * @param MakerConfigurationInterface $makerConfiguration
      * @return array<string, string>
      */
     protected function correspondingTypes(MakerConfigurationInterface $makerConfiguration): array

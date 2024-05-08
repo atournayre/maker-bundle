@@ -22,7 +22,6 @@ final class VoForObjectBuilder extends AbstractBuilder
 
     /**
      * @param VoForObjectMakerConfiguration $makerConfiguration
-     * @return PhpFileDefinition
      */
     public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {
@@ -56,8 +55,6 @@ final class VoForObjectBuilder extends AbstractBuilder
 
     /**
      * @param PropertyDefinition[] $voProperties
-     * @param VoForObjectMakerConfiguration $makerConfiguration
-     * @return Method
      */
     private function constructor(array $voProperties, VoForObjectMakerConfiguration $makerConfiguration): Method
     {
@@ -75,8 +72,6 @@ final class VoForObjectBuilder extends AbstractBuilder
 
     /**
      * @param PropertyDefinition[] $voProperties
-     * @param VoForObjectMakerConfiguration $makerConfiguration
-     * @return Method
      */
     private function namedConstructor(array $voProperties, VoForObjectMakerConfiguration $makerConfiguration): Method
     {
@@ -102,11 +97,6 @@ final class VoForObjectBuilder extends AbstractBuilder
         return $method;
     }
 
-    /**
-     * @param PropertyDefinition $property
-     * @param VoForObjectMakerConfiguration $makerConfiguration
-     * @return Method
-     */
     private function defineGetter(PropertyDefinition $property, VoForObjectMakerConfiguration $makerConfiguration): Method
     {
         $propertyType = $this->correspondingTypes($makerConfiguration)[$property->type];
@@ -117,11 +107,6 @@ final class VoForObjectBuilder extends AbstractBuilder
             ->setBody('return $this->' . $property->fieldName . ';');
     }
 
-    /**
-     * @param PropertyDefinition $property
-     * @param VoForObjectMakerConfiguration $makerConfiguration
-     * @return Method
-     */
     private function defineWither(PropertyDefinition $property, VoForObjectMakerConfiguration $makerConfiguration): Method
     {
         $propertyType = $this->correspondingTypes($makerConfiguration)[$property->type];

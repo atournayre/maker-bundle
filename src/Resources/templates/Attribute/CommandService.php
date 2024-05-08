@@ -7,9 +7,4 @@ namespace App\Attribute;
 class CommandService
 {
 	public readonly string $serviceName;
-
-
-	function __construct(string $serviceName)
-	{
-	}
 }

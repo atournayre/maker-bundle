@@ -18,7 +18,6 @@ final class CommandBuilder extends AbstractBuilder
 
     /**
      * @param CommandMakerConfiguration $makerConfiguration
-     * @return PhpFileDefinition
      */
     public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {
@@ -41,7 +40,6 @@ final class CommandBuilder extends AbstractBuilder
     }
 
     /**
-     * @param CommandMakerConfiguration $makerConfiguration
      * @return array<Attribute>
      */
     private function attributes(CommandMakerConfiguration $makerConfiguration): array

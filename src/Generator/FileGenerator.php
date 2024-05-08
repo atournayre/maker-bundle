@@ -18,10 +18,6 @@ final class FileGenerator
     {
     }
 
-    /**
-     * @param MakerConfigurationCollection $configurations
-     * @return void
-     */
     public function generate(MakerConfigurationCollection $configurations): void
     {
         $makerConfigurationCollection = $this->createMakerConfigurationCollectionWithSourceCode($configurations);

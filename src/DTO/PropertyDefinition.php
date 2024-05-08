@@ -15,7 +15,6 @@ final class PropertyDefinition
 
     /**
      * @param array{fieldName: string, type: string, nullable?: bool} $data
-     * @return self
      */
     public static function fromArray(array $data): self
     {
@@ -24,5 +23,15 @@ final class PropertyDefinition
             $data['type'],
             $data['nullable'] ?? false
         );
+    }
+
+    public function typeIsPrimitive(): bool
+    {
+        return !str_contains($this->type, '\\');
+    }
+
+    public function typeIsDateTimeInterface(): bool
+    {
+        return $this->type === '\DateTimeInterface';
     }
 }

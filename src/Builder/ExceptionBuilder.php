@@ -16,7 +16,6 @@ final class ExceptionBuilder extends AbstractBuilder
 
     /**
      * @param ExceptionMakerConfiguration $makerConfiguration
-     * @return PhpFileDefinition
      */
     public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {

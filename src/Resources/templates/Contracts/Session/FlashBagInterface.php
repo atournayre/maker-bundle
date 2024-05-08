@@ -20,8 +20,6 @@ interface FlashBagInterface
 
     /**
      * Use with caution, this method is used to display error messages from exceptions.
-     * @param \Exception $exception
-     * @return void
      */
     public function fromException(\Exception $exception): void;
 }

@@ -74,9 +74,7 @@ class Str
     }
 
     /**
-     * @param string $format
      * @param string ...$args
-     * @return string
      */
     public static function sprintf(string $format, ...$args): string
     {
@@ -84,9 +82,7 @@ class Str
     }
 
     /**
-     * @param string $glue
      * @param array<string> $pieces
-     * @return string
      */
     public static function implode(string $glue, array $pieces): string
     {
