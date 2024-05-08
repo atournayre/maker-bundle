@@ -14,9 +14,9 @@ final class InterfaceBuilder extends AbstractBuilder
         return $makerConfigurationClassName === InterfaceMakerConfiguration::class;
     }
 
-    public function createInstance(MakerConfigurationInterface|InterfaceMakerConfiguration $makerConfiguration): PhpFileDefinition
+    public function createPhpFileDefinition(MakerConfigurationInterface|InterfaceMakerConfiguration $makerConfiguration): PhpFileDefinition
     {
-        return parent::createInstance($makerConfiguration)
+        return parent::createPhpFileDefinition($makerConfiguration)
             ->setInterface()
         ;
     }

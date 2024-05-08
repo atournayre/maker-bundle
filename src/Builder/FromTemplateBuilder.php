@@ -33,7 +33,7 @@ class FromTemplateBuilder extends AbstractBuilder
         ];
     }
 
-    public function createInstance(MakerConfigurationInterface|FromTemplateMakerConfiguration $makerConfiguration): PhpFileDefinition
+    public function createPhpFileDefinition(MakerConfigurationInterface|FromTemplateMakerConfiguration $makerConfiguration): PhpFileDefinition
     {
         $sourceCode = $makerConfiguration->sourceCode();
 
@@ -45,7 +45,7 @@ class FromTemplateBuilder extends AbstractBuilder
 
         $comments = $this->comments($class->getComment());
 
-        $phpFileDefinition = parent::createInstance($makerConfiguration)
+        $phpFileDefinition = parent::createPhpFileDefinition($makerConfiguration)
             ->setStrictTypes($phpFile->hasStrictTypes());
 
         if ($class->isInterface()) {

@@ -15,9 +15,9 @@ final class ExceptionBuilder extends AbstractBuilder
         return $makerConfigurationClassName === ExceptionMakerConfiguration::class;
     }
 
-    public function createInstance(MakerConfigurationInterface|ExceptionMakerConfiguration $makerConfiguration): PhpFileDefinition
+    public function createPhpFileDefinition(MakerConfigurationInterface|ExceptionMakerConfiguration $makerConfiguration): PhpFileDefinition
     {
-        return parent::createInstance($makerConfiguration)
+        return parent::createPhpFileDefinition($makerConfiguration)
             ->setExtends($makerConfiguration->type())
             ->setMethods([
                 $this->namedConstructor($makerConfiguration),

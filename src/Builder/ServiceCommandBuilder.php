@@ -26,7 +26,7 @@ final class ServiceCommandBuilder extends AbstractBuilder
         return $makerConfigurationClassName === ServiceCommandMakerConfiguration::class;
     }
 
-    public function createInstance(MakerConfigurationInterface|ServiceCommandMakerConfiguration $makerConfiguration): PhpFileDefinition
+    public function createPhpFileDefinition(MakerConfigurationInterface|ServiceCommandMakerConfiguration $makerConfiguration): PhpFileDefinition
     {
         $voParameter = $makerConfiguration->vo();
 
@@ -36,7 +36,7 @@ final class ServiceCommandBuilder extends AbstractBuilder
             ]),
         ];
 
-        return parent::createInstance($makerConfiguration)
+        return parent::createPhpFileDefinition($makerConfiguration)
             ->setReadonly()
             ->setUses([
                 FailFast::class,

@@ -14,9 +14,9 @@ class AddAttributeBuilder extends AbstractBuilder
         return $makerConfigurationClassName === AddAttributeMakerConfiguration::class;
     }
 
-    public function createInstance(MakerConfigurationInterface|AddAttributeMakerConfiguration $makerConfiguration): PhpFileDefinition
+    public function createPhpFileDefinition(MakerConfigurationInterface|AddAttributeMakerConfiguration $makerConfiguration): PhpFileDefinition
     {
-        return parent::createInstance($makerConfiguration)
+        return parent::createPhpFileDefinition($makerConfiguration)
             ->setUses([$makerConfiguration->serviceNamespace()])
             ->setAttributes($makerConfiguration->attributes())
         ;

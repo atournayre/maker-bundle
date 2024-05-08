@@ -37,6 +37,7 @@ final class PhpFileDefinition
 
     public static function create(string $namespace, string $className): self
     {
+        $className = ucfirst($className);
         return new self($namespace, $className);
     }
 

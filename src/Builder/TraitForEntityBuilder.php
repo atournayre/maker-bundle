@@ -20,7 +20,7 @@ final class TraitForEntityBuilder extends AbstractBuilder
         return $makerConfigurationClassName === TraitForEntityMakerConfiguration::class;
     }
 
-    public function createInstance(MakerConfigurationInterface|TraitForEntityMakerConfiguration $makerConfiguration): PhpFileDefinition
+    public function createPhpFileDefinition(MakerConfigurationInterface|TraitForEntityMakerConfiguration $makerConfiguration): PhpFileDefinition
     {
         $traitProperties = Map::from($makerConfiguration->properties())
             ->map(function (array $propertyDatas) use ($makerConfiguration): array {
@@ -57,7 +57,7 @@ final class TraitForEntityBuilder extends AbstractBuilder
             $traitProperties
         );
 
-        return parent::createInstance($makerConfiguration)
+        return parent::createPhpFileDefinition($makerConfiguration)
             ->setTrait()
             ->setUses($uses)
             ->setProperties($properties)

@@ -18,9 +18,9 @@ class AddEventsToEntityBuilder extends FromTemplateBuilder
         return $makerConfigurationClassName === AddEventsToEntitiesMakerConfiguration::class;
     }
 
-    public function createInstance(MakerConfigurationInterface|AddEventsToEntitiesMakerConfiguration $makerConfiguration): PhpFileDefinition
+    public function createPhpFileDefinition(MakerConfigurationInterface|AddEventsToEntitiesMakerConfiguration $makerConfiguration): PhpFileDefinition
     {
-        $phpFileDefinition = parent::createInstance($makerConfiguration);
+        $phpFileDefinition = parent::createPhpFileDefinition($makerConfiguration);
 
         $phpFileDefinition->addUse(HasEventsInterface::class);
         $phpFileDefinition->addUse(EventCollection::class);

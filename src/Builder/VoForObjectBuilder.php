@@ -20,7 +20,7 @@ final class VoForObjectBuilder extends AbstractBuilder
         return $makerConfigurationClassName === VoForObjectMakerConfiguration::class;
     }
 
-    public function createInstance(MakerConfigurationInterface|VoForObjectMakerConfiguration $makerConfiguration): PhpFileDefinition
+    public function createPhpFileDefinition(MakerConfigurationInterface|VoForObjectMakerConfiguration $makerConfiguration): PhpFileDefinition
     {
         $voProperties = $makerConfiguration->properties();
 
@@ -29,7 +29,7 @@ final class VoForObjectBuilder extends AbstractBuilder
 
         $nullableTrait = $this->nullableTrait($makerConfiguration);
 
-        return parent::createInstance($makerConfiguration)
+        return parent::createPhpFileDefinition($makerConfiguration)
             ->setUses([
                 \Webmozart\Assert\Assert::class,
             ])

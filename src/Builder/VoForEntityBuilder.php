@@ -25,7 +25,7 @@ final class VoForEntityBuilder extends AbstractBuilder
         return $makerConfigurationClassName === VoForEntityMakerConfiguration::class;
     }
 
-    public function createInstance(MakerConfigurationInterface|VoForEntityMakerConfiguration $makerConfiguration): PhpFileDefinition
+    public function createPhpFileDefinition(MakerConfigurationInterface|VoForEntityMakerConfiguration $makerConfiguration): PhpFileDefinition
     {
         $entityNamespace = self::entityNamespace($makerConfiguration);
         $voProperties = Map::from($makerConfiguration->properties())
@@ -48,7 +48,7 @@ final class VoForEntityBuilder extends AbstractBuilder
         $getters = array_map(fn(array $property): Method => $this->defineGetter($property, $makerConfiguration), $voProperties);
         $nullableTrait = $this->nullableTrait($makerConfiguration);
 
-        return parent::createInstance($makerConfiguration)
+        return parent::createPhpFileDefinition($makerConfiguration)
             ->setUses([
                 Assert::class,
                 $entityNamespace->toString(),

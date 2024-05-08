@@ -18,7 +18,7 @@ final class TraitForObjectBuilder extends AbstractBuilder
         return $makerConfigurationClassName === TraitForObjectMakerConfiguration::class;
     }
 
-    public function createInstance(MakerConfigurationInterface|TraitForObjectMakerConfiguration $makerConfiguration): PhpFileDefinition
+    public function createPhpFileDefinition(MakerConfigurationInterface|TraitForObjectMakerConfiguration $makerConfiguration): PhpFileDefinition
     {
         $traitProperties = $makerConfiguration->properties();
 
@@ -27,7 +27,7 @@ final class TraitForObjectBuilder extends AbstractBuilder
             $traitProperties
         );
 
-        return parent::createInstance($makerConfiguration)
+        return parent::createPhpFileDefinition($makerConfiguration)
             ->setTrait()
             ->setProperties($properties)
             ->setMethods([

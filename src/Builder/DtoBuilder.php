@@ -21,7 +21,7 @@ final class DtoBuilder extends AbstractBuilder
         return $makerConfigurationClassName === DtoMakerConfiguration::class;
     }
 
-    public function createInstance(MakerConfigurationInterface|DtoMakerConfiguration $makerConfiguration): PhpFileDefinition
+    public function createPhpFileDefinition(MakerConfigurationInterface|DtoMakerConfiguration $makerConfiguration): PhpFileDefinition
     {
         $properties = array_map(
             fn (array $propertyDatas): Property => self::property($propertyDatas, $makerConfiguration),
@@ -30,7 +30,7 @@ final class DtoBuilder extends AbstractBuilder
 
         $nullableTrait = $this->nullableTrait($makerConfiguration);
 
-        return parent::createInstance($makerConfiguration)
+        return parent::createPhpFileDefinition($makerConfiguration)
             ->setProperties($properties)
             ->setMethods([
                 $this->namedConstructorFromArray($makerConfiguration),

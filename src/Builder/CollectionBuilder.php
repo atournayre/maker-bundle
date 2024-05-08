@@ -17,12 +17,12 @@ final class CollectionBuilder extends AbstractBuilder
         return $makerConfigurationClassName === CollectionMakerConfiguration::class;
     }
 
-    public function createInstance(MakerConfigurationInterface|CollectionMakerConfiguration $makerConfiguration): PhpFileDefinition
+    public function createPhpFileDefinition(MakerConfigurationInterface|CollectionMakerConfiguration $makerConfiguration): PhpFileDefinition
     {
         $extends = $this->extendsClass($makerConfiguration);
         $collectionType = $this->collectionType($makerConfiguration);
 
-        return parent::createInstance($makerConfiguration)
+        return parent::createPhpFileDefinition($makerConfiguration)
             ->setExtends($extends)
             ->setUses([
                 $extends,

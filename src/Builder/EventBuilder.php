@@ -18,11 +18,11 @@ final class EventBuilder extends AbstractBuilder
         return $makerConfigurationClassName === EventMakerConfiguration::class;
     }
 
-    public function createInstance(MakerConfigurationInterface|EventMakerConfiguration $makerConfiguration): PhpFileDefinition
+    public function createPhpFileDefinition(MakerConfigurationInterface|EventMakerConfiguration $makerConfiguration): PhpFileDefinition
     {
         $eventProperties = $makerConfiguration->properties();
 
-        return parent::createInstance($makerConfiguration)
+        return parent::createPhpFileDefinition($makerConfiguration)
             ->setUses([
                 \Symfony\Contracts\EventDispatcher\Event::class,
                 \Webmozart\Assert\Assert::class,

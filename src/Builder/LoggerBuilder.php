@@ -17,9 +17,9 @@ final class LoggerBuilder extends AbstractBuilder
         return $makerConfigurationClassName === LoggerMakerConfiguration::class;
     }
 
-    public function createInstance(MakerConfigurationInterface|LoggerMakerConfiguration $makerConfiguration): PhpFileDefinition
+    public function createPhpFileDefinition(MakerConfigurationInterface|LoggerMakerConfiguration $makerConfiguration): PhpFileDefinition
     {
-        return parent::createInstance($makerConfiguration)
+        return parent::createPhpFileDefinition($makerConfiguration)
             ->setExtends(AbstractLogger::class)
             ->setImplements([
                 LoggerInterface::class,

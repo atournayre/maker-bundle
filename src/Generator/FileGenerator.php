@@ -5,6 +5,7 @@ namespace Atournayre\Bundle\MakerBundle\Generator;
 
 use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfiguration;
+use Atournayre\Bundle\MakerBundle\Contracts\PhpFileBuilderInterface;
 use Atournayre\Bundle\MakerBundle\Printer\PhpFilePrinter;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -39,12 +40,13 @@ final class FileGenerator
         foreach ($makerConfigurationCollection->values() as $configuration) {
             $configurationClass = get_class($configuration);
 
+            /** @var PhpFileBuilderInterface $builder */
             foreach ($this->builders as $builder) {
                 if (!$builder->supports($configurationClass)) {
                     continue;
                 }
 
-                $phpFileDefinition = $builder->createInstance($configuration);
+                $phpFileDefinition = $builder->createPhpFileDefinition($configuration);
                 $sourceCode = PhpFilePrinter::create($phpFileDefinition)->print();
                 $newMakerConfigurationCollection[$configuration->fqcn] = $configuration->withSourceCode($sourceCode);
             }

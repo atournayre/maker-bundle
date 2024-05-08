@@ -17,9 +17,9 @@ final class CommandBuilder extends AbstractBuilder
         return $makerConfigurationClassName === CommandMakerConfiguration::class;
     }
 
-    public function createInstance(MakerConfigurationInterface|CommandMakerConfiguration $makerConfiguration): PhpFileDefinition
+    public function createPhpFileDefinition(MakerConfigurationInterface|CommandMakerConfiguration $makerConfiguration): PhpFileDefinition
     {
-        return parent::createInstance($makerConfiguration)
+        return parent::createPhpFileDefinition($makerConfiguration)
             ->setUses([
                 \Symfony\Component\Console\Attribute\AsCommand::class,
                 \Symfony\Component\Console\Input\InputInterface::class,

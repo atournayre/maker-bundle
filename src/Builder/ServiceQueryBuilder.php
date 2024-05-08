@@ -26,7 +26,7 @@ final class ServiceQueryBuilder extends AbstractBuilder
         return $makerConfigurationClassName === ServiceQueryMakerConfiguration::class;
     }
 
-    public function createInstance(MakerConfigurationInterface|ServiceQueryMakerConfiguration $makerConfiguration): PhpFileDefinition
+    public function createPhpFileDefinition(MakerConfigurationInterface|ServiceQueryMakerConfiguration $makerConfiguration): PhpFileDefinition
     {
         $voParameter = $makerConfiguration->vo();
 
@@ -36,7 +36,7 @@ final class ServiceQueryBuilder extends AbstractBuilder
             ]),
         ];
 
-        return parent::createInstance($makerConfiguration)
+        return parent::createPhpFileDefinition($makerConfiguration)
             ->setReadonly()
             ->setUses([
                 FailFast::class,

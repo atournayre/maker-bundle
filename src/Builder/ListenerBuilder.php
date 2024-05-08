@@ -18,11 +18,11 @@ final class ListenerBuilder extends AbstractBuilder
         return $makerConfigurationClassName === ListenerMakerConfiguration::class;
     }
 
-    public function createInstance(MakerConfigurationInterface|ListenerMakerConfiguration $makerConfiguration): PhpFileDefinition
+    public function createPhpFileDefinition(MakerConfigurationInterface|ListenerMakerConfiguration $makerConfiguration): PhpFileDefinition
     {
         $eventNamespace = $makerConfiguration->eventNamespace();
 
-        return parent::createInstance($makerConfiguration)
+        return parent::createPhpFileDefinition($makerConfiguration)
             ->setUses([$eventNamespace])
             ->setAttributes($this->attributes($makerConfiguration))
             ->setMethods([

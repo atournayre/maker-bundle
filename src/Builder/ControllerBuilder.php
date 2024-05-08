@@ -16,9 +16,9 @@ class ControllerBuilder extends FromTemplateBuilder
         return $makerConfigurationClassName === ControllerMakerConfiguration::class;
     }
 
-    public function createInstance(MakerConfigurationInterface|ControllerMakerConfiguration $makerConfiguration): PhpFileDefinition
+    public function createPhpFileDefinition(MakerConfigurationInterface|ControllerMakerConfiguration $makerConfiguration): PhpFileDefinition
     {
-        $phpFileDefinition = parent::createInstance($makerConfiguration);
+        $phpFileDefinition = parent::createPhpFileDefinition($makerConfiguration);
         $phpFileDefinition->renameClass($makerConfiguration->classname());
         $phpFileDefinition->updateMethod('createVo', $this->updateVoMethod($phpFileDefinition->getMethod('createVo'), $makerConfiguration));
         $phpFileDefinition->updateMethod('createForm', $this->updateFormMethod($phpFileDefinition->getMethod('createForm'), $makerConfiguration));
