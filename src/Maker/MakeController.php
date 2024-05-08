@@ -43,7 +43,7 @@ class MakeController extends AbstractMaker
     {
         parent::interact($input, $io, $command);
 
-        if (empty($this->entities())) {
+        if ($this->entities() === []) {
             $io->error('No entity found in the Entity directory');
             return;
         }
@@ -51,12 +51,12 @@ class MakeController extends AbstractMaker
         $questionControllerRelatedEntity = new ChoiceQuestion('Choose the entity related to this Controller', $this->entities());
         $this->controllerRelatedEntity = $io->askQuestion($questionControllerRelatedEntity);
 
-        if (empty($this->formTypes())) {
+        if ($this->formTypes() === []) {
             $io->error('No form types found in the FormType directory');
             return;
         }
 
-        if (empty($this->vos())) {
+        if ($this->vos() === []) {
             $io->error('No VO found in the VO directory');
             return;
         }

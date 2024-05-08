@@ -31,7 +31,7 @@ final class QueryService implements QueryServiceInterface
 	function fetch($object, ContextInterface $context, ?string $service = null)
 	{
 		if (!$this->supports($object, $service)) {
-		    return;
+		    return null;
 		}
 
 		$service ??= $this->getServiceName($object);
@@ -88,7 +88,7 @@ final class QueryService implements QueryServiceInterface
 	{
 		$service ??= $this->getServiceName($object);
 
-		if (empty($service)) {
+		if ($service === '' || $service === '0') {
 		    return false;
 		}
 
@@ -105,7 +105,7 @@ final class QueryService implements QueryServiceInterface
 	{
 		$serviceName = AttributeHelper::getParameter($object, AttributeQueryService::class, 'serviceName');
 
-		if (empty($serviceName)) {
+		if ($serviceName === null || $serviceName === '' || $serviceName === '0') {
 		    throw new \LogicException(sprintf('The Value Object %s requested a QueryService but does not have the attribute QueryService.', get_class($object)));
 		}
 

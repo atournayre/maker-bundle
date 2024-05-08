@@ -46,12 +46,12 @@ final class TraitForEntityBuilder extends AbstractBuilder
         ];
 
         $nullableProperties = array_filter($traitProperties, fn(PropertyDefinition $property) => !$property->nullable);
-        if (!empty($nullableProperties)) {
+        if ($nullableProperties !== []) {
             $uses[\Webmozart\Assert\Assert::class] = null;
         }
 
         $dateTimeInterfaceProperties = array_filter($traitProperties, fn(PropertyDefinition $property) => $property->typeIsDateTimeInterface());
-        if (!empty($dateTimeInterfaceProperties)) {
+        if ($dateTimeInterfaceProperties !== []) {
             $uses[\Doctrine\DBAL\Types\Types::class] = null;
         }
 
@@ -164,7 +164,7 @@ final class TraitForEntityBuilder extends AbstractBuilder
         ];
 
         $propertyType = $this->matchDoctrineType($clone->getType());
-        if (null !== $propertyType) {
+        if ($propertyType instanceof \Nette\PhpGenerator\Literal) {
             $columnArgs['type'] = $propertyType;
         }
 

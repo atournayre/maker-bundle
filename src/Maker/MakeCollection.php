@@ -54,7 +54,7 @@ class MakeCollection extends AbstractMaker
         $questionImmutablility = new Question('Collection must be immutable? (yes/no)', 'yes');
         $this->collectionIsImmutable = $io->askQuestion($questionImmutablility) === 'yes';
 
-        if (empty($this->relatedObjects())) {
+        if ($this->relatedObjects() === []) {
             $io->error('No object found in the Entity, DTO or VO directories');
             return;
         }

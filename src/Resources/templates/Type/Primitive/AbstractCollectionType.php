@@ -43,7 +43,7 @@ abstract class AbstractCollectionType implements \ArrayAccess, \Countable
             return;
         }
 
-        self::assertType($value, \gettype($firstElement));
+        $this->assertType($value, \gettype($firstElement));
     }
 
     public function offsetSet($offset, $value): void
@@ -80,7 +80,7 @@ abstract class AbstractCollectionType implements \ArrayAccess, \Countable
         return new ArrayCollection($this->collection);
     }
 
-    private static function assertType($value, string $type, string $message = ''): void
+    private function assertType($value, string $type, string $message = ''): void
     {
         switch ($type) {
             case 'string':

@@ -79,13 +79,13 @@ final class EmailBody implements NullableInterface
 
     public function isEmpty(): bool
     {
-        return empty($this->body);
+        return $this->body === '' || $this->body === '0';
     }
 
 
     public function isNotEmpty(): bool
     {
-        return !empty($this->body);
+        return $this->body !== '' && $this->body !== '0';
     }
 
     public function length(): int

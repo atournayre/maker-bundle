@@ -104,7 +104,7 @@ class MakeVo extends AbstractMaker
         $voIsRelatedToEntity = $io->askQuestion($questionVoIsRelatedToEntity);
 
         if ('yes' === $voIsRelatedToEntity) {
-            if (empty($this->entities())) {
+            if ($this->entities() === []) {
                 $io->error('No entity found in the Entity directory');
                 return;
             }
@@ -121,7 +121,7 @@ class MakeVo extends AbstractMaker
 
             $isFirstField = false;
 
-            if (null === $newField) {
+            if (!$newField instanceof \Atournayre\Bundle\MakerBundle\DTO\PropertyDefinition) {
                 break;
             }
 

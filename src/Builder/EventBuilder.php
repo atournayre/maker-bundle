@@ -87,7 +87,7 @@ final class EventBuilder extends AbstractBuilder
 
         $method->addBody('// Add assertions');
         $method->addBody('');
-        $method->addBody('return (new self(' . ($selfContent ? '$'.$selfContent : '') . '))');
+        $method->addBody('return (new self(' . ($selfContent !== '' && $selfContent !== '0' ? '$'.$selfContent : '') . '))');
         $method->addBody('    ->withContext($context)');
         $method->addBody(';');
 

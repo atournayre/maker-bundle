@@ -61,7 +61,7 @@ class Email implements NullableInterface
     {
         $errors = [];
 
-        if (null === $this->to || $this->to->hasNoElement()) {
+        if (!$this->to instanceof \App\Collection\Mail\EmailAddressCollection || $this->to->hasNoElement()) {
             $errors['to'] = 'validation.email.to.empty';
         }
 

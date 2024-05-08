@@ -83,7 +83,7 @@ final class CommandService implements CommandServiceInterface
 	{
 		$service ??= $this->getServiceName($object);
 
-		if (empty($service)) {
+		if ($service === '' || $service === '0') {
 		    return false;
 		}
 
@@ -100,7 +100,7 @@ final class CommandService implements CommandServiceInterface
 	{
 		$serviceName = AttributeHelper::getParameter($object, AttributeCommandService::class, 'serviceName');
 
-		if (empty($serviceName)) {
+		if ($serviceName === null || $serviceName === '' || $serviceName === '0') {
 		    throw new \LogicException(sprintf('The Value Object %s requested a CommandService but does not have the attribute CommandService.', get_class($object)));
 		}
 

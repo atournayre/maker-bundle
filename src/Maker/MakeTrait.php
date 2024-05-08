@@ -95,7 +95,7 @@ class MakeTrait extends AbstractMaker
 
             $isFirstField = false;
 
-            if (null === $newField) {
+            if (!$newField instanceof \Atournayre\Bundle\MakerBundle\DTO\PropertyDefinition) {
                 break;
             }
 

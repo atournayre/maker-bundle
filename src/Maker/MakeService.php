@@ -59,7 +59,7 @@ class MakeService extends AbstractMaker
 
         $availableVOs = $this->availableVOs();
 
-        if (empty($availableVOs)) {
+        if ($availableVOs === []) {
             $io->error('No VO available. Please create a VO first. Use "make:new:vo" command.');
             return;
         }
