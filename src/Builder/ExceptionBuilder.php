@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Atournayre\Bundle\MakerBundle\Builder;
 
 use Atournayre\Bundle\MakerBundle\Config\ExceptionMakerConfiguration;
-use Atournayre\Bundle\MakerBundle\Contracts\MakerConfigurationInterface;
 use Atournayre\Bundle\MakerBundle\VO\PhpFileDefinition;
 use Nette\PhpGenerator\Method;
 
@@ -15,7 +14,11 @@ final class ExceptionBuilder extends AbstractBuilder
         return $makerConfigurationClassName === ExceptionMakerConfiguration::class;
     }
 
-    public function createPhpFileDefinition(MakerConfigurationInterface|ExceptionMakerConfiguration $makerConfiguration): PhpFileDefinition
+    /**
+     * @param ExceptionMakerConfiguration $makerConfiguration
+     * @return PhpFileDefinition
+     */
+    public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {
         return parent::createPhpFileDefinition($makerConfiguration)
             ->setExtends($makerConfiguration->type())
@@ -25,7 +28,7 @@ final class ExceptionBuilder extends AbstractBuilder
         ;
     }
 
-    private function namedConstructor(MakerConfigurationInterface|ExceptionMakerConfiguration $makerConfiguration): ?Method
+    private function namedConstructor(ExceptionMakerConfiguration $makerConfiguration): ?Method
     {
         if (!$makerConfiguration->hasNamedConstructor()) {
             return null;

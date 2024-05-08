@@ -117,7 +117,10 @@ class MakeController extends AbstractMaker
         ]);
     }
 
-    public function dependencies(): array
+    /**
+     * @return array<string, string>
+     */
+    protected function dependencies(): array
     {
         return [
             \Symfony\Component\Form\Extension\Core\Type\FormType::class => 'symfony/form',

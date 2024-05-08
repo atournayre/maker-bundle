@@ -5,6 +5,9 @@ parameters:
     level: 6
     excludePaths:
         - src/Resources/templates
+        - src/Collection/MakerConfigurationCollection.php
+        - src/Config/MakerConfiguration.php
+        - src/Maker/MakeController.php
     ignoreErrors:
         - '#Class ApiPlatform\\Metadata\\ApiProperty not found.#'
         - '#Class Doctrine\\DBAL\\Types\\Types not found.#'
@@ -14,5 +17,5 @@ parameters:
         - '#Class Psr\\Clock\\ClockInterface not found.#'
         - '#Class Symfony\\Bundle\\SecurityBundle\\Security not found.#'
         - '#Class Symfony\\Component\\Form\\Extension\\Core\\Type\\FormType not found.#'
-        - '#Class Symfony\\Component\\Form\\FormInterface not found.#'
+#        - '#Class Symfony\\Component\\Form\\FormInterface not found.#'
     treatPhpDocTypesAsCertain: false

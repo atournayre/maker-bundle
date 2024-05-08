@@ -22,7 +22,7 @@ interface MakerConfigurationInterface
         string $rootDir,
         string $rootNamespace,
         string $fqcn,
-    ): static;
+    ): self;
 
     /**
      * @throws \Throwable
@@ -47,5 +47,8 @@ interface MakerConfigurationInterface
 
     public function sourceCode(): string;
 
+    /**
+     * @return array<string>
+     */
     public function allowedTypes(): array;
 }

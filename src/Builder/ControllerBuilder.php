@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Atournayre\Bundle\MakerBundle\Builder;
 
 use Atournayre\Bundle\MakerBundle\Config\ControllerMakerConfiguration;
-use Atournayre\Bundle\MakerBundle\Contracts\MakerConfigurationInterface;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\PhpFileDefinition;
 use Nette\PhpGenerator\Method;
@@ -16,7 +15,11 @@ class ControllerBuilder extends FromTemplateBuilder
         return $makerConfigurationClassName === ControllerMakerConfiguration::class;
     }
 
-    public function createPhpFileDefinition(MakerConfigurationInterface|ControllerMakerConfiguration $makerConfiguration): PhpFileDefinition
+    /**
+     * @param ControllerMakerConfiguration $makerConfiguration
+     * @return PhpFileDefinition
+     */
+    public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {
         $phpFileDefinition = parent::createPhpFileDefinition($makerConfiguration);
         $phpFileDefinition->renameClass($makerConfiguration->classname());
@@ -31,7 +34,7 @@ class ControllerBuilder extends FromTemplateBuilder
 
     private function updateVoMethod(
         Method $method,
-        MakerConfigurationInterface|ControllerMakerConfiguration $makerConfiguration
+        ControllerMakerConfiguration $makerConfiguration
     ): Method
     {
         $entityClassName = Str::classNameFromNamespace($makerConfiguration->entityClassName(), '');
@@ -46,7 +49,7 @@ class ControllerBuilder extends FromTemplateBuilder
 
     private function updateFormMethod(
         Method $method,
-        MakerConfigurationInterface|ControllerMakerConfiguration $makerConfiguration
+        ControllerMakerConfiguration $makerConfiguration
     ): Method
     {
         $voClassName = Str::classNameFromNamespace($makerConfiguration->voClassName(), '');

@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Atournayre\Bundle\MakerBundle\Builder;
 
 use Atournayre\Bundle\MakerBundle\Config\FromTemplateMakerConfiguration;
-use Atournayre\Bundle\MakerBundle\Contracts\MakerConfigurationInterface;
 use Atournayre\Bundle\MakerBundle\VO\PhpFileDefinition;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PhpNamespace;
@@ -16,6 +15,10 @@ class FromTemplateBuilder extends AbstractBuilder
         return $makerConfigurationClassName === FromTemplateMakerConfiguration::class;
     }
 
+    /**
+     * @param string|null $comment
+     * @return string[]
+     */
     private function comments(?string $comment): array
     {
         $defaultComments = [
@@ -33,7 +36,11 @@ class FromTemplateBuilder extends AbstractBuilder
         ];
     }
 
-    public function createPhpFileDefinition(MakerConfigurationInterface|FromTemplateMakerConfiguration $makerConfiguration): PhpFileDefinition
+    /**
+     * @param FromTemplateMakerConfiguration $makerConfiguration
+     * @return PhpFileDefinition
+     */
+    public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {
         $sourceCode = $makerConfiguration->sourceCode();
 

@@ -15,7 +15,7 @@ class CommandMakerConfiguration extends MakerConfiguration
     {
         $fqcn = u($fqcn)->ensureEnd('Command')->toString();
 
-        return parent::fromFqcn($rootDir, $rootNamespace, $fqcn);
+        return self::fromFqcn($rootDir, $rootNamespace, $fqcn);
     }
 
     public function title(): string

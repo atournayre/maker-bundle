@@ -6,7 +6,6 @@ namespace Atournayre\Bundle\MakerBundle\Builder;
 use App\Contracts\Logger\LoggerInterface;
 use App\Logger\AbstractLogger;
 use Atournayre\Bundle\MakerBundle\Config\LoggerMakerConfiguration;
-use Atournayre\Bundle\MakerBundle\Contracts\MakerConfigurationInterface;
 use Atournayre\Bundle\MakerBundle\VO\PhpFileDefinition;
 use Nette\PhpGenerator\Method;
 
@@ -17,7 +16,11 @@ final class LoggerBuilder extends AbstractBuilder
         return $makerConfigurationClassName === LoggerMakerConfiguration::class;
     }
 
-    public function createPhpFileDefinition(MakerConfigurationInterface|LoggerMakerConfiguration $makerConfiguration): PhpFileDefinition
+    /**
+     * @param LoggerMakerConfiguration $makerConfiguration
+     * @return PhpFileDefinition
+     */
+    public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {
         return parent::createPhpFileDefinition($makerConfiguration)
             ->setExtends(AbstractLogger::class)

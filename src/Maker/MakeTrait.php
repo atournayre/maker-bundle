@@ -6,6 +6,8 @@ namespace Atournayre\Bundle\MakerBundle\Maker;
 use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
 use Atournayre\Bundle\MakerBundle\Config\TraitForEntityMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\Config\TraitForObjectMakerConfiguration;
+use Atournayre\Bundle\MakerBundle\DTO\PropertyDefinition;
+use Atournayre\Bundle\MakerBundle\Traits\PropertiesTrait;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Component\Console\Command\Command;
@@ -19,10 +21,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 #[AutoconfigureTag('maker.command')]
 class MakeTrait extends AbstractMaker
 {
-    /**
-     * @var array<array{fieldName: string, type: string, nullable: bool}> $traitProperties
-     */
-    private array $traitProperties = [];
+    use PropertiesTrait;
     private bool $enableApiPlatform = false;
     private bool $traitIsUsedByEntity = false;
 
@@ -62,7 +61,7 @@ class MakeTrait extends AbstractMaker
                     className: $namespace,
                 )
                     ->withIsUsedByEntity()
-                    ->withProperties($this->traitProperties)
+                    ->withProperties($this->properties)
                     ->withEnableApiPlatform($this->enableApiPlatform)
                     ->withPropertiesAllowedTypes($this->configResources->trait->allowedTypes($this->filesystem)
                 )
@@ -76,7 +75,7 @@ class MakeTrait extends AbstractMaker
                 namespace: $this->configNamespaces->trait,
                 className: $namespace,
             )
-                ->withProperties($this->traitProperties)
+                ->withProperties($this->properties)
                 ->withEnableApiPlatform($this->enableApiPlatform)
                 ->withPropertiesAllowedTypes($this->configResources->trait->allowedTypes($this->filesystem))
         ]);
@@ -102,21 +101,21 @@ class MakeTrait extends AbstractMaker
                 break;
             }
 
-            $currentFields[$newField['fieldName']] = $newField;
+            $currentFields[$newField->fieldName] = $newField;
         }
 
         $this->enableApiPlatform = (bool)$input->getOption('enable-api-platform');
-        $this->traitProperties = $currentFields;
+        $this->properties = $currentFields;
         $this->traitIsUsedByEntity = $isUsedByEntity;
     }
 
     /**
      * @param ConsoleStyle $io
-     * @param array<array{fieldName: string, type: string, nullable: bool}> $fields
+     * @param array<string, PropertyDefinition> $fields
      * @param bool $isFirstField
-     * @return array{fieldName: string, type: string, nullable: bool}|null
+     * @return ?PropertyDefinition
      */
-    private function askForNextField(ConsoleStyle $io, array $fields, bool $isFirstField): ?array
+    private function askForNextField(ConsoleStyle $io, array $fields, bool $isFirstField): ?PropertyDefinition
     {
         $io->newLine();
 
@@ -169,17 +168,20 @@ class MakeTrait extends AbstractMaker
         $data = ['fieldName' => $fieldName, 'type' => $type, 'nullable' => false];
 
         if ('datetime' === $type) {
-            return $data;
+            return PropertyDefinition::fromArray($data);
         }
 
         if ($io->confirm('Can this field be null (nullable)', false)) {
             $data['nullable'] = true;
         }
 
-        return $data;
+        return PropertyDefinition::fromArray($data);
     }
 
-    public function dependencies(): array
+    /**
+     * @return array<string, string>
+     */
+    protected function dependencies(): array
     {
         return [
             \Doctrine\ORM\Mapping\Id::class => 'orm',

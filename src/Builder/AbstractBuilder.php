@@ -12,7 +12,11 @@ abstract class AbstractBuilder implements PhpFileBuilderInterface
 {
     abstract public function supports(string $makerConfigurationClassName): bool;
 
-    public function createPhpFileDefinition(MakerConfigurationInterface $makerConfiguration): PhpFileDefinition
+    /**
+     * @param MakerConfigurationInterface $makerConfiguration
+     * @return PhpFileDefinition
+     */
+    public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {
         return PhpFileDefinition::create(
             $makerConfiguration->namespace(),

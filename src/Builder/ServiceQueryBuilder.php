@@ -11,7 +11,6 @@ use App\Contracts\Service\TagQueryServiceInterface;
 use App\Contracts\VO\ContextInterface;
 use App\Exception\FailFast;
 use Atournayre\Bundle\MakerBundle\Config\ServiceQueryMakerConfiguration;
-use Atournayre\Bundle\MakerBundle\Contracts\MakerConfigurationInterface;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\PhpFileDefinition;
 use Nette\PhpGenerator\Attribute;
@@ -26,7 +25,11 @@ final class ServiceQueryBuilder extends AbstractBuilder
         return $makerConfigurationClassName === ServiceQueryMakerConfiguration::class;
     }
 
-    public function createPhpFileDefinition(MakerConfigurationInterface|ServiceQueryMakerConfiguration $makerConfiguration): PhpFileDefinition
+    /**
+     * @param ServiceQueryMakerConfiguration $makerConfiguration
+     * @return PhpFileDefinition
+     */
+    public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {
         $voParameter = $makerConfiguration->vo();
 

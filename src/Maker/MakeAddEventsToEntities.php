@@ -79,7 +79,10 @@ class MakeAddEventsToEntities extends AbstractMaker
         return SplFileInfoCollection::createAsMap($entities);
     }
 
-    public function dependencies(): array
+    /**
+     * @return array<string, string>
+     */
+    protected function dependencies(): array
     {
         return [
             \Webmozart\Assert\Assert::class => 'webmozart/assert',

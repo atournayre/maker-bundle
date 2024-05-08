@@ -13,7 +13,7 @@ class ServiceCommandMakerConfiguration extends MakerConfiguration
     {
         $fqcn = u($fqcn)->ensureEnd('CommandService')->toString();
 
-        return parent::fromFqcn($rootDir, $rootNamespace, $fqcn);
+        return self::fromFqcn($rootDir, $rootNamespace, $fqcn);
     }
 
     public function vo(): string

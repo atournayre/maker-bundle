@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Atournayre\Bundle\MakerBundle\VO;
 
 use Nette\PhpGenerator\Attribute;
+use Nette\PhpGenerator\Constant;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\Property;
 use Nette\PhpGenerator\TraitUse;
@@ -12,9 +13,13 @@ use Webmozart\Assert\Assert;
 final class PhpFileDefinition
 {
     private bool $strictTypes = true;
+    /** @var string[] */
     private array $comments = [];
+    /** @var array<string, null|string> */
     private array $uses = [];
+    /** @var string[] */
     private array $usesFunctions = [];
+    /** @var Attribute[] */
     private array $attributes = [];
     private bool $interface = false;
     private bool $trait = false;
@@ -22,10 +27,15 @@ final class PhpFileDefinition
     private bool $final = true;
     private bool $abstract = false;
     private ?string $extends = null;
+    /** @var string[] */
     private array $implements = [];
+    /** @var Constant[] */
     private array $constants = [];
+    /** @var string[]|TraitUse[] */
     private array $traits = [];
+    /** @var Property[] */
     private array $properties = [];
+    /** @var Method[] */
     private array $methods = [];
 
     private function __construct(
@@ -52,11 +62,18 @@ final class PhpFileDefinition
         return $this;
     }
 
+    /**
+     * @return string[]
+     */
     public function getComments(): array
     {
         return $this->comments;
     }
 
+    /**
+     * @param string[] $comments
+     * @return $this
+     */
     public function setComments(array $comments): self
     {
         Assert::allString($comments, 'Comments must be an array of strings');
@@ -64,11 +81,18 @@ final class PhpFileDefinition
         return $this;
     }
 
+    /**
+     * @return array<string, null|string>
+     */
     public function getUses(): array
     {
         return $this->uses;
     }
 
+    /**
+     * @param array<int|string, null|string> $uses
+     * @return $this
+     */
     public function setUses(array $uses): self
     {
         $usesWithAlias = [];
@@ -86,22 +110,36 @@ final class PhpFileDefinition
         return $this;
     }
 
+    /**
+     * @return string[]
+     */
     public function getUsesFunctions(): array
     {
         return $this->usesFunctions;
     }
 
+    /**
+     * @param string[] $usesFunctions
+     * @return $this
+     */
     public function setUsesFunctions(array $usesFunctions): self
     {
         $this->usesFunctions = $usesFunctions;
         return $this;
     }
 
+    /**
+     * @return Attribute[]
+     */
     public function getAttributes(): array
     {
         return $this->attributes;
     }
 
+    /**
+     * @param Attribute[] $attributes
+     * @return $this
+     */
     public function setAttributes(array $attributes): self
     {
         Assert::allIsInstanceOf($attributes, Attribute::class, 'Attributes must be an array of Attribute');
@@ -171,11 +209,18 @@ final class PhpFileDefinition
         return $this;
     }
 
+    /**
+     * @return string[]
+     */
     public function getImplements(): array
     {
         return $this->implements;
     }
 
+    /**
+     * @param string[] $implements
+     * @return $this
+     */
     public function setImplements(array $implements): self
     {
         sort($implements);
@@ -183,11 +228,18 @@ final class PhpFileDefinition
         return $this;
     }
 
+    /**
+     * @return Constant[]
+     */
     public function getConstants(): array
     {
         return $this->constants;
     }
 
+    /**
+     * @param Constant[] $constants
+     * @return $this
+     */
     public function setConstants(array $constants): self
     {
         sort($constants);
@@ -195,11 +247,18 @@ final class PhpFileDefinition
         return $this;
     }
 
+    /**
+     * @return string[]
+     */
     public function getTraits(): array
     {
         return $this->traits;
     }
 
+    /**
+     * @param string[]|TraitUse[] $traits
+     * @return $this
+     */
     public function setTraits(array $traits): self
     {
         $traits = array_map(
@@ -212,11 +271,18 @@ final class PhpFileDefinition
         return $this;
     }
 
+    /**
+     * @return Property[]
+     */
     public function getProperties(): array
     {
         return $this->properties;
     }
 
+    /**
+     * @param Property[] $properties
+     * @return $this
+     */
     public function setProperties(array $properties): self
     {
         usort($properties, fn (Property $a, Property $b) => $a->getName() <=> $b->getName());
@@ -225,11 +291,18 @@ final class PhpFileDefinition
         return $this;
     }
 
+    /**
+     * @return Method[]
+     */
     public function getMethods(): array
     {
         return $this->methods;
     }
 
+    /**
+     * @param Method[] $methods
+     * @return $this
+     */
     public function setMethods(array $methods): self
     {
         usort($methods, fn (Method $a, Method $b) => $a->getName() <=> $b->getName());

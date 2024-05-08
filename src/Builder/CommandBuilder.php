@@ -5,7 +5,6 @@ namespace Atournayre\Bundle\MakerBundle\Builder;
 
 use App\Command\AbstractCommand;
 use Atournayre\Bundle\MakerBundle\Config\CommandMakerConfiguration;
-use Atournayre\Bundle\MakerBundle\Contracts\MakerConfigurationInterface;
 use Atournayre\Bundle\MakerBundle\VO\PhpFileDefinition;
 use Nette\PhpGenerator\Attribute;
 use Nette\PhpGenerator\Method;
@@ -17,7 +16,11 @@ final class CommandBuilder extends AbstractBuilder
         return $makerConfigurationClassName === CommandMakerConfiguration::class;
     }
 
-    public function createPhpFileDefinition(MakerConfigurationInterface|CommandMakerConfiguration $makerConfiguration): PhpFileDefinition
+    /**
+     * @param CommandMakerConfiguration $makerConfiguration
+     * @return PhpFileDefinition
+     */
+    public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {
         return parent::createPhpFileDefinition($makerConfiguration)
             ->setUses([
@@ -37,7 +40,11 @@ final class CommandBuilder extends AbstractBuilder
         ;
     }
 
-    private function attributes(MakerConfigurationInterface|CommandMakerConfiguration $makerConfiguration): array
+    /**
+     * @param CommandMakerConfiguration $makerConfiguration
+     * @return array<Attribute>
+     */
+    private function attributes(CommandMakerConfiguration $makerConfiguration): array
     {
         return [
             new Attribute(\Symfony\Component\Console\Attribute\AsCommand::class, [
@@ -47,7 +54,7 @@ final class CommandBuilder extends AbstractBuilder
         ];
     }
 
-    private function titleMethod(MakerConfigurationInterface|CommandMakerConfiguration $makerConfiguration): Method
+    private function titleMethod(CommandMakerConfiguration $makerConfiguration): Method
     {
         $title = $makerConfiguration->title();
 

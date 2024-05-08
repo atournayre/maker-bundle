@@ -109,7 +109,10 @@ class MakeCollection extends AbstractMaker
         ]);
     }
 
-    public function dependencies(): array
+    /**
+     * @return array<string, string>
+     */
+    protected function dependencies(): array
     {
         return [
             \Atournayre\Collection\TypedCollection::class => 'atournayre/collection',

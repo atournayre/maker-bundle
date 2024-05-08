@@ -9,7 +9,6 @@ use App\Trait\IsTrait;
 use App\Trait\NotNullableTrait;
 use App\Trait\NullableTrait;
 use Atournayre\Bundle\MakerBundle\Config\VoForEntityMakerConfiguration;
-use Atournayre\Bundle\MakerBundle\Contracts\MakerConfigurationInterface;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\Helper\UStr;
 use Atournayre\Bundle\MakerBundle\VO\PhpFileDefinition;
@@ -25,7 +24,11 @@ final class VoForEntityBuilder extends AbstractBuilder
         return $makerConfigurationClassName === VoForEntityMakerConfiguration::class;
     }
 
-    public function createPhpFileDefinition(MakerConfigurationInterface|VoForEntityMakerConfiguration $makerConfiguration): PhpFileDefinition
+    /**
+     * @param VoForEntityMakerConfiguration $makerConfiguration
+     * @return PhpFileDefinition
+     */
+    public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {
         $entityNamespace = self::entityNamespace($makerConfiguration);
         $voProperties = Map::from($makerConfiguration->properties())
@@ -64,17 +67,17 @@ final class VoForEntityBuilder extends AbstractBuilder
         ;
     }
 
-    private function entityNamespace(MakerConfigurationInterface|VoForEntityMakerConfiguration $makerConfiguration): UnicodeString
+    private function entityNamespace(VoForEntityMakerConfiguration $makerConfiguration): UnicodeString
     {
         return UStr::create($makerConfiguration->relatedEntity());
     }
 
     /**
      * @param array{fieldName: string, type: string} $property
-     * @param MakerConfigurationInterface|VoForEntityMakerConfiguration $makerConfiguration
+     * @param VoForEntityMakerConfiguration $makerConfiguration
      * @return Method
      */
-    private function defineGetter(array $property, MakerConfigurationInterface|VoForEntityMakerConfiguration $makerConfiguration): Method
+    private function defineGetter(array $property, VoForEntityMakerConfiguration $makerConfiguration): Method
     {
         $correspondingTypes = $this->correspondingTypes($makerConfiguration);
         $propertyType = $correspondingTypes[$property['type']];
@@ -90,10 +93,10 @@ final class VoForEntityBuilder extends AbstractBuilder
 
     /**
      * @param array{fieldName: string, type: string} $property
-     * @param MakerConfigurationInterface|VoForEntityMakerConfiguration $makerConfiguration
+     * @param VoForEntityMakerConfiguration $makerConfiguration
      * @return Property
      */
-    private function defineProperty(array $property, MakerConfigurationInterface|VoForEntityMakerConfiguration $makerConfiguration): Property
+    private function defineProperty(array $property, VoForEntityMakerConfiguration $makerConfiguration): Property
     {
         $type = $property['type'];
         $fieldNameRaw = $property['fieldName'];
@@ -171,7 +174,7 @@ final class VoForEntityBuilder extends AbstractBuilder
         ];
     }
 
-    private function nullableTrait(MakerConfigurationInterface $makerConfiguration): string
+    private function nullableTrait(VoForEntityMakerConfiguration $makerConfiguration): string
     {
         if (Str::startsWith($makerConfiguration->classname(), 'Null')) {
             return NullableTrait::class;

@@ -6,7 +6,9 @@ namespace Atournayre\Bundle\MakerBundle\Maker;
 use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
 use Atournayre\Bundle\MakerBundle\Config\VoForEntityMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\Config\VoForObjectMakerConfiguration;
+use Atournayre\Bundle\MakerBundle\DTO\PropertyDefinition;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
+use Atournayre\Bundle\MakerBundle\Traits\PropertiesTrait;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Component\Console\Command\Command;
@@ -19,10 +21,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 #[AutoconfigureTag('maker.command')]
 class MakeVo extends AbstractMaker
 {
-    /**
-     * @var array<array{fieldName: string, type: string}> $voProperties
-     */
-    private array $voProperties = [];
+    use PropertiesTrait;
     private ?string $voRelatedEntity = null;
 
     public static function getCommandName(): string
@@ -44,11 +43,11 @@ class MakeVo extends AbstractMaker
 
     /**
      * @param ConsoleStyle $io
-     * @param array<array{fieldName: string, type: string}> $fields
+     * @param array<string, PropertyDefinition> $fields
      * @param bool $isFirstField
-     * @return array{fieldName: string, type: string}|null
+     * @return ?PropertyDefinition
      */
-    private function askForNextField(ConsoleStyle $io, array $fields, bool $isFirstField): ?array
+    private function askForNextField(ConsoleStyle $io, array $fields, bool $isFirstField): ?PropertyDefinition
     {
         $io->newLine();
 
@@ -97,7 +96,7 @@ class MakeVo extends AbstractMaker
             }
         }
 
-        return ['fieldName' => $fieldName, 'type' => $type];
+        return PropertyDefinition::fromArray(['fieldName' => $fieldName, 'type' => $type]);
     }
 
     public function interact(InputInterface $input, ConsoleStyle $io, Command $command): void
@@ -129,10 +128,10 @@ class MakeVo extends AbstractMaker
                 break;
             }
 
-            $currentFields[$newField['fieldName']] = $newField;
+            $currentFields[$newField->fieldName] = $newField;
         }
 
-        $this->voProperties = $currentFields;
+        $this->properties = $currentFields;
     }
 
     /**
@@ -159,7 +158,7 @@ class MakeVo extends AbstractMaker
                     className: $namespace,
                 )
                     ->withRelatedEntity(Str::prefixByRootNamespace(Str::namespaceFromPath($this->voRelatedEntity, $this->rootDir), $this->rootNamespace))
-                    ->withProperties($this->voProperties)
+                    ->withProperties($this->properties)
                     ->withPropertiesAllowedTypes($this->configResources->valueObject->allowedTypes($this->filesystem)
                 )
             ]);
@@ -172,13 +171,16 @@ class MakeVo extends AbstractMaker
                 namespace: $this->configNamespaces->vo,
                 className: $namespace,
             )
-                ->withProperties($this->voProperties)
+                ->withProperties($this->properties)
                 ->withPropertiesAllowedTypes($this->configResources->valueObject->allowedTypes($this->filesystem)
             )
         ]);
     }
 
-    public function dependencies(): array
+    /**
+     * @return array<string, string>
+     */
+    protected function dependencies(): array
     {
         return [
             \Webmozart\Assert\Assert::class => 'webmozart/assert',

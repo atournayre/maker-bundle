@@ -50,7 +50,7 @@ abstract class MakerConfiguration implements MakerConfigurationInterface
         string $rootDir,
         string $rootNamespace,
         string $fqcn,
-    ): static
+    ): self
     {
         $uFqcn = UStr::create($fqcn)
             ->split('\\');

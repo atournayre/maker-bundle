@@ -11,6 +11,6 @@ class InterfaceMakerConfiguration extends MakerConfiguration
     {
         $fqcn = u($fqcn)->ensureEnd('Interface')->toString();
 
-        return parent::fromFqcn($rootDir, $rootNamespace, $fqcn);
+        return self::fromFqcn($rootDir, $rootNamespace, $fqcn);
     }
 }

@@ -5,7 +5,6 @@ namespace Atournayre\Bundle\MakerBundle\Builder;
 
 use Aimeos\Map;
 use Atournayre\Bundle\MakerBundle\Config\TraitForEntityMakerConfiguration;
-use Atournayre\Bundle\MakerBundle\Contracts\MakerConfigurationInterface;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\PhpFileDefinition;
 use Nette\PhpGenerator\Literal;
@@ -20,7 +19,11 @@ final class TraitForEntityBuilder extends AbstractBuilder
         return $makerConfigurationClassName === TraitForEntityMakerConfiguration::class;
     }
 
-    public function createPhpFileDefinition(MakerConfigurationInterface|TraitForEntityMakerConfiguration $makerConfiguration): PhpFileDefinition
+    /**
+     * @param TraitForEntityMakerConfiguration $makerConfiguration
+     * @return PhpFileDefinition
+     */
+    public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {
         $traitProperties = Map::from($makerConfiguration->properties())
             ->map(function (array $propertyDatas) use ($makerConfiguration): array {
@@ -127,10 +130,10 @@ final class TraitForEntityBuilder extends AbstractBuilder
 
     /**
      * @param array{fieldName: string, type: string, nullable: bool} $propertyDatas
-     * @param MakerConfigurationInterface|TraitForEntityMakerConfiguration $makerConfiguration
+     * @param TraitForEntityMakerConfiguration $makerConfiguration
      * @return Property
      */
-    private function defineProperty(array $propertyDatas, MakerConfigurationInterface|TraitForEntityMakerConfiguration $makerConfiguration): Property
+    private function defineProperty(array $propertyDatas, TraitForEntityMakerConfiguration $makerConfiguration): Property
     {
         $type = $propertyDatas['type'];
         $fieldNameRaw = $propertyDatas['fieldName'];
@@ -175,7 +178,7 @@ final class TraitForEntityBuilder extends AbstractBuilder
         return $clone;
     }
 
-    private function matchDoctrineType(string $type): string|Literal|null
+    private function matchDoctrineType(string $type): Literal|null
     {
         return match ($type) {
             '\DateTimeInterface' => class_exists(\Doctrine\DBAL\Types\Types::class)

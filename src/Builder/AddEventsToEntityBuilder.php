@@ -7,7 +7,6 @@ use App\Collection\EventCollection;
 use App\Contracts\Event\HasEventsInterface;
 use App\Trait\EventsTrait;
 use Atournayre\Bundle\MakerBundle\Config\AddEventsToEntitiesMakerConfiguration;
-use Atournayre\Bundle\MakerBundle\Contracts\MakerConfigurationInterface;
 use Atournayre\Bundle\MakerBundle\VO\PhpFileDefinition;
 use Nette\PhpGenerator\Method;
 
@@ -18,7 +17,11 @@ class AddEventsToEntityBuilder extends FromTemplateBuilder
         return $makerConfigurationClassName === AddEventsToEntitiesMakerConfiguration::class;
     }
 
-    public function createPhpFileDefinition(MakerConfigurationInterface|AddEventsToEntitiesMakerConfiguration $makerConfiguration): PhpFileDefinition
+    /**
+     * @param AddEventsToEntitiesMakerConfiguration $makerConfiguration
+     * @return PhpFileDefinition
+     */
+    public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {
         $phpFileDefinition = parent::createPhpFileDefinition($makerConfiguration);
 

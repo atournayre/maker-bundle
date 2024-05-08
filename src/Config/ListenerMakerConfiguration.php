@@ -3,18 +3,20 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Config;
 
+use Atournayre\Bundle\MakerBundle\Traits\Config\PropertiesAllowedTypesTrait;
 use function Symfony\Component\String\u;
 
 class ListenerMakerConfiguration extends MakerConfiguration
 {
+    use PropertiesAllowedTypesTrait;
+
     private string $eventNamespace = '';
-    private array $propertiesAllowedTypes = [];
 
     public static function fromFqcn(string $rootDir, string $rootNamespace, string $fqcn,): static
     {
         $fqcn = u($fqcn)->ensureEnd('Listener')->toString();
 
-        return parent::fromFqcn($rootDir, $rootNamespace, $fqcn);
+        return self::fromFqcn($rootDir, $rootNamespace, $fqcn);
     }
 
     public function eventNamespace(): string
@@ -26,18 +28,6 @@ class ListenerMakerConfiguration extends MakerConfiguration
     {
         $config = clone $this;
         $config->eventNamespace = $eventNamespace;
-        return $config;
-    }
-
-    public function propertiesAllowedTypes(): array
-    {
-        return $this->propertiesAllowedTypes;
-    }
-
-    public function withPropertiesAllowedTypes(array $propertiesAllowedTypes): self
-    {
-        $config = clone $this;
-        $config->propertiesAllowedTypes = $propertiesAllowedTypes;
         return $config;
     }
 }

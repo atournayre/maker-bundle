@@ -77,7 +77,10 @@ class MakeCommand extends AbstractMaker
         ]);
     }
 
-    public function dependencies(): array
+    /**
+     * @return array<string, string>
+     */
+    protected function dependencies(): array
     {
         return [
             Command::class => 'console',

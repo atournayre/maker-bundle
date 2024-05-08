@@ -6,7 +6,9 @@ namespace Atournayre\Bundle\MakerBundle\Maker;
 use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
 use Atournayre\Bundle\MakerBundle\Config\EventMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\Config\ListenerMakerConfiguration;
+use Atournayre\Bundle\MakerBundle\DTO\PropertyDefinition;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
+use Atournayre\Bundle\MakerBundle\Traits\PropertiesTrait;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Component\Console\Command\Command;
@@ -18,10 +20,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 #[AutoconfigureTag('maker.command')]
 class MakeEvent extends AbstractMaker
 {
-    /**
-     * @var array<array{fieldName: string, type: string}> $eventProperties
-     */
-    private array $eventProperties = [];
+    use PropertiesTrait;
 
     public static function getCommandName(): string
     {
@@ -42,11 +41,11 @@ class MakeEvent extends AbstractMaker
 
     /**
      * @param ConsoleStyle $io
-     * @param array<array{fieldName: string, type: string}> $fields
+     * @param array<string, PropertyDefinition> $fields
      * @param bool $isFirstField
-     * @return array{fieldName: string, type: string}|null
+     * @return ?PropertyDefinition
      */
-    private function askForNextField(ConsoleStyle $io, array $fields, bool $isFirstField): ?array
+    private function askForNextField(ConsoleStyle $io, array $fields, bool $isFirstField): ?PropertyDefinition
     {
         $io->newLine();
 
@@ -95,7 +94,10 @@ class MakeEvent extends AbstractMaker
             }
         }
 
-        return ['fieldName' => $fieldName, 'type' => $type];
+        return PropertyDefinition::fromArray([
+            'fieldName' => $fieldName,
+            'type' => $type,
+        ]);
     }
 
     public function interact(InputInterface $input, ConsoleStyle $io, Command $command): void
@@ -115,10 +117,10 @@ class MakeEvent extends AbstractMaker
                 break;
             }
 
-            $currentFields[$newField['fieldName']] = $newField;
+            $currentFields[$newField->fieldName] = $newField;
         }
 
-        $this->eventProperties = $currentFields;
+        $this->properties = $currentFields;
     }
 
     /**
@@ -134,7 +136,7 @@ class MakeEvent extends AbstractMaker
             namespace: $this->configNamespaces->event,
             className: $namespace,
         )
-            ->withProperties($this->eventProperties)
+            ->withProperties($this->properties)
             ->withPropertiesAllowedTypes($this->configResources->event->allowedTypes($this->filesystem))
         ;
 
@@ -157,7 +159,10 @@ class MakeEvent extends AbstractMaker
         ]);
     }
 
-    public function dependencies(): array
+    /**
+     * @return array<string, string>
+     */
+    protected function dependencies(): array
     {
         return [
             \Webmozart\Assert\Assert::class => 'webmozart/assert',

@@ -84,7 +84,10 @@ class MakeProjectInstall extends AbstractMaker
         return SplFileInfoCollection::createAsMap($templates);
     }
 
-    public function dependencies(): array
+    /**
+     * @return array<string, string>
+     */
+    protected function dependencies(): array
     {
         $deps = $this->enableApiPlatform
             ? [\ApiPlatform\Metadata\ApiProperty::class => 'api-platform/core']

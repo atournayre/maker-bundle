@@ -11,11 +11,17 @@ class MakerConfigurationCollection extends TypedCollection
 {
     protected static string $type = MakerConfigurationInterface::class;
 
+    /**
+     * @param array<MakerConfigurationInterface> $collection
+     */
     public static function createAsList(array $collection): static
     {
         return new static($collection);
     }
 
+    /**
+     * @param array<MakerConfigurationInterface> $collection
+     */
     public static function createAsMap(array $collection): static
     {
         return new static($collection);

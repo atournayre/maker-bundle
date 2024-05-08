@@ -161,7 +161,10 @@ class MakeService extends AbstractMaker
         return MakerConfigurationCollection::createAsList($configurations);
     }
 
-    public function dependencies(): array
+    /**
+     * @return array<string, string>
+     */
+    protected function dependencies(): array
     {
         return [
             \Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag::class => 'symfony/dependency-injection',

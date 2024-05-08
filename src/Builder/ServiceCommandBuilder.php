@@ -11,7 +11,6 @@ use App\Contracts\Service\TagCommandServiceInterface;
 use App\Contracts\VO\ContextInterface;
 use App\Exception\FailFast;
 use Atournayre\Bundle\MakerBundle\Config\ServiceCommandMakerConfiguration;
-use Atournayre\Bundle\MakerBundle\Contracts\MakerConfigurationInterface;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\PhpFileDefinition;
 use Nette\PhpGenerator\Attribute;
@@ -26,7 +25,11 @@ final class ServiceCommandBuilder extends AbstractBuilder
         return $makerConfigurationClassName === ServiceCommandMakerConfiguration::class;
     }
 
-    public function createPhpFileDefinition(MakerConfigurationInterface|ServiceCommandMakerConfiguration $makerConfiguration): PhpFileDefinition
+    /**
+     * @param ServiceCommandMakerConfiguration $makerConfiguration
+     * @return PhpFileDefinition
+     */
+    public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {
         $voParameter = $makerConfiguration->vo();
 

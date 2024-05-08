@@ -14,7 +14,7 @@ class ExceptionMakerConfiguration extends MakerConfiguration
     {
         $fqcn = u($fqcn)->trimSuffix('Exception')->toString();
 
-        return parent::fromFqcn($rootDir, $rootNamespace, $fqcn);
+        return self::fromFqcn($rootDir, $rootNamespace, $fqcn);
     }
 
     public function type(): string

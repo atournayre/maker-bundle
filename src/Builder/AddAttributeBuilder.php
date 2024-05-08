@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Atournayre\Bundle\MakerBundle\Builder;
 
 use Atournayre\Bundle\MakerBundle\Config\AddAttributeMakerConfiguration;
-use Atournayre\Bundle\MakerBundle\Contracts\MakerConfigurationInterface;
 use Atournayre\Bundle\MakerBundle\VO\PhpFileDefinition;
 
 class AddAttributeBuilder extends AbstractBuilder
@@ -14,7 +13,11 @@ class AddAttributeBuilder extends AbstractBuilder
         return $makerConfigurationClassName === AddAttributeMakerConfiguration::class;
     }
 
-    public function createPhpFileDefinition(MakerConfigurationInterface|AddAttributeMakerConfiguration $makerConfiguration): PhpFileDefinition
+    /**
+     * @param AddAttributeMakerConfiguration $makerConfiguration
+     * @return PhpFileDefinition
+     */
+    public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {
         return parent::createPhpFileDefinition($makerConfiguration)
             ->setUses([$makerConfiguration->serviceNamespace()])

@@ -12,6 +12,7 @@ use Symfony\Component\Filesystem\Filesystem;
 final class FileGenerator
 {
     public function __construct(
+        /** @var iterable<PhpFileBuilderInterface> */
         private readonly iterable $builders
     )
     {
@@ -20,7 +21,6 @@ final class FileGenerator
     /**
      * @param MakerConfigurationCollection $configurations
      * @return void
-     * @throws \ReflectionException
      */
     public function generate(MakerConfigurationCollection $configurations): void
     {
@@ -28,9 +28,6 @@ final class FileGenerator
         $this->generateFiles($makerConfigurationCollection);
     }
 
-    /**
-     * @throws \ReflectionException
-     */
     private function createMakerConfigurationCollectionWithSourceCode(
         MakerConfigurationCollection $makerConfigurationCollection
     ): MakerConfigurationCollection

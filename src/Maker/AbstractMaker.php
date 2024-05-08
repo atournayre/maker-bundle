@@ -33,6 +33,9 @@ abstract class AbstractMaker extends \Symfony\Bundle\MakerBundle\Maker\AbstractM
         $this->configResources = $this->bundleConfiguration->resources;
     }
 
+    /**
+     * @return array<string, string>
+     */
     protected function dependencies(): array
     {
         return [];
@@ -54,6 +57,8 @@ abstract class AbstractMaker extends \Symfony\Bundle\MakerBundle\Maker\AbstractM
         $namespace = $input->hasArgument('namespace')
             ? Str::cleanNamespace($input->getArgument('namespace'))
             : '';
+
+        $namespace = ucfirst($namespace);
 
         $configurations = $this->configurations($namespace);
 

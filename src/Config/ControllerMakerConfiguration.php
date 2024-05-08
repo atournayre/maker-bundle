@@ -4,12 +4,20 @@ declare(strict_types=1);
 namespace Atournayre\Bundle\MakerBundle\Config;
 
 use Atournayre\Bundle\MakerBundle\Helper\Str;
+use function Symfony\Component\String\u;
 
-class ControllerMakerConfiguration extends MakerConfiguration
+class ControllerMakerConfiguration extends FromTemplateMakerConfiguration
 {
     public string $entityPath = '';
     public string $formTypePath = '';
     public string $voPath = '';
+
+    public static function fromFqcn(string $rootDir, string $rootNamespace, string $fqcn,): static
+    {
+        $fqcn = u($fqcn)->ensureEnd('Controller')->toString();
+
+        return self::fromFqcn($rootDir, $rootNamespace, $fqcn);
+    }
 
     public function entityPath(string $entityPath): static
     {

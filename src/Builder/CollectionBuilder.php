@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Atournayre\Bundle\MakerBundle\Builder;
 
 use Atournayre\Bundle\MakerBundle\Config\CollectionMakerConfiguration;
-use Atournayre\Bundle\MakerBundle\Contracts\MakerConfigurationInterface;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\PhpFileDefinition;
 use Nette\PhpGenerator\Literal;
@@ -17,7 +16,11 @@ final class CollectionBuilder extends AbstractBuilder
         return $makerConfigurationClassName === CollectionMakerConfiguration::class;
     }
 
-    public function createPhpFileDefinition(MakerConfigurationInterface|CollectionMakerConfiguration $makerConfiguration): PhpFileDefinition
+    /**
+     * @param CollectionMakerConfiguration $makerConfiguration
+     * @return PhpFileDefinition
+     */
+    public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {
         $extends = $this->extendsClass($makerConfiguration);
         $collectionType = $this->collectionType($makerConfiguration);
@@ -34,7 +37,7 @@ final class CollectionBuilder extends AbstractBuilder
         ;
     }
 
-    private function extendsClass(MakerConfigurationInterface|CollectionMakerConfiguration $makerConfiguration): string
+    private function extendsClass(CollectionMakerConfiguration $makerConfiguration): string
     {
         if ($makerConfiguration->ofDecimals()) {
             return \Atournayre\Collection\DecimalValueCollection::class;
@@ -45,7 +48,7 @@ final class CollectionBuilder extends AbstractBuilder
             : \Atournayre\Collection\TypedCollection::class;
     }
 
-    private function collectionType(MakerConfigurationInterface|CollectionMakerConfiguration $makerConfiguration): string
+    private function collectionType(CollectionMakerConfiguration $makerConfiguration): string
     {
         if ($makerConfiguration->ofDecimals()) {
             return \Atournayre\Types\DecimalValue::class;
@@ -54,7 +57,7 @@ final class CollectionBuilder extends AbstractBuilder
         return $makerConfiguration->relatedObject();
     }
 
-    private function propertyType(MakerConfigurationInterface|CollectionMakerConfiguration $makerConfiguration): Property
+    private function propertyType(CollectionMakerConfiguration $makerConfiguration): Property
     {
         $type = $this->collectionType($makerConfiguration);
 

@@ -5,6 +5,8 @@ namespace Atournayre\Bundle\MakerBundle\Maker;
 
 use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
 use Atournayre\Bundle\MakerBundle\Config\DtoMakerConfiguration;
+use Atournayre\Bundle\MakerBundle\DTO\PropertyDefinition;
+use Atournayre\Bundle\MakerBundle\Traits\PropertiesTrait;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Component\Console\Command\Command;
@@ -16,10 +18,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 #[AutoconfigureTag('maker.command')]
 class MakeDto extends AbstractMaker
 {
-    /**
-     * @var array<array{fieldName: string, type: string, nullable: bool}> $dtoProperties
-     */
-    private array $dtoProperties = [];
+    use PropertiesTrait;
 
     public static function getCommandName(): string
     {
@@ -40,11 +39,11 @@ class MakeDto extends AbstractMaker
 
     /**
      * @param ConsoleStyle $io
-     * @param array<array{fieldName: string, type: string, nullable: bool}> $fields
+     * @param array<string, PropertyDefinition> $fields
      * @param bool $isFirstField
-     * @return array{fieldName: string, type: string, nullable: bool}|null
+     * @return ?PropertyDefinition
      */
-    private function askForNextField(ConsoleStyle $io, array $fields, bool $isFirstField): ?array
+    private function askForNextField(ConsoleStyle $io, array $fields, bool $isFirstField): ?PropertyDefinition
     {
         $io->newLine();
 
@@ -97,14 +96,14 @@ class MakeDto extends AbstractMaker
         $data = ['fieldName' => $fieldName, 'type' => $type, 'nullable' => false];
 
         if ('datetime' === $type) {
-            return $data;
+            return PropertyDefinition::fromArray($data);
         }
 
         if ($io->confirm('Can this field be null (nullable)', false)) {
             $data['nullable'] = true;
         }
 
-        return $data;
+        return PropertyDefinition::fromArray($data);
     }
 
     public function interact(InputInterface $input, ConsoleStyle $io, Command $command): void
@@ -124,10 +123,10 @@ class MakeDto extends AbstractMaker
                 break;
             }
 
-            $currentFields[$newField['fieldName']] = $newField;
+            $currentFields[$newField->fieldName] = $newField;
         }
 
-        $this->dtoProperties = $currentFields;
+        $this->properties = $currentFields;
     }
 
     /**
@@ -144,12 +143,15 @@ class MakeDto extends AbstractMaker
                 namespace: $this->configNamespaces->dto,
                 className: $namespace,
             )
-                ->withProperties($this->dtoProperties)
+                ->withProperties($this->properties)
                 ->withPropertiesAllowedTypes($this->configResources->dto->allowedTypes($this->filesystem)),
         ]);
     }
 
-    public function dependencies(): array
+    /**
+     * @return array<string, string>
+     */
+    protected function dependencies(): array
     {
         return [
             \Webmozart\Assert\Assert::class => 'webmozart/assert',

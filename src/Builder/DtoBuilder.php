@@ -7,7 +7,7 @@ use App\Contracts\Null\NullableInterface;
 use App\Trait\NotNullableTrait;
 use App\Trait\NullableTrait;
 use Atournayre\Bundle\MakerBundle\Config\DtoMakerConfiguration;
-use Atournayre\Bundle\MakerBundle\Contracts\MakerConfigurationInterface;
+use Atournayre\Bundle\MakerBundle\DTO\PropertyDefinition;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\PhpFileDefinition;
 use Nette\PhpGenerator\Method;
@@ -21,10 +21,14 @@ final class DtoBuilder extends AbstractBuilder
         return $makerConfigurationClassName === DtoMakerConfiguration::class;
     }
 
-    public function createPhpFileDefinition(MakerConfigurationInterface|DtoMakerConfiguration $makerConfiguration): PhpFileDefinition
+    /**
+     * @param DtoMakerConfiguration $makerConfiguration
+     * @return PhpFileDefinition
+     */
+    public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {
         $properties = array_map(
-            fn (array $propertyDatas): Property => self::property($propertyDatas, $makerConfiguration),
+            fn (PropertyDefinition $propertyDatas): Property => $this->property($propertyDatas, $makerConfiguration),
             $makerConfiguration->properties()
         );
 
@@ -42,21 +46,20 @@ final class DtoBuilder extends AbstractBuilder
     }
 
     /**
-     * @param array{fieldName: string, type: string, nullable: bool} $propertyDatas
-     * @param MakerConfigurationInterface|DtoMakerConfiguration $configuration
+     * @param PropertyDefinition $propertyDatas
+     * @param DtoMakerConfiguration $configuration
      * @return Property
      */
-    private function property(array $propertyDatas, MakerConfigurationInterface|DtoMakerConfiguration $configuration): Property
+    private function property(PropertyDefinition $propertyDatas, DtoMakerConfiguration $configuration): Property
     {
-        /** @var string $type */
-        $type = $propertyDatas['type'];
+        $type = $propertyDatas->type;
         Assert::inArray(
             $type,
             array_keys($this->correspondingTypes($configuration)),
-            Str::sprintf('Property "%s" should be of type %s; %s given', $propertyDatas['fieldName'], Str::implode(', ', array_keys($this->correspondingTypes($configuration))), $type)
+            Str::sprintf('Property "%s" should be of type %s; %s given', $propertyDatas->fieldName, Str::implode(', ', array_keys($this->correspondingTypes($configuration))), $type)
         );
 
-        $property = new Property($propertyDatas['fieldName']);
+        $property = new Property($propertyDatas->fieldName);
         $property->setVisibility('public')->setType($this->correspondingTypes($configuration)[$type]);
 
         $defaultValue = match ($type) {
@@ -73,21 +76,21 @@ final class DtoBuilder extends AbstractBuilder
             $property->setNullable();
         }
 
-        if ($propertyDatas['nullable']) {
+        if ($propertyDatas->nullable) {
             $property->setValue(null)->setNullable();
         }
 
         return $property;
     }
 
-    private function namedConstructorFromArray(MakerConfigurationInterface|DtoMakerConfiguration $makerConfiguration): Method
+    private function namedConstructorFromArray(DtoMakerConfiguration $makerConfiguration): Method
     {
         $dtoProperties = $makerConfiguration->properties();
 
         $bodyParts = [];
         $bodyParts[] = '$dto = new self();';
         foreach ($dtoProperties as $property) {
-            $bodyParts[] = Str::sprintf('$dto->%s = $data[\'%s\'];', $property['fieldName'], $property['fieldName']);
+            $bodyParts[] = Str::sprintf('$dto->%s = $data[\'%s\'];', $property->fieldName, $property->fieldName);
         }
         $bodyParts[] = '';
         $bodyParts[] = 'return $dto;';
@@ -103,7 +106,7 @@ final class DtoBuilder extends AbstractBuilder
         return $method;
     }
 
-    private function methodValidate(MakerConfigurationInterface|DtoMakerConfiguration $makerConfiguration): Method
+    private function methodValidate(DtoMakerConfiguration $makerConfiguration): Method
     {
         $dtoProperties = $makerConfiguration->properties();
         $className = $makerConfiguration->classname();
@@ -111,11 +114,11 @@ final class DtoBuilder extends AbstractBuilder
         $validationErrors = [];
         foreach ($dtoProperties as $property) {
             $if = 'if (%s) {'.PHP_EOL.'    $errors[\'%s\'] = \'validation.%s.%s.empty\';'.PHP_EOL.'}';
-            $ifTest = match ($property['type']) {
-                'datetime' => "null === \$this->{$property['fieldName']}",
-                default => "'' == \$this->{$property['fieldName']}",
+            $ifTest = match ($property->type) {
+                'datetime' => "null === \$this->{$property->fieldName}",
+                default => "'' == \$this->{$property->fieldName}",
             };
-            $fieldName = Str::property($property['fieldName']);
+            $fieldName = Str::property($property->fieldName);
             $dtoName = Str::asCamelCase($className);
 
             $validationErrors[] = Str::sprintf($if, $ifTest, $fieldName, $dtoName, $fieldName);
@@ -137,7 +140,7 @@ return $errors;';
             ->setBody($body);
     }
 
-    private function nullableTrait(MakerConfigurationInterface $makerConfiguration): string
+    private function nullableTrait(DtoMakerConfiguration $makerConfiguration): string
     {
         if (Str::startsWith($makerConfiguration->classname(), 'Null')) {
             return NullableTrait::class;

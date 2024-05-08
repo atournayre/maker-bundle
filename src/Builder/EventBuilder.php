@@ -6,7 +6,7 @@ namespace Atournayre\Bundle\MakerBundle\Builder;
 use App\Contracts\VO\ContextInterface;
 use App\Trait\ContextTrait;
 use Atournayre\Bundle\MakerBundle\Config\EventMakerConfiguration;
-use Atournayre\Bundle\MakerBundle\Contracts\MakerConfigurationInterface;
+use Atournayre\Bundle\MakerBundle\DTO\PropertyDefinition;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\PhpFileDefinition;
 use Nette\PhpGenerator\Method;
@@ -18,7 +18,11 @@ final class EventBuilder extends AbstractBuilder
         return $makerConfigurationClassName === EventMakerConfiguration::class;
     }
 
-    public function createPhpFileDefinition(MakerConfigurationInterface|EventMakerConfiguration $makerConfiguration): PhpFileDefinition
+    /**
+     * @param EventMakerConfiguration $makerConfiguration
+     * @return PhpFileDefinition
+     */
+    public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {
         $eventProperties = $makerConfiguration->properties();
 
@@ -39,20 +43,20 @@ final class EventBuilder extends AbstractBuilder
     }
 
     /**
-     * @param array{fieldName: string, type: string}[] $properties
-     * @param MakerConfigurationInterface|EventMakerConfiguration $makerConfiguration
+     * @param PropertyDefinition[] $properties
+     * @param EventMakerConfiguration $makerConfiguration
      * @return Method
      */
-    private function constructor(array $properties, MakerConfigurationInterface|EventMakerConfiguration $makerConfiguration): Method
+    private function constructor(array $properties, EventMakerConfiguration $makerConfiguration): Method
     {
         $method = new Method('__construct');
         $method->setPrivate();
 
         foreach ($properties as $property) {
-            $method->addPromotedParameter($property['fieldName'])
+            $method->addPromotedParameter($property->fieldName)
                 ->setPublic()
                 ->setReadOnly()
-                ->setType(self::correspondingTypes($makerConfiguration)[$property['type']])
+                ->setType(self::correspondingTypes($makerConfiguration)[$property->type])
             ;
         }
 
@@ -60,11 +64,11 @@ final class EventBuilder extends AbstractBuilder
     }
 
     /**
-     * @param array{fieldName: string, type: string}[] $eventProperties
-     * @param MakerConfigurationInterface|EventMakerConfiguration $makerConfiguration
+     * @param PropertyDefinition[] $eventProperties
+     * @param EventMakerConfiguration $makerConfiguration
      * @return Method
      */
-    private function namedConstructor(array $eventProperties, MakerConfigurationInterface|EventMakerConfiguration $makerConfiguration): Method
+    private function namedConstructor(array $eventProperties, EventMakerConfiguration $makerConfiguration): Method
     {
         $method = new Method('create');
         $method->setStatic()
@@ -78,12 +82,13 @@ final class EventBuilder extends AbstractBuilder
         );
 
         foreach ($properties as $property) {
-            $method->addParameter($property['fieldName'])
-                ->setType(self::correspondingTypes($makerConfiguration)[$property['type']])
+            $method->addParameter($property->fieldName)
+                ->setType(self::correspondingTypes($makerConfiguration)[$property->type])
             ;
         }
 
-        $selfContent = implode(', $', array_column($eventProperties, 'fieldName'));
+        $fieldNames = array_map(fn(PropertyDefinition $property) => $property->fieldName, $eventProperties);
+        $selfContent = implode(', $', $fieldNames);
 
         $method->addBody('// Add assertions');
         $method->addBody('');

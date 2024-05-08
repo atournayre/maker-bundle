@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Atournayre\Bundle\MakerBundle\Builder;
 
 use Atournayre\Bundle\MakerBundle\Config\ListenerMakerConfiguration;
-use Atournayre\Bundle\MakerBundle\Contracts\MakerConfigurationInterface;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\PhpFileDefinition;
 use Nette\PhpGenerator\Attribute;
@@ -18,7 +17,11 @@ final class ListenerBuilder extends AbstractBuilder
         return $makerConfigurationClassName === ListenerMakerConfiguration::class;
     }
 
-    public function createPhpFileDefinition(MakerConfigurationInterface|ListenerMakerConfiguration $makerConfiguration): PhpFileDefinition
+    /**
+     * @param ListenerMakerConfiguration $makerConfiguration
+     * @return PhpFileDefinition
+     */
+    public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {
         $eventNamespace = $makerConfiguration->eventNamespace();
 
@@ -31,7 +34,11 @@ final class ListenerBuilder extends AbstractBuilder
         ;
     }
 
-    private function attributes(MakerConfigurationInterface|ListenerMakerConfiguration $makerConfiguration): array
+    /**
+     * @param ListenerMakerConfiguration $makerConfiguration
+     * @return array<Attribute>
+     */
+    private function attributes(ListenerMakerConfiguration $makerConfiguration): array
     {
         $eventNamespace = $makerConfiguration->eventNamespace();
         $eventName = Str::classNameFromNamespace($eventNamespace, 'Event');
@@ -43,7 +50,7 @@ final class ListenerBuilder extends AbstractBuilder
         ];
     }
 
-    private function invoke(MakerConfigurationInterface|ListenerMakerConfiguration $makerConfiguration): Method
+    private function invoke(ListenerMakerConfiguration $makerConfiguration): Method
     {
         $eventNamespace = $makerConfiguration->eventNamespace();
 
