@@ -30,7 +30,7 @@ final class PhpFileDefinition
 
     private function __construct(
         public readonly string $namespace,
-        public readonly string $className,
+        public string $className,
     )
     {
     }
@@ -316,6 +316,21 @@ final class PhpFileDefinition
         $implements[$class] = $class;
         $this->setImplements($implements);
 
+        return $this;
+    }
+
+    public function removeUse(string $class): self
+    {
+        $uses = $this->getUses();
+        unset($uses[$class]);
+        $this->setUses($uses);
+
+        return $this;
+    }
+
+    public function renameClass(string $name): self
+    {
+        $this->className = $name;
         return $this;
     }
 }

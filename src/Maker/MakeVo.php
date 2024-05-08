@@ -142,9 +142,7 @@ class MakeVo extends NewAbstractMaker
      */
     private function entities(): array
     {
-        return MakeHelper::findFilesInDirectory(
-            $this->bundleConfiguration->directories->entity
-        );
+        return $this->filesystem->findFilesInDirectory($this->bundleConfiguration->directories->entity);
     }
 
     /**

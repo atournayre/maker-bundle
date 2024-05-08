@@ -4,6 +4,7 @@ use Atournayre\Bundle\MakerBundle\Builder\AddAttributeBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\AddEventsToEntityBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\CollectionBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\CommandBuilder;
+use Atournayre\Bundle\MakerBundle\Builder\ControllerBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\DtoBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\EventBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\ExceptionBuilder;
@@ -66,6 +67,7 @@ return static function (ContainerConfigurator $container): void {
         AddEventsToEntityBuilder::class,
         CollectionBuilder::class,
         CommandBuilder::class,
+        ControllerBuilder::class,
         DtoBuilder::class,
         EventBuilder::class,
         ExceptionBuilder::class,

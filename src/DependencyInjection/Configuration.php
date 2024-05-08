@@ -83,6 +83,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('directories')
                     ->addDefaultsIfNotSet()
                     ->children()
+                        ->scalarNode('controller')->defaultValue('%kernel.project_dir%/src/Controller')->end()
                         ->scalarNode('entity')->defaultValue('%kernel.project_dir%/src/Entity')->end()
                         ->scalarNode('form')->defaultValue('%kernel.project_dir%/src/Form')->end()
                         ->scalarNode('vo')->defaultValue('%kernel.project_dir%/src/VO')->end()
