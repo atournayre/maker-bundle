@@ -58,7 +58,7 @@ final class FileGenerator
         }
     }
 
-    protected function saveFile(string $filePath, string $content): void
+    private function saveFile(string $filePath, string $content): void
     {
         (new Filesystem())->dumpFile($filePath, $content);
     }

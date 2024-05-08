@@ -320,7 +320,7 @@ final class PhpFileDefinition
 
     public function isClass(): bool
     {
-        return !$this->isInterface() && !$this->isTrait();
+        return !$this->interface && !$this->trait;
     }
 
     public function setAbstract(bool $isAbstract = true): self
@@ -336,7 +336,7 @@ final class PhpFileDefinition
 
     public function addUse(string $use, ?string $alias = null): self
     {
-        $uses = $this->getUses();
+        $uses = $this->uses;
         $uses[$use] = $alias;
         $this->setUses($uses);
 
@@ -347,7 +347,7 @@ final class PhpFileDefinition
     {
         $trait = $trait instanceof TraitUse ? $trait->getName() : $trait;
 
-        $traits = $this->getTraits();
+        $traits = $this->traits;
         $traits[$trait] = $trait;
         $this->setTraits($traits);
 
@@ -361,7 +361,7 @@ final class PhpFileDefinition
 
     public function updateMethod(string $string, Method $method): self
     {
-        $methods = $this->getMethods();
+        $methods = $this->methods;
         $methods[$string] = $method;
         $this->setMethods($methods);
 
@@ -370,7 +370,7 @@ final class PhpFileDefinition
 
     public function addMethod(Method $method): self
     {
-        $methods = $this->getMethods();
+        $methods = $this->methods;
         $methods[$method->getName()] = $method;
         $this->setMethods($methods);
 
@@ -386,7 +386,7 @@ final class PhpFileDefinition
 
     public function addImplement(string $class): self
     {
-        $implements = $this->getImplements();
+        $implements = $this->implements;
         $implements[$class] = $class;
         $this->setImplements($implements);
 
@@ -395,7 +395,7 @@ final class PhpFileDefinition
 
     public function removeUse(string $class): self
     {
-        $uses = $this->getUses();
+        $uses = $this->uses;
         unset($uses[$class]);
         $this->setUses($uses);
 

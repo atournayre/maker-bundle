@@ -13,7 +13,7 @@ return RectorConfig::configure()
         codeQuality: true,
 //        codingStyle: true,
 //        typeDeclarations: true,
-//        privatization: true,
+        privatization: true,
 //        naming: true,
 //        earlyReturn: true,
     )
