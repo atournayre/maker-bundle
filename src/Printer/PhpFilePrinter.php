@@ -52,6 +52,7 @@ final class PhpFilePrinter
             $class
                 ->setFinal($phpFileDefinition->isFinal())
                 ->setReadOnly($phpFileDefinition->isReadonly())
+                ->setAbstract($phpFileDefinition->isAbstract())
             ;
         }
 

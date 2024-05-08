@@ -233,7 +233,9 @@ final class PhpFileDefinition
     {
         usort($methods, fn (Method $a, Method $b) => $a->getName() <=> $b->getName());
 
-        $this->methods = $methods;
+        $names = array_map(fn (Method $method) => $method->getName(), $methods);
+
+        $this->methods = array_combine($names, $methods);
         return $this;
     }
 
@@ -256,5 +258,64 @@ final class PhpFileDefinition
     public function isAbstract(): bool
     {
         return $this->abstract;
+    }
+
+    public function addUse(string $use, ?string $alias = null): self
+    {
+        $uses = $this->getUses();
+        $uses[$use] = $alias;
+        $this->setUses($uses);
+
+        return $this;
+    }
+
+    public function addTrait(string|TraitUse $trait): self
+    {
+        $trait = $trait instanceof TraitUse ? $trait->getName() : $trait;
+
+        $traits = $this->getTraits();
+        $traits[$trait] = $trait;
+        $this->setTraits($traits);
+
+        return $this;
+    }
+
+    public function hasMethod(string $name): bool
+    {
+        return array_key_exists($name, $this->methods);
+    }
+
+    public function updateMethod(string $string, Method $method): self
+    {
+        $methods = $this->getMethods();
+        $methods[$string] = $method;
+        $this->setMethods($methods);
+
+        return $this;
+    }
+
+    public function addMethod(Method $method): self
+    {
+        $methods = $this->getMethods();
+        $methods[$method->getName()] = $method;
+        $this->setMethods($methods);
+
+        return $this;
+
+    }
+
+    public function getMethod(string $string): Method
+    {
+        Assert::keyExists($this->methods, $string, 'Method %s not found');
+        return $this->methods[$string];
+    }
+
+    public function addImplement(string $class): self
+    {
+        $implements = $this->getImplements();
+        $implements[$class] = $class;
+        $this->setImplements($implements);
+
+        return $this;
     }
 }

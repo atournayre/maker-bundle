@@ -4,13 +4,12 @@ declare(strict_types=1);
 namespace Atournayre\Bundle\MakerBundle\Builder;
 
 use Atournayre\Bundle\MakerBundle\Config\FromTemplateMakerConfiguration;
-use Atournayre\Bundle\MakerBundle\Config\InterfaceMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\Contracts\MakerConfigurationInterface;
 use Atournayre\Bundle\MakerBundle\VO\PhpFileDefinition;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PhpNamespace;
 
-final class FromTemplateBuilder extends AbstractBuilder
+class FromTemplateBuilder extends AbstractBuilder
 {
     public function supports(string $makerConfigurationClassName): bool
     {
@@ -34,7 +33,7 @@ final class FromTemplateBuilder extends AbstractBuilder
         ];
     }
 
-    public function createInstance(MakerConfigurationInterface|InterfaceMakerConfiguration $makerConfiguration): PhpFileDefinition
+    public function createInstance(MakerConfigurationInterface|FromTemplateMakerConfiguration $makerConfiguration): PhpFileDefinition
     {
         $sourceCode = $makerConfiguration->sourceCode();
 
