@@ -15,7 +15,7 @@ return RectorConfig::configure()
 //        typeDeclarations: true,
         privatization: true,
 //        naming: true,
-//        earlyReturn: true,
+        earlyReturn: true,
     )
 //    ->withPhpSets()
     ->withRootFiles()
