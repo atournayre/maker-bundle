@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\FormInterface;
 use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
 use Atournayre\Bundle\MakerBundle\Config\ControllerMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
@@ -121,8 +123,8 @@ class MakeController extends AbstractMaker
     protected function dependencies(): array
     {
         return [
-            \Symfony\Component\Form\Extension\Core\Type\FormType::class => 'symfony/form',
-            \Symfony\Component\Form\FormInterface::class => 'symfony/form',
+            FormType::class => 'symfony/form',
+            FormInterface::class => 'symfony/form',
         ];
     }
 }

@@ -51,7 +51,7 @@ final class EntityEventDispatcher implements EntityEventDispatcherInterface
             return $context;
         }
 
-        if (!$context instanceof \App\Contracts\VO\ContextInterface) {
+        if (!$context instanceof ContextInterface) {
             return $this->contextFactory->create();
         }
 

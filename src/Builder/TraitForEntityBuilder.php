@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Builder;
 
+use Doctrine\ORM\Mapping;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping\Column;
 use Aimeos\Map;
 use Atournayre\Bundle\MakerBundle\Config\TraitForEntityMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\DTO\PropertyDefinition;
@@ -42,17 +45,17 @@ final class TraitForEntityBuilder extends AbstractBuilder
             ->toArray();
 
         $uses = [
-            \Doctrine\ORM\Mapping::class => 'ORM',
+            Mapping::class => 'ORM',
         ];
 
         $nullableProperties = array_filter($traitProperties, fn(PropertyDefinition $property) => !$property->nullable);
         if ($nullableProperties !== []) {
-            $uses[\Webmozart\Assert\Assert::class] = null;
+            $uses[Assert::class] = null;
         }
 
         $dateTimeInterfaceProperties = array_filter($traitProperties, fn(PropertyDefinition $property) => $property->typeIsDateTimeInterface());
         if ($dateTimeInterfaceProperties !== []) {
-            $uses[\Doctrine\DBAL\Types\Types::class] = null;
+            $uses[Types::class] = null;
         }
 
         $properties = array_map(
@@ -164,11 +167,11 @@ final class TraitForEntityBuilder extends AbstractBuilder
         ];
 
         $propertyType = $this->matchDoctrineType($clone->getType());
-        if ($propertyType instanceof \Nette\PhpGenerator\Literal) {
+        if ($propertyType instanceof Literal) {
             $columnArgs['type'] = $propertyType;
         }
 
-        $clone->addAttribute(\Doctrine\ORM\Mapping\Column::class, $columnArgs);
+        $clone->addAttribute(Column::class, $columnArgs);
 
         return $clone;
     }
@@ -176,7 +179,7 @@ final class TraitForEntityBuilder extends AbstractBuilder
     private function matchDoctrineType(string $type): Literal|null
     {
         return match ($type) {
-            '\DateTimeInterface' => class_exists(\Doctrine\DBAL\Types\Types::class)
+            '\DateTimeInterface' => class_exists(Types::class)
                 ? new Literal('Types::DATETIME_MUTABLE')
                 : null,
             default => null,

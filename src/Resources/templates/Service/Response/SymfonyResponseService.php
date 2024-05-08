@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace App\Service\Response;
 
+use App\Service\Templating\TwigTemplatingService;
+use App\Service\Routing\SymfonyRoutingService;
+use App\Logger\DefaultLogger;
 use App\Contracts\Logger\LoggerInterface;
 use App\Contracts\Response\ResponseInterface;
 use App\Contracts\Routing\RoutingInterface;
@@ -16,11 +19,11 @@ use Symfony\Component\HttpFoundation\Response;
 final class SymfonyResponseService implements ResponseInterface
 {
 	public function __construct(
-		#[Autowire(service: \App\Service\Templating\TwigTemplatingService::class)]
+		#[Autowire(service: TwigTemplatingService::class)]
 		private readonly TemplatingInterface $templating,
-		#[Autowire(service: \App\Service\Routing\SymfonyRoutingService::class)]
+		#[Autowire(service: SymfonyRoutingService::class)]
 		private readonly RoutingInterface $routing,
-		#[Autowire(service: \App\Logger\DefaultLogger::class)]
+		#[Autowire(service: DefaultLogger::class)]
 		private readonly LoggerInterface $logger,
 	) {
 	}

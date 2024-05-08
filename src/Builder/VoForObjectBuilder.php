@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Builder;
 
+use Webmozart\Assert\Assert;
 use App\Contracts\Null\NullableInterface;
 use App\Trait\IsTrait;
 use App\Trait\NotNullableTrait;
@@ -34,7 +35,7 @@ final class VoForObjectBuilder extends AbstractBuilder
 
         return parent::createPhpFileDefinition($makerConfiguration)
             ->setUses([
-                \Webmozart\Assert\Assert::class,
+                Assert::class,
             ])
             ->setComments($this->comment())
             ->setMethods([

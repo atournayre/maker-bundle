@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Builder;
 
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use App\Contracts\Service\FailFastInterface;
 use App\Contracts\Service\PostConditionsChecksInterface;
 use App\Contracts\Service\PreConditionsChecksInterface;
@@ -33,7 +34,7 @@ final class ServiceQueryBuilder extends AbstractBuilder
         $voParameter = $makerConfiguration->vo();
 
         $attributes = [
-            new Attribute(\Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag::class, [
+            new Attribute(AutoconfigureTag::class, [
                 new Literal('TagQueryServiceInterface::class'),
             ]),
         ];
@@ -42,8 +43,8 @@ final class ServiceQueryBuilder extends AbstractBuilder
             ->setReadonly()
             ->setUses([
                 FailFast::class,
-                \Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag::class,
-                \App\Contracts\Service\TagQueryServiceInterface::class,
+                AutoconfigureTag::class,
+                TagQueryServiceInterface::class,
                 $voParameter,
                 QueryServiceInterface::class,
                 PreConditionsChecksInterface::class,

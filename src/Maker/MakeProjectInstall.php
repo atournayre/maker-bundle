@@ -3,6 +3,28 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
+use ApiPlatform\Metadata\ApiProperty;
+use Atournayre\Collection\TypedCollection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Mapping\Id;
+use Psr\Clock\ClockInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
+use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\String\UnicodeString;
+use Twig\Environment;
+use Webmozart\Assert\Assert;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
 use Atournayre\Bundle\MakerBundle\Collection\SplFileInfoCollection;
 use Atournayre\Bundle\MakerBundle\Config\FromTemplateMakerConfiguration;
@@ -88,30 +110,30 @@ class MakeProjectInstall extends AbstractMaker
     protected function dependencies(): array
     {
         $deps = $this->enableApiPlatform
-            ? [\ApiPlatform\Metadata\ApiProperty::class => 'api-platform/core']
+            ? [ApiProperty::class => 'api-platform/core']
             : [];
 
         return [
             ...$deps,
-            \Atournayre\Collection\TypedCollection::class => 'atournayre/collection',
-            \Doctrine\Common\Collections\ArrayCollection::class => 'doctrine/collections',
-            \Doctrine\ORM\Mapping\Id::class => 'doctrine/orm',
-            \Psr\Clock\ClockInterface::class => 'psr/clock',
-            \Psr\Log\LoggerInterface::class => 'psr/log',
-            \Symfony\Bundle\SecurityBundle\Security::class => 'symfony/security-bundle',
-            \Symfony\Component\DependencyInjection\Attribute\Autowire::class => 'symfony/dependency-injection',
-            \Symfony\Component\DependencyInjection\Attribute\TaggedIterator::class => 'symfony/dependency-injection',
-            \Symfony\Component\HttpFoundation\BinaryFileResponse::class => 'symfony/http-foundation',
-            \Symfony\Component\HttpFoundation\JsonResponse::class => 'symfony/http-foundation',
-            \Symfony\Component\HttpFoundation\RedirectResponse::class => 'symfony/http-foundation',
-            \Symfony\Component\HttpFoundation\Request::class => 'symfony/http-foundation',
-            \Symfony\Component\HttpFoundation\Response::class => 'symfony/http-foundation',
-            \Symfony\Component\HttpKernel\Controller\ValueResolverInterface::class => 'symfony/http-kernel',
-            \Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata::class => 'symfony/http-kernel',
-            \Symfony\Component\Routing\RouterInterface::class => 'symfony/routing',
-            \Symfony\Component\String\UnicodeString::class => 'symfony/string',
-            \Twig\Environment::class => 'twig/twig',
-            \Webmozart\Assert\Assert::class => 'webmozart/assert',
+            TypedCollection::class => 'atournayre/collection',
+            ArrayCollection::class => 'doctrine/collections',
+            Id::class => 'doctrine/orm',
+            ClockInterface::class => 'psr/clock',
+            LoggerInterface::class => 'psr/log',
+            Security::class => 'symfony/security-bundle',
+            Autowire::class => 'symfony/dependency-injection',
+            TaggedIterator::class => 'symfony/dependency-injection',
+            BinaryFileResponse::class => 'symfony/http-foundation',
+            JsonResponse::class => 'symfony/http-foundation',
+            RedirectResponse::class => 'symfony/http-foundation',
+            Request::class => 'symfony/http-foundation',
+            Response::class => 'symfony/http-foundation',
+            ValueResolverInterface::class => 'symfony/http-kernel',
+            ArgumentMetadata::class => 'symfony/http-kernel',
+            RouterInterface::class => 'symfony/routing',
+            UnicodeString::class => 'symfony/string',
+            Environment::class => 'twig/twig',
+            Assert::class => 'webmozart/assert',
         ];
     }
 
@@ -143,8 +165,8 @@ class MakeProjectInstall extends AbstractMaker
         $services['services']['App\Contracts\Session\FlashBagInterface'] = '@App\Service\Session\SymfonyFlashBagService';
         $services['services']['App\Contracts\Service\CommandServiceInterface'] = '@App\Service\CommandService';
         $services['services']['App\Contracts\Service\QueryServiceInterface'] = '@App\Service\QueryService';
-        $services['services'][\Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface::class] = [
-            'class' => \Symfony\Component\HttpFoundation\Session\Flash\FlashBag::class,
+        $services['services'][FlashBagInterface::class] = [
+            'class' => FlashBag::class,
             'public' => true
         ];
 

@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Builder;
 
+use Symfony\Contracts\EventDispatcher\Event;
+use Webmozart\Assert\Assert;
 use App\Contracts\VO\ContextInterface;
 use App\Trait\ContextTrait;
 use Atournayre\Bundle\MakerBundle\Config\EventMakerConfiguration;
@@ -27,12 +29,12 @@ final class EventBuilder extends AbstractBuilder
 
         return parent::createPhpFileDefinition($makerConfiguration)
             ->setUses([
-                \Symfony\Contracts\EventDispatcher\Event::class,
-                \Webmozart\Assert\Assert::class,
+                Event::class,
+                Assert::class,
                 ContextTrait::class,
                 ContextInterface::class,
             ])
-            ->setExtends(\Symfony\Contracts\EventDispatcher\Event::class)
+            ->setExtends(Event::class)
             ->setTraits([ContextTrait::class])
             ->setMethods([
                 $this->constructor($eventProperties, $makerConfiguration),

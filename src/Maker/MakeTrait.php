@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
+use Doctrine\ORM\Mapping\Id;
+use Webmozart\Assert\Assert;
+use Doctrine\DBAL\Types\Types;
 use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
 use Atournayre\Bundle\MakerBundle\Config\TraitForEntityMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\Config\TraitForObjectMakerConfiguration;
@@ -95,7 +98,7 @@ class MakeTrait extends AbstractMaker
 
             $isFirstField = false;
 
-            if (!$newField instanceof \Atournayre\Bundle\MakerBundle\DTO\PropertyDefinition) {
+            if (!$newField instanceof PropertyDefinition) {
                 break;
             }
 
@@ -179,9 +182,9 @@ class MakeTrait extends AbstractMaker
     protected function dependencies(): array
     {
         return [
-            \Doctrine\ORM\Mapping\Id::class => 'orm',
-            \Webmozart\Assert\Assert::class => 'webmozart/assert',
-            \Doctrine\DBAL\Types\Types::class => 'doctrine/dbal',
+            Id::class => 'orm',
+            Assert::class => 'webmozart/assert',
+            Types::class => 'doctrine/dbal',
         ];
     }
 }

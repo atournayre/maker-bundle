@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Builder;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Atournayre\Bundle\MakerBundle\Config\ListenerMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\PhpFileDefinition;
@@ -42,7 +43,7 @@ final class ListenerBuilder extends AbstractBuilder
         $eventName = Str::classNameFromNamespace($eventNamespace, 'Event');
 
         return [
-            new Attribute(\Symfony\Component\EventDispatcher\Attribute\AsEventListener::class, [
+            new Attribute(AsEventListener::class, [
                 'event' => new Literal(Str::classNameSemiColonFromNamespace($eventName)),
             ]),
         ];

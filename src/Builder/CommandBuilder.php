@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Builder;
 
+use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use App\Command\AbstractCommand;
 use Atournayre\Bundle\MakerBundle\Config\CommandMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\VO\PhpFileDefinition;
@@ -23,9 +26,9 @@ final class CommandBuilder extends AbstractBuilder
     {
         return parent::createPhpFileDefinition($makerConfiguration)
             ->setUses([
-                \Symfony\Component\Console\Attribute\AsCommand::class,
-                \Symfony\Component\Console\Input\InputInterface::class,
-                \Symfony\Component\Console\Style\SymfonyStyle::class,
+                AsCommand::class,
+                InputInterface::class,
+                SymfonyStyle::class,
             ])
             ->setAttributes($this->attributes($makerConfiguration))
             ->setExtends(AbstractCommand::class)
@@ -45,7 +48,7 @@ final class CommandBuilder extends AbstractBuilder
     private function attributes(CommandMakerConfiguration $makerConfiguration): array
     {
         return [
-            new Attribute(\Symfony\Component\Console\Attribute\AsCommand::class, [
+            new Attribute(AsCommand::class, [
                 'name' => $makerConfiguration->commandName(),
                 'description' => $makerConfiguration->description(),
             ]),
@@ -67,8 +70,8 @@ final class CommandBuilder extends AbstractBuilder
     {
         $method = new Method('doExecute');
         $method->setPublic()->setReturnType('void');
-        $method->addParameter('input')->setType(\Symfony\Component\Console\Input\InputInterface::class);
-        $method->addParameter('io')->setType(\Symfony\Component\Console\Style\SymfonyStyle::class);
+        $method->addParameter('input')->setType(InputInterface::class);
+        $method->addParameter('io')->setType(SymfonyStyle::class);
         $method->setBody('// Add your logic here');
         return $method;
     }
@@ -77,8 +80,8 @@ final class CommandBuilder extends AbstractBuilder
     {
         $method = new Method('preConditionsChecks');
         $method->setProtected()->setReturnType('void');
-        $method->addParameter('input')->setType(\Symfony\Component\Console\Input\InputInterface::class);
-        $method->addParameter('io')->setType(\Symfony\Component\Console\Style\SymfonyStyle::class);
+        $method->addParameter('input')->setType(InputInterface::class);
+        $method->addParameter('io')->setType(SymfonyStyle::class);
         $method->setBody('// Implement method or remove it if not needed');
         return $method;
     }
@@ -87,8 +90,8 @@ final class CommandBuilder extends AbstractBuilder
     {
         $method = new Method('failFast');
         $method->setProtected()->setReturnType('void');
-        $method->addParameter('input')->setType(\Symfony\Component\Console\Input\InputInterface::class);
-        $method->addParameter('io')->setType(\Symfony\Component\Console\Style\SymfonyStyle::class);
+        $method->addParameter('input')->setType(InputInterface::class);
+        $method->addParameter('io')->setType(SymfonyStyle::class);
         $method->setBody('// Implement method or remove it if not needed');
         return $method;
     }
@@ -97,8 +100,8 @@ final class CommandBuilder extends AbstractBuilder
     {
         $method = new Method('postConditionsChecks');
         $method->setProtected()->setReturnType('void');
-        $method->addParameter('input')->setType(\Symfony\Component\Console\Input\InputInterface::class);
-        $method->addParameter('io')->setType(\Symfony\Component\Console\Style\SymfonyStyle::class);
+        $method->addParameter('input')->setType(InputInterface::class);
+        $method->addParameter('io')->setType(SymfonyStyle::class);
         $method->setBody('// Implement method or remove it if not needed');
         return $method;
     }

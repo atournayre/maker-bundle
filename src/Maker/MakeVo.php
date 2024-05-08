@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
+use Webmozart\Assert\Assert;
 use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
 use Atournayre\Bundle\MakerBundle\Config\VoForEntityMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\Config\VoForObjectMakerConfiguration;
@@ -121,7 +122,7 @@ class MakeVo extends AbstractMaker
 
             $isFirstField = false;
 
-            if (!$newField instanceof \Atournayre\Bundle\MakerBundle\DTO\PropertyDefinition) {
+            if (!$newField instanceof PropertyDefinition) {
                 break;
             }
 
@@ -178,7 +179,7 @@ class MakeVo extends AbstractMaker
     protected function dependencies(): array
     {
         return [
-            \Webmozart\Assert\Assert::class => 'webmozart/assert',
+            Assert::class => 'webmozart/assert',
         ];
     }
 }

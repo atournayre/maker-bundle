@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
+use Webmozart\Assert\Assert;
 use App\Contracts\Event\HasEventsInterface;
 use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
 use Atournayre\Bundle\MakerBundle\Collection\SplFileInfoCollection;
@@ -78,7 +79,7 @@ class MakeAddEventsToEntities extends AbstractMaker
     protected function dependencies(): array
     {
         return [
-            \Webmozart\Assert\Assert::class => 'webmozart/assert',
+            Assert::class => 'webmozart/assert',
         ];
     }
 }

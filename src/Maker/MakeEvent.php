@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
+use Webmozart\Assert\Assert;
+use Symfony\Contracts\EventDispatcher\Event;
 use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
 use Atournayre\Bundle\MakerBundle\Config\EventMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\Config\ListenerMakerConfiguration;
@@ -110,7 +112,7 @@ class MakeEvent extends AbstractMaker
 
             $isFirstField = false;
 
-            if (!$newField instanceof \Atournayre\Bundle\MakerBundle\DTO\PropertyDefinition) {
+            if (!$newField instanceof PropertyDefinition) {
                 break;
             }
 
@@ -160,8 +162,8 @@ class MakeEvent extends AbstractMaker
     protected function dependencies(): array
     {
         return [
-            \Webmozart\Assert\Assert::class => 'webmozart/assert',
-            \Symfony\Contracts\EventDispatcher\Event::class => 'symfony/event-dispatcher',
+            Assert::class => 'webmozart/assert',
+            Event::class => 'symfony/event-dispatcher',
         ];
     }
 }

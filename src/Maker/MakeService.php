@@ -165,7 +165,7 @@ class MakeService extends AbstractMaker
     protected function dependencies(): array
     {
         return [
-            \Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag::class => 'symfony/dependency-injection',
+            AutoconfigureTag::class => 'symfony/dependency-injection',
         ];
     }
 

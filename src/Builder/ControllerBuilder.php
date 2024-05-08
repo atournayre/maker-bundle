@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Builder;
 
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Atournayre\Bundle\MakerBundle\Config\ControllerMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\PhpFileDefinition;
@@ -27,7 +28,7 @@ class ControllerBuilder extends FromTemplateBuilder
         $phpFileDefinition->addUse($makerConfiguration->entityClassName());
         $phpFileDefinition->addUse($makerConfiguration->formTypeClassName());
         $phpFileDefinition->addUse($makerConfiguration->voClassName());
-        $phpFileDefinition->removeUse(\Symfony\Component\Form\Extension\Core\Type\FormType::class);
+        $phpFileDefinition->removeUse(FormType::class);
         return $phpFileDefinition;
     }
 
@@ -56,7 +57,7 @@ class ControllerBuilder extends FromTemplateBuilder
 
         // Replace FormType by the form type class name in the body
         $formTypeNamespace = $makerConfiguration->formTypeClassName();
-        $formType = \Symfony\Component\Form\Extension\Core\Type\FormType::class;
+        $formType = FormType::class;
         $body = $method->getBody();
         $body = Str::replace($body, $formType, $formTypeNamespace);
         $method->setBody($body);

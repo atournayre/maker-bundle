@@ -3,11 +3,12 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
+use Atournayre\Collection\TypedCollection;
+use Atournayre\Collection\TypedCollectionImmutable;
 use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
 use Atournayre\Bundle\MakerBundle\Config\CollectionMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
-use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -113,8 +114,8 @@ class MakeCollection extends AbstractMaker
     protected function dependencies(): array
     {
         return [
-            \Atournayre\Collection\TypedCollection::class => 'atournayre/collection',
-            \Atournayre\Collection\TypedCollectionImmutable::class => 'atournayre/collection',
+            TypedCollection::class => 'atournayre/collection',
+            TypedCollectionImmutable::class => 'atournayre/collection',
         ];
     }
 }

@@ -3,6 +3,10 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Builder;
 
+use Atournayre\Collection\DecimalValueCollection;
+use Atournayre\Collection\TypedCollectionImmutable;
+use Atournayre\Collection\TypedCollection;
+use Atournayre\Types\DecimalValue;
 use Atournayre\Bundle\MakerBundle\Config\CollectionMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\PhpFileDefinition;
@@ -39,18 +43,18 @@ final class CollectionBuilder extends AbstractBuilder
     private function extendsClass(CollectionMakerConfiguration $makerConfiguration): string
     {
         if ($makerConfiguration->ofDecimals()) {
-            return \Atournayre\Collection\DecimalValueCollection::class;
+            return DecimalValueCollection::class;
         }
 
         return $makerConfiguration->isImmutable()
-            ? \Atournayre\Collection\TypedCollectionImmutable::class
-            : \Atournayre\Collection\TypedCollection::class;
+            ? TypedCollectionImmutable::class
+            : TypedCollection::class;
     }
 
     private function collectionType(CollectionMakerConfiguration $makerConfiguration): string
     {
         if ($makerConfiguration->ofDecimals()) {
-            return \Atournayre\Types\DecimalValue::class;
+            return DecimalValue::class;
         }
 
         return $makerConfiguration->relatedObject();
