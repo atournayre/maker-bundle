@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
-use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
-use Atournayre\Bundle\MakerBundle\VO\Builder\InterfaceBuilder;
+use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
+use Atournayre\Bundle\MakerBundle\Config\InterfaceMakerConfiguration;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -32,17 +32,18 @@ class MakeInterface extends AbstractMaker
 
     /**
      * @param string $namespace
-     * @return MakerConfig[]
+     * @return MakerConfigurationCollection
+     * @throws \Throwable
      */
-    protected function configurations(string $namespace): array
+    protected function configurations(string $namespace): MakerConfigurationCollection
     {
-        return [
-            new MakerConfig(
-                namespace: $namespace,
-                builder: InterfaceBuilder::class,
-                classnameSuffix: 'Interface',
-                namespacePrefix: $this->configNamespaces->contracts,
-            ),
-        ];
+        return MakerConfigurationCollection::createAsList([
+            InterfaceMakerConfiguration::fromNamespace(
+                rootDir: $this->rootDir,
+                rootNamespace: $this->rootNamespace,
+                namespace: $this->configNamespaces->contracts,
+                className: $namespace,
+            )
+        ]);
     }
 }

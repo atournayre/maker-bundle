@@ -3,17 +3,17 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
-use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
+use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
+use Atournayre\Bundle\MakerBundle\Collection\SplFileInfoCollection;
+use Atournayre\Bundle\MakerBundle\Config\FromTemplateMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
-use Atournayre\Bundle\MakerBundle\VO\Builder\FromTemplateBuilder;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
-use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Yaml\Yaml;
 use function Symfony\Component\String\u;
 
@@ -30,8 +30,7 @@ class MakeProjectInstall extends AbstractMaker
     public function configureCommand(Command $command, InputConfiguration $inputConfig): void
     {
         $command
-            ->setDescription(self::getCommandDescription())
-            ->addOption('enable-api-platform', null, InputOption::VALUE_OPTIONAL, 'Enable ApiPlatform', false);
+            ->setDescription(self::getCommandDescription());
     }
 
     public static function getCommandDescription(): string
@@ -41,32 +40,38 @@ class MakeProjectInstall extends AbstractMaker
 
     /**
      * @param string $namespace
-     * @return MakerConfig[]
+     * @return MakerConfigurationCollection
+     * @throws \Throwable
      */
-    protected function configurations(string $namespace): array
+    protected function configurations(string $namespace): MakerConfigurationCollection
     {
-        $templates = $this->getTemplates();
-        $configurations = [];
-        foreach ($templates as $template) {
-            $configurations[] = (new MakerConfig(
-                namespace: $namespace,
-                builder: FromTemplateBuilder::class,
-                enableApiPlatform: $this->enableApiPlatform,
-            ))->withTemplatePath($template);
-        }
-        return $configurations;
+        $configurations = $this->getTemplates()
+            ->toMap()
+            ->map(function (SplFileInfo $template) {
+                $templatePath = u($template->getRealPath())
+                    ->afterLast('Resources/templates/')
+                    ->prepend($this->rootDir)
+                ;
+
+                return FromTemplateMakerConfiguration::fromTemplate(
+                    rootDir: $this->rootDir,
+                    rootNamespace: $this->rootNamespace,
+                    templatePath: $templatePath->toString(),
+                )->withSourceCode($template->getContents());
+            })
+            ->values()
+            ->toArray()
+        ;
+        return MakerConfigurationCollection::createAsList($configurations);
     }
 
-    /**
-     * @return array<string>
-     */
-    private function getTemplates(): array
+    private function getTemplates(): SplFileInfoCollection
     {
         $templateDirectory = __DIR__.'/../Resources/templates';
 
         $filesystem = new Filesystem();
         if (!$filesystem->exists($templateDirectory)) {
-            return [];
+            return SplFileInfoCollection::createAsMap([]);
         }
 
         $finder = (new Finder())
@@ -75,17 +80,21 @@ class MakeProjectInstall extends AbstractMaker
             ->name('*.php')
             ->sortByName();
 
-        $templates = [];
-        foreach ($finder as $file) {
-            $path = u($file->getPathname())->afterLast('Resources/templates/');
-            $templates[] = $path->toString();
-        }
-        return $templates;
+        $templates = iterator_to_array($finder->getIterator());
+        return SplFileInfoCollection::createAsMap($templates);
     }
 
-    public function configureDependencies(DependencyBuilder $dependencies): void
+    /**
+     * @return array<string, string>
+     */
+    protected function dependencies(): array
     {
-        $deps = [
+        $deps = $this->enableApiPlatform
+            ? [\ApiPlatform\Metadata\ApiProperty::class => 'api-platform/core']
+            : [];
+
+        return [
+            ...$deps,
             \Atournayre\Collection\TypedCollection::class => 'atournayre/collection',
             \Doctrine\Common\Collections\ArrayCollection::class => 'doctrine/collections',
             \Doctrine\ORM\Mapping\Id::class => 'doctrine/orm',
@@ -106,14 +115,6 @@ class MakeProjectInstall extends AbstractMaker
             \Twig\Environment::class => 'twig/twig',
             \Webmozart\Assert\Assert::class => 'webmozart/assert',
         ];
-
-        if ($this->enableApiPlatform) {
-            $deps[\ApiPlatform\Metadata\ApiProperty::class] = 'api-platform/core';
-        }
-
-        foreach ($deps as $class => $package) {
-            $dependencies->addClassDependency($class, $package);
-        }
     }
 
     protected function updateConfig(ConsoleStyle $io): void
@@ -142,6 +143,8 @@ class MakeProjectInstall extends AbstractMaker
 
         $services['services']['App\Contracts\Logger\LoggerInterface'] = '@App\Logger\DefaultLogger';
         $services['services']['App\Contracts\Session\FlashBagInterface'] = '@App\Service\Session\SymfonyFlashBagService';
+        $services['services']['App\Contracts\Service\CommandServiceInterface'] = '@App\Service\CommandService';
+        $services['services']['App\Contracts\Service\QueryServiceInterface'] = '@App\Service\QueryService';
         $services['services'][\Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface::class] = [
             'class' => \Symfony\Component\HttpFoundation\Session\Flash\FlashBag::class,
             'public' => true

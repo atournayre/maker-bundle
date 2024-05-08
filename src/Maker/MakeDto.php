@@ -3,10 +3,11 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
-use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
-use Atournayre\Bundle\MakerBundle\VO\Builder\DtoBuilder;
+use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
+use Atournayre\Bundle\MakerBundle\Config\DtoMakerConfiguration;
+use Atournayre\Bundle\MakerBundle\DTO\PropertyDefinition;
+use Atournayre\Bundle\MakerBundle\Traits\PropertiesTrait;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
-use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -17,10 +18,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 #[AutoconfigureTag('maker.command')]
 class MakeDto extends AbstractMaker
 {
-    /**
-     * @var array<array{fieldName: string, type: string, nullable: bool}> $dtoProperties
-     */
-    private array $dtoProperties = [];
+    use PropertiesTrait;
 
     public static function getCommandName(): string
     {
@@ -41,11 +39,11 @@ class MakeDto extends AbstractMaker
 
     /**
      * @param ConsoleStyle $io
-     * @param array<array{fieldName: string, type: string, nullable: bool}> $fields
+     * @param array<string, PropertyDefinition> $fields
      * @param bool $isFirstField
-     * @return array{fieldName: string, type: string, nullable: bool}|null
+     * @return ?PropertyDefinition
      */
-    private function askForNextField(ConsoleStyle $io, array $fields, bool $isFirstField): ?array
+    private function askForNextField(ConsoleStyle $io, array $fields, bool $isFirstField): ?PropertyDefinition
     {
         $io->newLine();
 
@@ -72,7 +70,7 @@ class MakeDto extends AbstractMaker
             return null;
         }
 
-        $allowedTypes = $this->allowedTypes($this->configResources->dto);
+        $allowedTypes = $this->configResources->dto->allowedTypes($this->filesystem);
 
         $type = null;
 
@@ -98,14 +96,14 @@ class MakeDto extends AbstractMaker
         $data = ['fieldName' => $fieldName, 'type' => $type, 'nullable' => false];
 
         if ('datetime' === $type) {
-            return $data;
+            return PropertyDefinition::fromArray($data);
         }
 
         if ($io->confirm('Can this field be null (nullable)', false)) {
             $data['nullable'] = true;
         }
 
-        return $data;
+        return PropertyDefinition::fromArray($data);
     }
 
     public function interact(InputInterface $input, ConsoleStyle $io, Command $command): void
@@ -125,37 +123,38 @@ class MakeDto extends AbstractMaker
                 break;
             }
 
-            $currentFields[$newField['fieldName']] = $newField;
+            $currentFields[$newField->fieldName] = $newField;
         }
 
-        $this->dtoProperties = $currentFields;
+        $this->properties = $currentFields;
     }
 
     /**
      * @param string $namespace
-     * @return MakerConfig[]
+     * @return MakerConfigurationCollection
+     * @throws \Throwable
      */
-    protected function configurations(string $namespace): array
+    protected function configurations(string $namespace): MakerConfigurationCollection
     {
-        return [
-            (new MakerConfig(
-                namespace: $namespace,
-                builder: DtoBuilder::class,
-                dtoProperties: $this->dtoProperties,
-                namespacePrefix: $this->configNamespaces->dto,
-            ))
-                ->withExtraProperty('allowedTypes', $this->allowedTypes($this->configResources->dto)),
-        ];
+        return MakerConfigurationCollection::createAsList([
+            DtoMakerConfiguration::fromNamespace(
+                rootDir: $this->rootDir,
+                rootNamespace: $this->rootNamespace,
+                namespace: $this->configNamespaces->dto,
+                className: $namespace,
+            )
+                ->withProperties($this->properties)
+                ->withPropertiesAllowedTypes($this->configResources->dto->allowedTypes($this->filesystem)),
+        ]);
     }
 
-    public function configureDependencies(DependencyBuilder $dependencies): void
+    /**
+     * @return array<string, string>
+     */
+    protected function dependencies(): array
     {
-        $deps = [
+        return [
             \Webmozart\Assert\Assert::class => 'webmozart/assert',
         ];
-
-        foreach ($deps as $class => $package) {
-            $dependencies->addClassDependency($class, $package);
-        }
     }
 }

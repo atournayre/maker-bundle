@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
-use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
-use Atournayre\Bundle\MakerBundle\VO\Builder\ExceptionBuilder;
+use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
+use Atournayre\Bundle\MakerBundle\Config\ExceptionMakerConfiguration;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Component\Console\Command\Command;
@@ -64,18 +64,20 @@ class MakeException extends AbstractMaker
 
     /**
      * @param string $namespace
-     * @return MakerConfig[]
+     * @return MakerConfigurationCollection
+     * @throws \Throwable
      */
-    protected function configurations(string $namespace): array
+    protected function configurations(string $namespace): MakerConfigurationCollection
     {
-        return [
-            (new MakerConfig(
-                namespace: $namespace,
-                builder: ExceptionBuilder::class,
-                namespacePrefix: $this->configNamespaces->exception,
-            ))
-                ->withExtraProperty('exceptionType', $this->exceptionType)
-                ->withExtraProperty('exceptionNamedConstructor', $this->exceptionNamedConstructor),
-        ];
+        return MakerConfigurationCollection::createAsList([
+            ExceptionMakerConfiguration::fromNamespace(
+                rootDir: $this->rootDir,
+                rootNamespace: $this->rootNamespace,
+                namespace: $this->configNamespaces->exception,
+                className: $namespace,
+            )
+                ->withType($this->exceptionType)
+                ->withNamedConstructor($this->exceptionNamedConstructor),
+        ]);
     }
 }

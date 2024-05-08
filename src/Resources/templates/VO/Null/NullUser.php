@@ -7,7 +7,7 @@ use App\Contracts\Security\UserInterface;
 
 final class NullUser implements UserInterface
 {
-	static function create(): self
+	public static function create(): self
 	{
 		return new self();
 	}

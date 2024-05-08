@@ -3,18 +3,17 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
-use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
-use Atournayre\Bundle\MakerBundle\Helper\MakeHelper;
-use Atournayre\Bundle\MakerBundle\VO\Builder\ControllerBuilder;
+use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
+use Atournayre\Bundle\MakerBundle\Config\ControllerMakerConfiguration;
+use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
-use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
-use Symfony\Component\Console\Question\Question;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
+use Symfony\Component\Finder\SplFileInfo;
 
 #[AutoconfigureTag('maker.command')]
 class MakeController extends AbstractMaker
@@ -22,7 +21,6 @@ class MakeController extends AbstractMaker
     private ?string $controllerRelatedEntity = null;
     private ?string $controllerRelatedFormType = null;
     private ?string $controllerRelatedVO = null;
-    private bool $useAForm = false;
 
     public static function getCommandName(): string
     {
@@ -45,9 +43,6 @@ class MakeController extends AbstractMaker
     {
         parent::interact($input, $io, $command);
 
-        $questionWithForm = new Question('Create a controller with a form? (yes/no)', 'yes');
-        $this->useAForm = $io->askQuestion($questionWithForm) === 'yes';
-
         if (empty($this->entities())) {
             $io->error('No entity found in the Entity directory');
             return;
@@ -56,16 +51,6 @@ class MakeController extends AbstractMaker
         $questionControllerRelatedEntity = new ChoiceQuestion('Choose the entity related to this Controller', $this->entities());
         $this->controllerRelatedEntity = $io->askQuestion($questionControllerRelatedEntity);
 
-        if ($this->useAForm) {
-            $this->interactWithForm($input, $io, $command);
-            return;
-        }
-
-        $this->interactSimple($input, $io, $command);
-    }
-
-    public function interactWithForm(InputInterface $input, ConsoleStyle $io, Command $command): void
-    {
         if (empty($this->formTypes())) {
             $io->error('No form types found in the FormType directory');
             return;
@@ -83,17 +68,12 @@ class MakeController extends AbstractMaker
         $this->controllerRelatedVO = $io->askQuestion($questionControllerRelatedVO);
     }
 
-    public function interactSimple(InputInterface $input, ConsoleStyle $io, Command $command): void
-    {
-        throw new \RuntimeException('Creating controller without form is not implemented yet!');
-    }
-
     /**
      * @return string[]
      */
     private function entities(): array
     {
-        return MakeHelper::findFilesInDirectory($this->bundleConfiguration->directories->entity);
+        return $this->filesystem->findFilesInDirectory($this->bundleConfiguration->directories->entity);
     }
 
     /**
@@ -101,7 +81,7 @@ class MakeController extends AbstractMaker
      */
     private function formTypes(): array
     {
-        return MakeHelper::findFilesInDirectory($this->bundleConfiguration->directories->form);
+        return $this->filesystem->findFilesInDirectory($this->bundleConfiguration->directories->form);
     }
 
     /**
@@ -109,51 +89,42 @@ class MakeController extends AbstractMaker
      */
     private function vos(): array
     {
-        return MakeHelper::findFilesInDirectory($this->bundleConfiguration->directories->vo);
+        return $this->filesystem->findFilesInDirectory($this->bundleConfiguration->directories->vo);
     }
 
     /**
      * @param string $namespace
-     * @return MakerConfig[]
+     * @return MakerConfigurationCollection
+     * @throws \Throwable
      */
-    protected function configurations(string $namespace): array
+    protected function configurations(string $namespace): MakerConfigurationCollection
     {
-        if ($this->useAForm) {
-            return [
-                (new MakerConfig(
-                    namespace: $namespace,
-                    builder: ControllerBuilder::class,
-                    classnameSuffix: 'Controller',
-                    namespacePrefix: $this->configNamespaces->controller,
-                ))
-                    ->withTemplatePathKeepingNamespace('Controller/WithFormController.php')
-                    ->withExtraProperty('entityPath', $this->controllerRelatedEntity)
-                    ->withExtraProperty('formTypePath', $this->controllerRelatedFormType)
-                    ->withExtraProperty('voPath', $this->controllerRelatedVO),
-            ];
-        }
+        $withFormControllerPath = $this->bundleConfiguration->directories->controller.'/WithFormController.php';
+        $withFormController = new SplFileInfo($withFormControllerPath, $withFormControllerPath, $withFormControllerPath);
 
-        return [
-            (new MakerConfig(
-                namespace: $namespace,
-                builder: ControllerBuilder::class,
-                classnameSuffix: 'Controller',
-                namespacePrefix: $this->configNamespaces->controller,
-            ))
-                ->withTemplatePathKeepingNamespace('Controller/SimpleController.php')
-                ->withExtraProperty('entityPath', $this->controllerRelatedEntity),
-        ];
+        $fqcn = Str::sprintf('%s\%s', $this->bundleConfiguration->namespaces->controller, $namespace);
+
+        return MakerConfigurationCollection::createAsList([
+            ControllerMakerConfiguration::fromFqcn(
+                rootDir: $this->rootDir,
+                rootNamespace: $this->rootNamespace,
+                fqcn: $fqcn,
+            )
+                ->withSourceCode($withFormController->getContents())
+                ->withEntityPath($this->controllerRelatedEntity)
+                ->withFormTypePath($this->controllerRelatedFormType)
+                ->withVoPath($this->controllerRelatedVO),
+        ]);
     }
 
-    public function configureDependencies(DependencyBuilder $dependencies): void
+    /**
+     * @return array<string, string>
+     */
+    protected function dependencies(): array
     {
-        $deps = [
+        return [
             \Symfony\Component\Form\Extension\Core\Type\FormType::class => 'symfony/form',
             \Symfony\Component\Form\FormInterface::class => 'symfony/form',
         ];
-
-        foreach ($deps as $class => $package) {
-            $dependencies->addClassDependency($class, $package);
-        }
     }
 }

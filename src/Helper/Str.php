@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Helper;
 
+use Aimeos\Map;
+use Symfony\Component\String\AbstractString;
+
 class Str
 {
     public static function classNameFromNamespace(string $namespace, ?string $suffix): string
@@ -12,7 +15,12 @@ class Str
 
     public static function absolutePathFromNamespace(string $namespace, string $rootNamespace, string $rootDirectory, ?string $extension = '.php'): string
     {
-        return UStr::absolutePathFromNamespace($namespace, $rootNamespace, $rootDirectory, $extension)->toString();
+        $normalizedNamespace = Map::from(UStr::create($namespace)->split('\\'))
+            ->map(fn(AbstractString $part) => $part->title()->toString())
+            ->join('\\')
+        ;
+
+        return UStr::absolutePathFromNamespace($normalizedNamespace, $rootNamespace, $rootDirectory, $extension)->toString();
     }
 
     public static function wither(string $name): string

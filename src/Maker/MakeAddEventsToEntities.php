@@ -4,15 +4,16 @@ declare(strict_types=1);
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
 use App\Contracts\Event\HasEventsInterface;
-use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
+use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
+use Atournayre\Bundle\MakerBundle\Collection\SplFileInfoCollection;
+use Atournayre\Bundle\MakerBundle\Config\AddEventsToEntitiesMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
-use Atournayre\Bundle\MakerBundle\VO\Builder\AddEventsToEntityBuilder;
-use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 
 #[AutoconfigureTag('maker.command')]
 class MakeAddEventsToEntities extends AbstractMaker
@@ -35,29 +36,36 @@ class MakeAddEventsToEntities extends AbstractMaker
 
     /**
      * @param string $namespace
-     * @return MakerConfig[]
+     * @return MakerConfigurationCollection
      */
-    protected function configurations(string $namespace): array
+    protected function configurations(string $namespace): MakerConfigurationCollection
     {
-        return array_map(
-            fn(string $entity) => new MakerConfig(
-                namespace: Str::prefixByRootNamespace(Str::namespaceFromPath($entity, $this->rootDir), $this->rootNamespace),
-                builder: AddEventsToEntityBuilder::class,
-            ),
-            $this->entitiesWithoutEvents()
-        );
+        $configurations = $this->entitiesWithoutEvents()
+            ->toMap()
+            ->map(function (SplFileInfo $entityFile) {
+                $fqcn = Str::prefixByRootNamespace(Str::namespaceFromPath($entityFile->getRealPath(), $this->rootDir), $this->rootNamespace);
+
+                return AddEventsToEntitiesMakerConfiguration::fromFqcn(
+                    rootDir: $this->rootDir,
+                    rootNamespace: $this->rootNamespace,
+                    fqcn: $fqcn,
+                )->withSourceCode($entityFile->getContents());
+            })
+            ->toArray()
+        ;
+        return MakerConfigurationCollection::createAsList($configurations);
     }
 
     /**
-     * @return string[]
+     * @return SplFileInfoCollection
      */
-    private function entitiesWithoutEvents(): array
+    private function entitiesWithoutEvents(): SplFileInfoCollection
     {
-        $entityDirectory = $this->configNamespaces->entity;
+        $entityDirectory = $this->bundleConfiguration->directories->entity;
 
         $filesystem = new Filesystem();
         if (!$filesystem->exists($entityDirectory)) {
-            return [];
+            return SplFileInfoCollection::createAsMap([]);
         }
 
         $finder = (new Finder())
@@ -67,21 +75,17 @@ class MakeAddEventsToEntities extends AbstractMaker
             ->notContains(HasEventsInterface::class)
         ;
 
-        $entities = [];
-        foreach ($finder as $file) {
-            $entities[] = $file->getRealPath();
-        }
-        return $entities;
+        $entities = iterator_to_array($finder->getIterator());
+        return SplFileInfoCollection::createAsMap($entities);
     }
 
-    public function configureDependencies(DependencyBuilder $dependencies): void
+    /**
+     * @return array<string, string>
+     */
+    protected function dependencies(): array
     {
-        $deps = [
+        return [
             \Webmozart\Assert\Assert::class => 'webmozart/assert',
         ];
-
-        foreach ($deps as $class => $package) {
-            $dependencies->addClassDependency($class, $package);
-        }
     }
 }

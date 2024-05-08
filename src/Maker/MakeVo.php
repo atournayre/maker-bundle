@@ -3,12 +3,13 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
-use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
-use Atournayre\Bundle\MakerBundle\Helper\MakeHelper;
-use Atournayre\Bundle\MakerBundle\VO\Builder\VoForEntityBuilder;
-use Atournayre\Bundle\MakerBundle\VO\Builder\VoForObjectBuilder;
+use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
+use Atournayre\Bundle\MakerBundle\Config\VoForEntityMakerConfiguration;
+use Atournayre\Bundle\MakerBundle\Config\VoForObjectMakerConfiguration;
+use Atournayre\Bundle\MakerBundle\DTO\PropertyDefinition;
+use Atournayre\Bundle\MakerBundle\Helper\Str;
+use Atournayre\Bundle\MakerBundle\Traits\PropertiesTrait;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
-use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -20,10 +21,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 #[AutoconfigureTag('maker.command')]
 class MakeVo extends AbstractMaker
 {
-    /**
-     * @var array<array{fieldName: string, type: string}> $voProperties
-     */
-    private array $voProperties = [];
+    use PropertiesTrait;
     private ?string $voRelatedEntity = null;
 
     public static function getCommandName(): string
@@ -45,11 +43,11 @@ class MakeVo extends AbstractMaker
 
     /**
      * @param ConsoleStyle $io
-     * @param array<array{fieldName: string, type: string}> $fields
+     * @param array<string, PropertyDefinition> $fields
      * @param bool $isFirstField
-     * @return array{fieldName: string, type: string}|null
+     * @return ?PropertyDefinition
      */
-    private function askForNextField(ConsoleStyle $io, array $fields, bool $isFirstField): ?array
+    private function askForNextField(ConsoleStyle $io, array $fields, bool $isFirstField): ?PropertyDefinition
     {
         $io->newLine();
 
@@ -76,7 +74,7 @@ class MakeVo extends AbstractMaker
             return null;
         }
 
-        $allowedTypes = $this->allowedTypes($this->configResources->valueObject);
+        $allowedTypes = $this->configResources->valueObject->allowedTypes($this->filesystem);
 
         $type = null;
 
@@ -98,7 +96,7 @@ class MakeVo extends AbstractMaker
             }
         }
 
-        return ['fieldName' => $fieldName, 'type' => $type];
+        return PropertyDefinition::fromArray(['fieldName' => $fieldName, 'type' => $type]);
     }
 
     public function interact(InputInterface $input, ConsoleStyle $io, Command $command): void
@@ -130,10 +128,10 @@ class MakeVo extends AbstractMaker
                 break;
             }
 
-            $currentFields[$newField['fieldName']] = $newField;
+            $currentFields[$newField->fieldName] = $newField;
         }
 
-        $this->voProperties = $currentFields;
+        $this->properties = $currentFields;
     }
 
     /**
@@ -141,46 +139,51 @@ class MakeVo extends AbstractMaker
      */
     private function entities(): array
     {
-        return MakeHelper::findFilesInDirectory(
-            $this->bundleConfiguration->directories->entity
-        );
+        return $this->filesystem->findFilesInDirectory($this->bundleConfiguration->directories->entity);
     }
 
     /**
      * @param string $namespace
-     * @return MakerConfig[]
+     * @return MakerConfigurationCollection
+     * @throws \Throwable
      */
-    protected function configurations(string $namespace): array
+    protected function configurations(string $namespace): MakerConfigurationCollection
     {
         if ($this->voRelatedEntity) {
-            return [
-                (new MakerConfig(
-                    namespace: $namespace,
-                    builder: VoForEntityBuilder::class,
-                    voProperties: $this->voProperties,
-                    voRelatedToAnEntity: $this->voRelatedEntity,
-                    namespacePrefix: $this->configNamespaces->vo
-                ))
-                    ->withVoEntityNamespace()
-                    ->withExtraProperty('allowedTypes', $this->allowedTypes($this->configResources->valueObject)),
-            ];
+            return MakerConfigurationCollection::createAsList([
+                VoForEntityMakerConfiguration::fromNamespace(
+                    rootDir: $this->rootDir,
+                    rootNamespace: $this->rootNamespace,
+                    namespace: $this->configNamespaces->voEntity,
+                    className: $namespace,
+                )
+                    ->withRelatedEntity(Str::prefixByRootNamespace(Str::namespaceFromPath($this->voRelatedEntity, $this->rootDir), $this->rootNamespace))
+                    ->withProperties($this->properties)
+                    ->withPropertiesAllowedTypes($this->configResources->valueObject->allowedTypes($this->filesystem)
+                )
+            ]);
         }
 
-        return [
-            (new MakerConfig(
-                namespace: $namespace,
-                builder: VoForObjectBuilder::class,
-                voProperties: $this->voProperties,
-                namespacePrefix: $this->configNamespaces->vo,
-            ))
-                ->withExtraProperty('allowedTypes', $this->allowedTypes($this->configResources->valueObject)),
-        ];
+        return MakerConfigurationCollection::createAsList([
+            VoForObjectMakerConfiguration::fromNamespace(
+                rootDir: $this->rootDir,
+                rootNamespace: $this->rootNamespace,
+                namespace: $this->configNamespaces->vo,
+                className: $namespace,
+            )
+                ->withProperties($this->properties)
+                ->withPropertiesAllowedTypes($this->configResources->valueObject->allowedTypes($this->filesystem)
+            )
+        ]);
     }
 
-    public function configureDependencies(DependencyBuilder $dependencies): void
+    /**
+     * @return array<string, string>
+     */
+    protected function dependencies(): array
     {
-        MakeHelper::configureDependencies($dependencies, [
+        return [
             \Webmozart\Assert\Assert::class => 'webmozart/assert',
-        ]);
+        ];
     }
 }

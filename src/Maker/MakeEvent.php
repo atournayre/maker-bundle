@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
-use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
-use Atournayre\Bundle\MakerBundle\Helper\MakeHelper;
+use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
+use Atournayre\Bundle\MakerBundle\Config\EventMakerConfiguration;
+use Atournayre\Bundle\MakerBundle\Config\ListenerMakerConfiguration;
+use Atournayre\Bundle\MakerBundle\DTO\PropertyDefinition;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
-use Atournayre\Bundle\MakerBundle\VO\Builder\EventBuilder;
-use Atournayre\Bundle\MakerBundle\VO\Builder\ListenerBuilder;
+use Atournayre\Bundle\MakerBundle\Traits\PropertiesTrait;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
-use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -20,10 +20,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 #[AutoconfigureTag('maker.command')]
 class MakeEvent extends AbstractMaker
 {
-    /**
-     * @var array<array{fieldName: string, type: string}> $eventProperties
-     */
-    private array $eventProperties = [];
+    use PropertiesTrait;
 
     public static function getCommandName(): string
     {
@@ -44,11 +41,11 @@ class MakeEvent extends AbstractMaker
 
     /**
      * @param ConsoleStyle $io
-     * @param array<array{fieldName: string, type: string}> $fields
+     * @param array<string, PropertyDefinition> $fields
      * @param bool $isFirstField
-     * @return array{fieldName: string, type: string}|null
+     * @return ?PropertyDefinition
      */
-    private function askForNextField(ConsoleStyle $io, array $fields, bool $isFirstField): ?array
+    private function askForNextField(ConsoleStyle $io, array $fields, bool $isFirstField): ?PropertyDefinition
     {
         $io->newLine();
 
@@ -75,7 +72,7 @@ class MakeEvent extends AbstractMaker
             return null;
         }
 
-        $allowedTypes = $this->allowedTypes($this->configResources->event);
+        $allowedTypes = $this->configResources->event->allowedTypes($this->filesystem);
 
         $type = null;
 
@@ -97,7 +94,10 @@ class MakeEvent extends AbstractMaker
             }
         }
 
-        return ['fieldName' => $fieldName, 'type' => $type];
+        return PropertyDefinition::fromArray([
+            'fieldName' => $fieldName,
+            'type' => $type,
+        ]);
     }
 
     public function interact(InputInterface $input, ConsoleStyle $io, Command $command): void
@@ -117,54 +117,56 @@ class MakeEvent extends AbstractMaker
                 break;
             }
 
-            $currentFields[$newField['fieldName']] = $newField;
+            $currentFields[$newField->fieldName] = $newField;
         }
 
-        $this->eventProperties = $currentFields;
+        $this->properties = $currentFields;
     }
 
     /**
      * @param string $namespace
-     * @return MakerConfig[]
+     * @return MakerConfigurationCollection
+     * @throws \Throwable
      */
-    protected function configurations(string $namespace): array
+    protected function configurations(string $namespace): MakerConfigurationCollection
     {
-        $makerConfigEvent = (new MakerConfig(
-            namespace: $namespace,
-            builder: EventBuilder::class,
-            classnameSuffix: 'Event',
-            namespacePrefix: $this->configNamespaces->event,
-        ))
-            ->withExtraProperty('eventProperties', $this->eventProperties)
-            ->withExtraProperty('allowedTypes', $this->allowedTypes($this->configResources->event));
+        $makerConfigEvent = EventMakerConfiguration::fromNamespace(
+            rootDir: $this->rootDir,
+            rootNamespace: $this->rootNamespace,
+            namespace: $this->configNamespaces->event,
+            className: $namespace,
+        )
+            ->withProperties($this->properties)
+            ->withPropertiesAllowedTypes($this->configResources->event->allowedTypes($this->filesystem))
+        ;
 
         $listenerNamespace = Str::replace($namespace, 'Event', 'Listener');
         $listenerNamespace = Str::replace($listenerNamespace, '\Listener\\', '\EventListener\\');
 
-        $makerConfigListener = (new MakerConfig(
-            namespace: $listenerNamespace,
-            builder: ListenerBuilder::class,
-            classnameSuffix: 'Listener',
-            namespacePrefix: $this->configNamespaces->eventListener,
-        ))
-            ->withExtraProperty('eventNamespace', $makerConfigEvent->namespace())
-            ->withExtraProperty('allowedTypes', $this->allowedTypes($this->configResources->event));
+        $makerConfigListener = ListenerMakerConfiguration::fromNamespace(
+            rootDir: $this->rootDir,
+            rootNamespace: $this->rootNamespace,
+            namespace: $this->configNamespaces->eventListener,
+            className: $listenerNamespace,
+        )
+            ->withEventNamespace($makerConfigEvent->fqcn)
+            ->withPropertiesAllowedTypes($this->configResources->event->allowedTypes($this->filesystem))
+        ;
 
-        return [
+        return MakerConfigurationCollection::createAsList([
             $makerConfigEvent,
             $makerConfigListener,
-        ];
+        ]);
     }
 
-    public function configureDependencies(DependencyBuilder $dependencies): void
+    /**
+     * @return array<string, string>
+     */
+    protected function dependencies(): array
     {
-        $deps = [
+        return [
             \Webmozart\Assert\Assert::class => 'webmozart/assert',
             \Symfony\Contracts\EventDispatcher\Event::class => 'symfony/event-dispatcher',
         ];
-
-        foreach ($deps as $class => $package) {
-            $dependencies->addClassDependency($class, $package);
-        }
     }
 }
