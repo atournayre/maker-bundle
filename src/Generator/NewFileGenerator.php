@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Generator;
 
-use Atournayre\Bundle\MakerBundle\Builder\AbstractBuilder;
 use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfiguration;
 use Atournayre\Bundle\MakerBundle\Printer\PhpFilePrinter;
@@ -49,7 +48,6 @@ final class NewFileGenerator
                 $sourceCode = PhpFilePrinter::create($phpFileDefinition)->print();
                 $newMakerConfigurationCollection[$configuration->fqcn] = $configuration->withSourceCode($sourceCode);
             }
-
         }
 
         return MakerConfigurationCollection::createAsMap($newMakerConfigurationCollection);

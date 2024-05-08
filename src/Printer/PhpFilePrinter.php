@@ -64,7 +64,6 @@ final class PhpFilePrinter
         $namespace = $class->getNamespace();
 
         foreach ($phpFileDefinition->getTraits() as $trait) {
-            $class->removeTrait($trait);
             $class->addTrait($trait);
             $namespace->addUse($trait);
         }
@@ -75,6 +74,10 @@ final class PhpFilePrinter
 
         foreach ($phpFileDefinition->getUses() as $use => $alias) {
             $namespace->addUse($use, $alias);
+        }
+
+        foreach ($phpFileDefinition->getUsesFunctions() as $use => $alias) {
+            $namespace->addUseFunction($use, $alias);
         }
 
         /** @var Attribute $attribute */

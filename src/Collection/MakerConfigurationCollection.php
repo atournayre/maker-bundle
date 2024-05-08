@@ -11,6 +11,16 @@ class MakerConfigurationCollection extends TypedCollection
 {
     protected static string $type = MakerConfigurationInterface::class;
 
+    public static function createAsList(array $collection): static
+    {
+        return new static($collection);
+    }
+
+    public static function createAsMap(array $collection): static
+    {
+        return new static($collection);
+    }
+
     public function absolutePaths(): Map
     {
         return $this

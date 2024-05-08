@@ -7,6 +7,7 @@ use Atournayre\Bundle\MakerBundle\Builder\CommandBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\DtoBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\EventBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\ExceptionBuilder;
+use Atournayre\Bundle\MakerBundle\Builder\FromTemplateBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\InterfaceBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\ListenerBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\LoggerBuilder;
@@ -68,6 +69,7 @@ return static function (ContainerConfigurator $container): void {
         DtoBuilder::class,
         EventBuilder::class,
         ExceptionBuilder::class,
+        FromTemplateBuilder::class,
         InterfaceBuilder::class,
         ListenerBuilder::class,
         LoggerBuilder::class,

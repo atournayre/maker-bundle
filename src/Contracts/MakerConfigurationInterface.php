@@ -24,6 +24,15 @@ interface MakerConfigurationInterface
         string $fqcn,
     ): static;
 
+    /**
+     * @throws \Throwable
+     */
+    public static function fromTemplate(
+        string $rootDir,
+        string $rootNamespace,
+        string $templatePath,
+    ): static;
+
     public function namespace(): string;
 
     public function classname(): string;

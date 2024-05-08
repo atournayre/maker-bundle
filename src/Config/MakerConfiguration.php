@@ -72,6 +72,20 @@ abstract class MakerConfiguration implements MakerConfigurationInterface
         );
     }
 
+    public static function fromTemplate(
+        string $rootDir,
+        string $rootNamespace,
+        string $templatePath,
+    ): static
+    {
+        return static::fromFqcn(
+            rootDir: $rootDir,
+            rootNamespace: $rootNamespace,
+            fqcn: Str::prefixByRootNamespace(Str::namespaceFromPath($templatePath, $rootDir), $rootNamespace),
+        );
+    }
+
+
     public function namespace(): string
     {
         return $this->namespace;

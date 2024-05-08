@@ -3,22 +3,23 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
-use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
+use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
+use Atournayre\Bundle\MakerBundle\Collection\SplFileInfoCollection;
+use Atournayre\Bundle\MakerBundle\Config\FromTemplateMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
-use Atournayre\Bundle\MakerBundle\VO\Builder\FromTemplateBuilder;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Yaml\Yaml;
 use function Symfony\Component\String\u;
 
 #[AutoconfigureTag('maker.command')]
-class MakeProjectInstall extends AbstractMaker
+class MakeProjectInstall extends NewAbstractMaker
 {
     private bool $enableApiPlatform = false;
 
@@ -30,8 +31,7 @@ class MakeProjectInstall extends AbstractMaker
     public function configureCommand(Command $command, InputConfiguration $inputConfig): void
     {
         $command
-            ->setDescription(self::getCommandDescription())
-            ->addOption('enable-api-platform', null, InputOption::VALUE_OPTIONAL, 'Enable ApiPlatform', false);
+            ->setDescription(self::getCommandDescription());
     }
 
     public static function getCommandDescription(): string
@@ -41,32 +41,38 @@ class MakeProjectInstall extends AbstractMaker
 
     /**
      * @param string $namespace
-     * @return MakerConfig[]
+     * @return MakerConfigurationCollection
+     * @throws \Throwable
      */
-    protected function configurations(string $namespace): array
+    protected function configurations(string $namespace): MakerConfigurationCollection
     {
-        $templates = $this->getTemplates();
-        $configurations = [];
-        foreach ($templates as $template) {
-            $configurations[] = (new MakerConfig(
-                namespace: $namespace,
-                builder: FromTemplateBuilder::class,
-                enableApiPlatform: $this->enableApiPlatform,
-            ))->withTemplatePath($template);
-        }
-        return $configurations;
+        $configurations = $this->getTemplates()
+            ->toMap()
+            ->map(function (SplFileInfo $template) {
+                $templatePath = u($template->getRealPath())
+                    ->afterLast('Resources/templates/')
+                    ->prepend($this->rootDir)
+                ;
+
+                return FromTemplateMakerConfiguration::fromTemplate(
+                    rootDir: $this->rootDir,
+                    rootNamespace: $this->rootNamespace,
+                    templatePath: $templatePath->toString(),
+                )->withSourceCode($template->getContents());
+            })
+            ->values()
+            ->toArray()
+        ;
+        return MakerConfigurationCollection::createAsList($configurations);
     }
 
-    /**
-     * @return array<string>
-     */
-    private function getTemplates(): array
+    private function getTemplates(): SplFileInfoCollection
     {
         $templateDirectory = __DIR__.'/../Resources/templates';
 
         $filesystem = new Filesystem();
         if (!$filesystem->exists($templateDirectory)) {
-            return [];
+            return SplFileInfoCollection::createAsMap([]);
         }
 
         $finder = (new Finder())
@@ -75,12 +81,8 @@ class MakeProjectInstall extends AbstractMaker
             ->name('*.php')
             ->sortByName();
 
-        $templates = [];
-        foreach ($finder as $file) {
-            $path = u($file->getPathname())->afterLast('Resources/templates/');
-            $templates[] = $path->toString();
-        }
-        return $templates;
+        $templates = iterator_to_array($finder->getIterator());
+        return SplFileInfoCollection::createAsMap($templates);
     }
 
     public function configureDependencies(DependencyBuilder $dependencies): void

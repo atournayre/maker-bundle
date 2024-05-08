@@ -4,6 +4,9 @@ declare(strict_types=1);
 namespace Atournayre\Bundle\MakerBundle\VO;
 
 use Nette\PhpGenerator\Attribute;
+use Nette\PhpGenerator\Method;
+use Nette\PhpGenerator\Property;
+use Nette\PhpGenerator\TraitUse;
 use Webmozart\Assert\Assert;
 
 final class PhpFileDefinition
@@ -11,11 +14,13 @@ final class PhpFileDefinition
     private bool $strictTypes = true;
     private array $comments = [];
     private array $uses = [];
+    private array $usesFunctions = [];
     private array $attributes = [];
     private bool $interface = false;
     private bool $trait = false;
     private bool $readonly = false;
     private bool $final = true;
+    private bool $abstract = false;
     private ?string $extends = null;
     private array $implements = [];
     private array $constants = [];
@@ -74,8 +79,20 @@ final class PhpFileDefinition
 
             $usesWithAlias[$use] = $alias;
         }
+        ksort($usesWithAlias);
 
         $this->uses = $usesWithAlias;
+        return $this;
+    }
+
+    public function getUsesFunctions(): array
+    {
+        return $this->usesFunctions;
+    }
+
+    public function setUsesFunctions(array $usesFunctions): self
+    {
+        $this->usesFunctions = $usesFunctions;
         return $this;
     }
 
@@ -87,6 +104,9 @@ final class PhpFileDefinition
     public function setAttributes(array $attributes): self
     {
         Assert::allIsInstanceOf($attributes, Attribute::class, 'Attributes must be an array of Attribute');
+
+        usort($attributes, fn (Attribute $a, Attribute $b) => $a->getName() <=> $b->getName());
+
         $this->attributes = $attributes;
         return $this;
     }
@@ -157,6 +177,7 @@ final class PhpFileDefinition
 
     public function setImplements(array $implements): self
     {
+        sort($implements);
         $this->implements = $implements;
         return $this;
     }
@@ -168,6 +189,7 @@ final class PhpFileDefinition
 
     public function setConstants(array $constants): self
     {
+        sort($constants);
         $this->constants = $constants;
         return $this;
     }
@@ -179,6 +201,12 @@ final class PhpFileDefinition
 
     public function setTraits(array $traits): self
     {
+        $traits = array_map(
+            fn (string|TraitUse $trait) => $trait instanceof TraitUse ? $trait->getName() : $trait,
+            $traits
+        );
+
+        sort($traits);
         $this->traits = $traits;
         return $this;
     }
@@ -190,6 +218,8 @@ final class PhpFileDefinition
 
     public function setProperties(array $properties): self
     {
+        usort($properties, fn (Property $a, Property $b) => $a->getName() <=> $b->getName());
+
         $this->properties = $properties;
         return $this;
     }
@@ -201,6 +231,8 @@ final class PhpFileDefinition
 
     public function setMethods(array $methods): self
     {
+        usort($methods, fn (Method $a, Method $b) => $a->getName() <=> $b->getName());
+
         $this->methods = $methods;
         return $this;
     }
@@ -208,5 +240,21 @@ final class PhpFileDefinition
     public function fqcn(): string
     {
         return $this->namespace . '\\' . $this->className;
+    }
+
+    public function isClass(): bool
+    {
+        return !$this->isInterface() && !$this->isTrait();
+    }
+
+    public function setAbstract(bool $isAbstract = true): self
+    {
+        $this->abstract = $isAbstract;
+        return $this;
+    }
+
+    public function isAbstract(): bool
+    {
+        return $this->abstract;
     }
 }
