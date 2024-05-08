@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
+use App\Contracts\Service\CommandServiceInterface;
+use App\Contracts\Service\QueryServiceInterface;
 use App\Attribute\CommandService;
 use App\Attribute\QueryService;
 use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
@@ -181,8 +183,8 @@ class MakeService extends AbstractMaker
 
         $services = Yaml::parseFile($fileServices);
 
-        $services['services']['App\Contracts\Service\CommandServiceInterface'] = '@App\Service\CommandService';
-        $services['services']['App\Contracts\Service\QueryServiceInterface'] = '@App\Service\QueryService';
+        $services['services'][CommandServiceInterface::class] = '@App\Service\CommandService';
+        $services['services'][QueryServiceInterface::class] = '@App\Service\QueryService';
 
         $yaml = Yaml::dump($services, 4);
         file_put_contents($fileServices, $yaml);

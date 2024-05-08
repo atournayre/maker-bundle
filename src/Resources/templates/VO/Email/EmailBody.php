@@ -32,13 +32,10 @@ final class EmailBody implements NullableInterface
 {
     use NotNullableTrait;
     use IsTrait;
-
-    private string $body;
     private bool $isHtml = true;
 
-    private function __construct(string $body)
+    private function __construct(private string $body)
     {
-        $this->body = $body;
     }
 
     public static function create(string $body): self

@@ -8,23 +8,17 @@ use Webmozart\Assert\Assert;
 
 class IntegerType implements ScalarObjectInterface
 {
-    private int $value;
-    private int $integerPart;
-    private int $decimalPart;
-    private int $precision;
+    private readonly int $value;
 
     private function __construct(
         int $value,
-        int $integerPart,
-        int $decimalPart,
-        int $precision
+        private readonly int $integerPart,
+        private readonly int $decimalPart,
+        private readonly int $precision
     )
     {
         Assert::integer($value, 'Value must be an integer');
         $this->value = $value;
-        $this->precision = $precision;
-        $this->integerPart = $integerPart;
-        $this->decimalPart = $decimalPart;
     }
 
     /**

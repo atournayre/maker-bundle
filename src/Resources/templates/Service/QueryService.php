@@ -106,7 +106,7 @@ final class QueryService implements QueryServiceInterface
 		$serviceName = AttributeHelper::getParameter($object, AttributeQueryService::class, 'serviceName');
 
 		if ($serviceName === null || $serviceName === '' || $serviceName === '0') {
-		    throw new \LogicException(sprintf('The Value Object %s requested a QueryService but does not have the attribute QueryService.', get_class($object)));
+		    throw new \LogicException(sprintf('The Value Object %s requested a QueryService but does not have the attribute QueryService.', $object::class));
 		}
 
 		return $serviceName;
@@ -125,7 +125,7 @@ final class QueryService implements QueryServiceInterface
 		    $services = iterator_to_array($this->services);
 		}
 
-		$servicesNames = array_map(fn($object) => get_class($object), $services);
+		$servicesNames = array_map(fn($object) => $object::class, $services);
 
 		return array_combine($servicesNames, $services);
 	}

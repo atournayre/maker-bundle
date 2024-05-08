@@ -93,7 +93,7 @@ final class PhpFilePrinter
         }
 
         foreach ($phpFileDefinition->getProperties() as $property) {
-            if (str_contains($property->getType(), '\\')) {
+            if (str_contains((string) $property->getType(), '\\')) {
                 $namespace->addUse($property->getType());
             }
         }

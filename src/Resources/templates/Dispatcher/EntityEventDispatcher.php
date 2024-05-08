@@ -61,18 +61,18 @@ final class EntityEventDispatcher implements EntityEventDispatcherInterface
     private function addContext($event, ContextInterface $context)
     {
         if ($event->hasContext()) {
-            $this->logger->info(sprintf('Event %s already has context', get_class($event)));
+            $this->logger->info(sprintf('Event %s already has context', $event::class));
             return $event;
         }
 
-        $this->logger->info(sprintf('Adding context to %s event', get_class($event)));
+        $this->logger->info(sprintf('Adding context to %s event', $event::class));
         return $event->withContext($context);
     }
 
     private function dispatchEvent($event): void
     {
-        $this->logger->info(sprintf('Dispatching %s event', get_class($event)));
+        $this->logger->info(sprintf('Dispatching %s event', $event::class));
         $this->eventDispatcher->dispatch($event);
-        $this->logger->info(sprintf('Event %s dispatched', get_class($event)));
+        $this->logger->info(sprintf('Event %s dispatched', $event::class));
     }
 }

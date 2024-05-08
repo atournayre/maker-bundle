@@ -43,7 +43,7 @@ class FileSize
 
     public function humanReadable(): string
     {
-        $units = array('B', 'KB', 'MB', 'GB', 'TB');
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
         $value = $this->bytes;
         $unit = 0;
 

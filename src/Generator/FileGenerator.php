@@ -31,7 +31,7 @@ final class FileGenerator
         $newMakerConfigurationCollection = [];
         /** @var MakerConfiguration $configuration */
         foreach ($makerConfigurationCollection->values() as $configuration) {
-            $configurationClass = get_class($configuration);
+            $configurationClass = $configuration::class;
 
             /** @var PhpFileBuilderInterface $builder */
             foreach ($this->builders as $builder) {

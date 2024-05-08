@@ -8,11 +8,8 @@ use Webmozart\Assert\Assert;
 
 class BooleanType implements ScalarObjectInterface
 {
-    private bool $value;
-
-    private function __construct(bool $value)
+    private function __construct(private readonly bool $value)
     {
-        $this->value = $value;
     }
 
     public static function create(bool $value): self

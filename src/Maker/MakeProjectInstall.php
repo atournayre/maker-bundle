@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
+use App\Logger\DefaultLogger;
+use App\Contracts\Service\CommandServiceInterface;
+use App\Contracts\Service\QueryServiceInterface;
 use ApiPlatform\Metadata\ApiProperty;
 use Atournayre\Collection\TypedCollection;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -155,16 +158,16 @@ class MakeProjectInstall extends AbstractMaker
         $services['services']['App\\']['exclude'] = $appExclude;
 
         $services['services']['app.logger.toto'] = [
-            'class' => 'App\\Logger\\DefaultLogger',
+            'class' => DefaultLogger::class,
             'calls' => [
                 ['setLoggerIdentifier', ['toto']]
             ]
         ];
 
-        $services['services']['App\Contracts\Logger\LoggerInterface'] = '@App\Logger\DefaultLogger';
-        $services['services']['App\Contracts\Session\FlashBagInterface'] = '@App\Service\Session\SymfonyFlashBagService';
-        $services['services']['App\Contracts\Service\CommandServiceInterface'] = '@App\Service\CommandService';
-        $services['services']['App\Contracts\Service\QueryServiceInterface'] = '@App\Service\QueryService';
+        $services['services'][\App\Contracts\Logger\LoggerInterface::class] = '@App\Logger\DefaultLogger';
+        $services['services'][\App\Contracts\Session\FlashBagInterface::class] = '@App\Service\Session\SymfonyFlashBagService';
+        $services['services'][CommandServiceInterface::class] = '@App\Service\CommandService';
+        $services['services'][QueryServiceInterface::class] = '@App\Service\QueryService';
         $services['services'][FlashBagInterface::class] = [
             'class' => FlashBag::class,
             'public' => true

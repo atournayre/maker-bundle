@@ -7,12 +7,10 @@ class AttributeHelper
 {
 	public static function getNamedArguments($objectOrClass, string $attributeName): array
 	{
-		$reflectionClass = new \ReflectionClass(get_class($objectOrClass));
+		$reflectionClass = new \ReflectionClass($objectOrClass::class);
 		$attributes = $reflectionClass->getAttributes();
 
-		$attributes = array_filter($attributes, function ($attribute) use($attributeName) {
-		    return $attribute->getName() === $attributeName;
-		});
+		$attributes = array_filter($attributes, fn($attribute) => $attribute->getName() === $attributeName);
 
 		$namedArguments = [];
 		foreach ($attributes as $attribute) {

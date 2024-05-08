@@ -8,13 +8,8 @@ use Webmozart\Assert\Assert;
 
 abstract class AbstractCollectionType implements \ArrayAccess, \Countable
 {
-    private array $collection = [];
-
-    protected function __construct(
-        array $collection
-    )
+    protected function __construct(private array $collection)
     {
-        $this->collection = $collection;
     }
 
     public function offsetExists($offset): bool
@@ -39,7 +34,7 @@ abstract class AbstractCollectionType implements \ArrayAccess, \Countable
         $firstElement = reset($this->collection);
 
         if (\is_object($firstElement)) {
-            Assert::isInstanceOf($value, \get_class($firstElement));
+            Assert::isInstanceOf($value, $firstElement::class);
             return;
         }
 
@@ -82,33 +77,18 @@ abstract class AbstractCollectionType implements \ArrayAccess, \Countable
 
     private function assertType($value, string $type, string $message = ''): void
     {
-        switch ($type) {
-            case 'string':
-                Assert::string($value, $message);
-                break;
-            case 'int':
-                Assert::integer($value, $message);
-                break;
-            case 'float':
-                Assert::float($value, $message);
-                break;
-            case 'bool':
-                Assert::boolean($value, $message);
-                break;
-            case 'array':
-                Assert::isArray($value, $message);
-                break;
-            case 'object':
-                Assert::object($value, $message);
-                break;
-            case 'null':
-                Assert::null($value, $message);
-                break;
-            default:
-                throw new \InvalidArgumentException(sprintf(
-                    'Invalid type "%s". Expected one of "string", "int", "float", "bool", "array", "object" or "null".',
-                    $type
-                ));
-        }
+        match ($type) {
+            'string' => Assert::string($value, $message),
+            'int' => Assert::integer($value, $message),
+            'float' => Assert::float($value, $message),
+            'bool' => Assert::boolean($value, $message),
+            'array' => Assert::isArray($value, $message),
+            'object' => Assert::object($value, $message),
+            'null' => Assert::null($value, $message),
+            default => throw new \InvalidArgumentException(sprintf(
+                'Invalid type "%s". Expected one of "string", "int", "float", "bool", "array", "object" or "null".',
+                $type
+            )),
+        };
     }
 }

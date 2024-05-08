@@ -53,7 +53,7 @@ class MakeCommand extends AbstractMaker
         $description = new Question('Choose a description for your command. Press <Enter> to skip.');
         $this->commandDescription = $io->askQuestion($description) ?? '';
 
-        $this->commandName = trim($input->getArgument('name'));
+        $this->commandName = trim((string) $input->getArgument('name'));
     }
 
     /**

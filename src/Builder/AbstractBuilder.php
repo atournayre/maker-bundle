@@ -35,7 +35,7 @@ abstract class AbstractBuilder implements PhpFileBuilderInterface
 
         $allowedTypesMapping = [];
         foreach ($allowedTypes as $allowedType) {
-            if (!str_contains($allowedType, '/')) {
+            if (!str_contains((string) $allowedType, '/')) {
                 $allowedTypesMapping[$allowedType] = $allowedType;
                 continue;
             }

@@ -17,7 +17,7 @@ return RectorConfig::configure()
 //        naming: true,
         earlyReturn: true,
     )
-//    ->withPhpSets()
+    ->withPhpSets()
     ->withRootFiles()
     ->withImportNames(
         importShortClasses: false,
