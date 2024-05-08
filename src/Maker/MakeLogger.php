@@ -11,7 +11,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('maker.command')]
-class MakeLogger extends NewAbstractMaker
+class MakeLogger extends AbstractMaker
 {
     public static function getCommandName(): string
     {

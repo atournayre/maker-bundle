@@ -6,10 +6,8 @@ namespace Atournayre\Bundle\MakerBundle\Maker;
 use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
 use Atournayre\Bundle\MakerBundle\Config\VoForEntityMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\Config\VoForObjectMakerConfiguration;
-use Atournayre\Bundle\MakerBundle\Helper\MakeHelper;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
-use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -19,7 +17,7 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('maker.command')]
-class MakeVo extends NewAbstractMaker
+class MakeVo extends AbstractMaker
 {
     /**
      * @var array<array{fieldName: string, type: string}> $voProperties
@@ -180,10 +178,10 @@ class MakeVo extends NewAbstractMaker
         ]);
     }
 
-    public function configureDependencies(DependencyBuilder $dependencies): void
+    public function dependencies(): array
     {
-        MakeHelper::configureDependencies($dependencies, [
+        return [
             \Webmozart\Assert\Assert::class => 'webmozart/assert',
-        ]);
+        ];
     }
 }

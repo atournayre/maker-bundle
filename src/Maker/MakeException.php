@@ -15,7 +15,7 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('maker.command')]
-class MakeException extends NewAbstractMaker
+class MakeException extends AbstractMaker
 {
     private string $exceptionType;
     private ?string $exceptionNamedConstructor = null;

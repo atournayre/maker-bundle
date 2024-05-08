@@ -8,7 +8,6 @@ use Atournayre\Bundle\MakerBundle\Collection\SplFileInfoCollection;
 use Atournayre\Bundle\MakerBundle\Config\FromTemplateMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
-use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
@@ -19,7 +18,7 @@ use Symfony\Component\Yaml\Yaml;
 use function Symfony\Component\String\u;
 
 #[AutoconfigureTag('maker.command')]
-class MakeProjectInstall extends NewAbstractMaker
+class MakeProjectInstall extends AbstractMaker
 {
     private bool $enableApiPlatform = false;
 
@@ -85,9 +84,14 @@ class MakeProjectInstall extends NewAbstractMaker
         return SplFileInfoCollection::createAsMap($templates);
     }
 
-    public function configureDependencies(DependencyBuilder $dependencies): void
+    public function dependencies(): array
     {
-        $deps = [
+        $deps = $this->enableApiPlatform
+            ? [\ApiPlatform\Metadata\ApiProperty::class => 'api-platform/core']
+            : [];
+
+        return [
+            ...$deps,
             \Atournayre\Collection\TypedCollection::class => 'atournayre/collection',
             \Doctrine\Common\Collections\ArrayCollection::class => 'doctrine/collections',
             \Doctrine\ORM\Mapping\Id::class => 'doctrine/orm',
@@ -108,14 +112,6 @@ class MakeProjectInstall extends NewAbstractMaker
             \Twig\Environment::class => 'twig/twig',
             \Webmozart\Assert\Assert::class => 'webmozart/assert',
         ];
-
-        if ($this->enableApiPlatform) {
-            $deps[\ApiPlatform\Metadata\ApiProperty::class] = 'api-platform/core';
-        }
-
-        foreach ($deps as $class => $package) {
-            $dependencies->addClassDependency($class, $package);
-        }
     }
 
     protected function updateConfig(ConsoleStyle $io): void

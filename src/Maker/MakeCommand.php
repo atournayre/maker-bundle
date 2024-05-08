@@ -6,7 +6,6 @@ namespace Atournayre\Bundle\MakerBundle\Maker;
 use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
 use Atournayre\Bundle\MakerBundle\Config\CommandMakerConfiguration;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
-use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Bundle\MakerBundle\Str;
 use Symfony\Component\Console\Command\Command;
@@ -16,7 +15,7 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('maker.command')]
-class MakeCommand extends NewAbstractMaker
+class MakeCommand extends AbstractMaker
 {
     private string $commandTitle = '';
     private string $commandDescription = '';
@@ -78,14 +77,10 @@ class MakeCommand extends NewAbstractMaker
         ]);
     }
 
-    public function configureDependencies(DependencyBuilder $dependencies): void
+    public function dependencies(): array
     {
-        $deps = [
+        return [
             Command::class => 'console',
         ];
-
-        foreach ($deps as $class => $package) {
-            $dependencies->addClassDependency($class, $package);
-        }
     }
 }

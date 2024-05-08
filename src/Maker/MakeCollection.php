@@ -17,7 +17,7 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('maker.command')]
-class MakeCollection extends NewAbstractMaker
+class MakeCollection extends AbstractMaker
 {
     private ?string $collectionRelatedObject = null;
     private bool $collectionIsImmutable = true;
@@ -109,15 +109,11 @@ class MakeCollection extends NewAbstractMaker
         ]);
     }
 
-    public function configureDependencies(DependencyBuilder $dependencies): void
+    public function dependencies(): array
     {
-        $deps = [
+        return [
             \Atournayre\Collection\TypedCollection::class => 'atournayre/collection',
             \Atournayre\Collection\TypedCollectionImmutable::class => 'atournayre/collection',
         ];
-
-        foreach ($deps as $class => $package) {
-            $dependencies->addClassDependency($class, $package);
-        }
     }
 }

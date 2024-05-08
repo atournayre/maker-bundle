@@ -3,52 +3,63 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Generator;
 
-use Atournayre\Bundle\MakerBundle\Collection\FileDefinitionCollection;
-use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
-use Atournayre\Bundle\MakerBundle\VO\Builder\AbstractBuilder;
+use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
+use Atournayre\Bundle\MakerBundle\Config\MakerConfiguration;
+use Atournayre\Bundle\MakerBundle\Printer\PhpFilePrinter;
 use Symfony\Component\Filesystem\Filesystem;
-use Webmozart\Assert\Assert;
 
-class FileGenerator
+final class FileGenerator
 {
     public function __construct(
-        private readonly string $rootDir,
-        private readonly string $rootNamespace,
+        private readonly iterable $builders
     )
     {
     }
 
     /**
-     * @param array|MakerConfig[] $configurations
+     * @param MakerConfigurationCollection $configurations
      * @return void
+     * @throws \ReflectionException
      */
-    public function generate(array $configurations): void
+    public function generate(MakerConfigurationCollection $configurations): void
     {
-        Assert::allIsInstanceOf($configurations, MakerConfig::class);
-
-        $fileDefinitionCollection = FileDefinitionCollection::fromConfigurations($configurations, $this->rootNamespace, $this->rootDir);
-
-        $this->addSourceCodeToFilesDefinitions($fileDefinitionCollection);
-        $this->generateFiles($fileDefinitionCollection);
+        $makerConfigurationCollection = $this->createMakerConfigurationCollectionWithSourceCode($configurations);
+        $this->generateFiles($makerConfigurationCollection);
     }
 
-    private function addSourceCodeToFilesDefinitions(FileDefinitionCollection $fileDefinitionCollection): void
+    /**
+     * @throws \ReflectionException
+     */
+    private function createMakerConfigurationCollectionWithSourceCode(
+        MakerConfigurationCollection $makerConfigurationCollection
+    ): MakerConfigurationCollection
     {
-        foreach ($fileDefinitionCollection->getFileDefinitions() as $fileDefinition) {
-            $builder = $fileDefinition->builder().'::build';
-            /** @var AbstractBuilder $builderCreate */
-            $builderCreate = $builder($fileDefinition);
-            $sourceCode = $builderCreate->generate();
-            $fileDefinitionCollection->set($fileDefinition->uniqueIdentifier(), $fileDefinition->withSourceCode($sourceCode));
+        $newMakerConfigurationCollection = [];
+        /** @var MakerConfiguration $configuration */
+        foreach ($makerConfigurationCollection->values() as $configuration) {
+            $configurationClass = get_class($configuration);
+
+            foreach ($this->builders as $builder) {
+                if (!$builder->supports($configurationClass)) {
+                    continue;
+                }
+
+                $phpFileDefinition = $builder->createInstance($configuration);
+                $sourceCode = PhpFilePrinter::create($phpFileDefinition)->print();
+                $newMakerConfigurationCollection[$configuration->fqcn] = $configuration->withSourceCode($sourceCode);
+            }
         }
+
+        return MakerConfigurationCollection::createAsMap($newMakerConfigurationCollection);
     }
 
-    private function generateFiles(FileDefinitionCollection $fileDefinitionCollection): void
+    private function generateFiles(MakerConfigurationCollection $makerConfigurationCollection): void
     {
-        $filesDefinitions = $fileDefinitionCollection->getFileDefinitions();
+        $makerConfigurations = $makerConfigurationCollection->values();
 
-        foreach ($filesDefinitions as $fileDefinition) {
-            $this->saveFile($fileDefinition->absolutePath(), $fileDefinition->sourceCode());
+        /** @var MakerConfiguration $makerConfiguration */
+        foreach ($makerConfigurations as $makerConfiguration) {
+            $this->saveFile($makerConfiguration->absolutePath(), $makerConfiguration->sourceCode());
         }
     }
 

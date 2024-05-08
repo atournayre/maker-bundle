@@ -6,7 +6,6 @@ namespace Atournayre\Bundle\MakerBundle\Maker;
 use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
 use Atournayre\Bundle\MakerBundle\Config\DtoMakerConfiguration;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
-use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -15,7 +14,7 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('maker.command')]
-class MakeDto extends NewAbstractMaker
+class MakeDto extends AbstractMaker
 {
     /**
      * @var array<array{fieldName: string, type: string, nullable: bool}> $dtoProperties
@@ -150,14 +149,10 @@ class MakeDto extends NewAbstractMaker
         ]);
     }
 
-    public function configureDependencies(DependencyBuilder $dependencies): void
+    public function dependencies(): array
     {
-        $deps = [
+        return [
             \Webmozart\Assert\Assert::class => 'webmozart/assert',
         ];
-
-        foreach ($deps as $class => $package) {
-            $dependencies->addClassDependency($class, $package);
-        }
     }
 }

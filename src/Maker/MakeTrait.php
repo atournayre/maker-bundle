@@ -6,9 +6,7 @@ namespace Atournayre\Bundle\MakerBundle\Maker;
 use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
 use Atournayre\Bundle\MakerBundle\Config\TraitForEntityMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\Config\TraitForObjectMakerConfiguration;
-use Atournayre\Bundle\MakerBundle\Helper\MakeHelper;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
-use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -19,7 +17,7 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('maker.command')]
-class MakeTrait extends NewAbstractMaker
+class MakeTrait extends AbstractMaker
 {
     /**
      * @var array<array{fieldName: string, type: string, nullable: bool}> $traitProperties
@@ -181,12 +179,12 @@ class MakeTrait extends NewAbstractMaker
         return $data;
     }
 
-    public function configureDependencies(DependencyBuilder $dependencies): void
+    public function dependencies(): array
     {
-        MakeHelper::configureDependencies($dependencies, [
+        return [
             \Doctrine\ORM\Mapping\Id::class => 'orm',
             \Webmozart\Assert\Assert::class => 'webmozart/assert',
             \Doctrine\DBAL\Types\Types::class => 'doctrine/dbal',
-        ]);
+        ];
     }
 }

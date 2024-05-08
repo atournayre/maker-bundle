@@ -9,12 +9,10 @@ use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
 use Atournayre\Bundle\MakerBundle\Config\AddAttributeMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\Config\ServiceCommandMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\Config\ServiceQueryMakerConfiguration;
-use Atournayre\Bundle\MakerBundle\Helper\MakeHelper;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Nette\PhpGenerator\Attribute;
 use Nette\PhpGenerator\Literal;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
-use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -26,7 +24,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Yaml;
 
 #[AutoconfigureTag('maker.command')]
-class MakeService extends NewAbstractMaker
+class MakeService extends AbstractMaker
 {
     private const COMMAND = 'Command';
     private const QUERY = 'Query';
@@ -163,11 +161,11 @@ class MakeService extends NewAbstractMaker
         return MakerConfigurationCollection::createAsList($configurations);
     }
 
-    public function configureDependencies(DependencyBuilder $dependencies): void
+    public function dependencies(): array
     {
-        MakeHelper::configureDependencies($dependencies, [
+        return [
             \Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag::class => 'symfony/dependency-injection',
-        ]);
+        ];
     }
 
     protected function updateConfig(ConsoleStyle $io): void

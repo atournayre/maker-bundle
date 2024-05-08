@@ -3,16 +3,13 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
-use Atournayre\Bundle\MakerBundle\Collection\FileDefinitionCollection;
-use Atournayre\Bundle\MakerBundle\Config\MakerConfig;
+use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
 use Atournayre\Bundle\MakerBundle\DTO\Config\BundleConfiguration;
 use Atournayre\Bundle\MakerBundle\DTO\Config\Namespaces;
-use Atournayre\Bundle\MakerBundle\DTO\Config\Resource;
 use Atournayre\Bundle\MakerBundle\DTO\Config\Resources;
 use Atournayre\Bundle\MakerBundle\Generator\FileGenerator;
-use Atournayre\Bundle\MakerBundle\Helper\MakeHelper;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
-use Atournayre\Bundle\MakerBundle\VO\FileDefinition;
+use Atournayre\Bundle\MakerBundle\Service\FilesystemService;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\Generator;
@@ -25,9 +22,10 @@ abstract class AbstractMaker extends \Symfony\Bundle\MakerBundle\Maker\AbstractM
     protected readonly Resources $configResources;
 
     public function __construct(
-        protected readonly string        $rootDir,
-        protected readonly FileGenerator $fileGenerator,
+        protected readonly string              $rootDir,
+        protected readonly FileGenerator       $fileGenerator,
         protected readonly BundleConfiguration $bundleConfiguration,
+        protected readonly FilesystemService   $filesystem,
     )
     {
         $this->rootNamespace = $this->bundleConfiguration->rootNamespace;
@@ -35,11 +33,22 @@ abstract class AbstractMaker extends \Symfony\Bundle\MakerBundle\Maker\AbstractM
         $this->configResources = $this->bundleConfiguration->resources;
     }
 
-    public function configureDependencies(DependencyBuilder $dependencies): void
+    protected function dependencies(): array
     {
-        // no-op
+        return [];
     }
 
+    public function configureDependencies(DependencyBuilder $dependencies): void
+    {
+        $deps = $this->dependencies();
+        foreach ($deps as $class => $package) {
+            $dependencies->addClassDependency($class, $package);
+        }
+    }
+
+    /**
+     * @throws \Throwable
+     */
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
     {
         $namespace = $input->hasArgument('namespace')
@@ -52,12 +61,7 @@ abstract class AbstractMaker extends \Symfony\Bundle\MakerBundle\Maker\AbstractM
 
         $this->writeSuccessMessage($io);
 
-        $fileDefinitionCollection = FileDefinitionCollection::fromConfigurations($configurations, $this->rootNamespace, $this->rootDir);
-        $files = array_map(
-            fn(FileDefinition $fileDefinition) => $fileDefinition->absolutePath(),
-            $fileDefinitionCollection->getFileDefinitions()
-        );
-        foreach ($files as $file) {
+        foreach ($configurations->absolutePaths() as $file) {
             $io->text(sprintf('Created: %s', $file));
         }
 
@@ -66,25 +70,12 @@ abstract class AbstractMaker extends \Symfony\Bundle\MakerBundle\Maker\AbstractM
 
     /**
      * @param string $namespace
-     * @return MakerConfig[]
+     * @return MakerConfigurationCollection
      */
-    abstract protected function configurations(string $namespace): array;
+    abstract protected function configurations(string $namespace): MakerConfigurationCollection;
 
     protected function updateConfig(ConsoleStyle $io): void
     {
         // no-op
-    }
-
-    /**
-     * @param Resource $resource
-     * @return string[]
-     */
-    protected function allowedTypes(Resource $resource): array
-    {
-        $primitivesAndResources = array_merge(
-            $resource->primitivesMapping,
-            MakeHelper::findFilesInDirectory($resource->resources, $resource->exclude)
-        );
-        return array_unique(array_values($primitivesAndResources));
     }
 }

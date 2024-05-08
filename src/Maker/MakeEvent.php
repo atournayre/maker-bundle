@@ -8,7 +8,6 @@ use Atournayre\Bundle\MakerBundle\Config\EventMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\Config\ListenerMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
-use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -17,7 +16,7 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('maker.command')]
-class MakeEvent extends NewAbstractMaker
+class MakeEvent extends AbstractMaker
 {
     /**
      * @var array<array{fieldName: string, type: string}> $eventProperties
@@ -158,15 +157,11 @@ class MakeEvent extends NewAbstractMaker
         ]);
     }
 
-    public function configureDependencies(DependencyBuilder $dependencies): void
+    public function dependencies(): array
     {
-        $deps = [
+        return [
             \Webmozart\Assert\Assert::class => 'webmozart/assert',
             \Symfony\Contracts\EventDispatcher\Event::class => 'symfony/event-dispatcher',
         ];
-
-        foreach ($deps as $class => $package) {
-            $dependencies->addClassDependency($class, $package);
-        }
     }
 }

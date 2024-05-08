@@ -7,7 +7,6 @@ use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
 use Atournayre\Bundle\MakerBundle\Config\ControllerMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
-use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -17,7 +16,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\Finder\SplFileInfo;
 
 #[AutoconfigureTag('maker.command')]
-class MakeController extends NewAbstractMaker
+class MakeController extends AbstractMaker
 {
     private ?string $controllerRelatedEntity = null;
     private ?string $controllerRelatedFormType = null;
@@ -118,15 +117,11 @@ class MakeController extends NewAbstractMaker
         ]);
     }
 
-    public function configureDependencies(DependencyBuilder $dependencies): void
+    public function dependencies(): array
     {
-        $deps = [
+        return [
             \Symfony\Component\Form\Extension\Core\Type\FormType::class => 'symfony/form',
             \Symfony\Component\Form\FormInterface::class => 'symfony/form',
         ];
-
-        foreach ($deps as $class => $package) {
-            $dependencies->addClassDependency($class, $package);
-        }
     }
 }
