@@ -52,20 +52,20 @@ final class CommandService implements CommandServiceInterface
 		$serviceClass = $this->getServices()[$service];
 		Assert::methodExists($serviceClass, 'execute');
 
-		$serviceReflection = new \ReflectionClass($service);
+		$reflectionClass = new \ReflectionClass($service);
 
 		$this->logger->start();
 		try {
-		    if ($serviceReflection->implementsInterface(PreConditionsChecksInterface::class)) {
+		    if ($reflectionClass->implementsInterface(PreConditionsChecksInterface::class)) {
 		        $serviceClass->preConditionsChecks($object, $context);
 		    }
-		    if ($serviceReflection->implementsInterface(FailFastInterface::class)) {
+		    if ($reflectionClass->implementsInterface(FailFastInterface::class)) {
 		        $serviceClass->failFast($object, $context);
 		    }
 
 		    $serviceClass->execute($object, $context);
 
-		    if ($serviceReflection->implementsInterface(PostConditionsChecksInterface::class)) {
+		    if ($reflectionClass->implementsInterface(PostConditionsChecksInterface::class)) {
 		        $serviceClass->postConditionsChecks($object, $context);
 		    }
 

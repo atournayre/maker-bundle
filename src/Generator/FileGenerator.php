@@ -29,17 +29,17 @@ final class FileGenerator
     ): MakerConfigurationCollection
     {
         $newMakerConfigurationCollection = [];
-        foreach ($makerConfigurationCollection->values() as $configuration) {
-            $configurationClass = $configuration::class;
+        foreach ($makerConfigurationCollection->values() as $makerConfiguration) {
+            $configurationClass = $makerConfiguration::class;
 
             foreach ($this->builders as $builder) {
                 if (!$builder->supports($configurationClass)) {
                     continue;
                 }
 
-                $phpFileDefinition = $builder->createPhpFileDefinition($configuration);
+                $phpFileDefinition = $builder->createPhpFileDefinition($makerConfiguration);
                 $sourceCode = PhpFilePrinter::create($phpFileDefinition)->print();
-                $newMakerConfigurationCollection[$configuration->fqcn()] = $configuration->withSourceCode($sourceCode);
+                $newMakerConfigurationCollection[$makerConfiguration->fqcn()] = $makerConfiguration->withSourceCode($sourceCode);
             }
         }
 

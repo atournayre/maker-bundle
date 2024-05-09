@@ -29,18 +29,18 @@ final class TraitForEntityBuilder extends AbstractBuilder
     public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {
         $traitProperties = Map::from($makerConfiguration->properties())
-            ->map(function (PropertyDefinition $propertyDatas) use ($makerConfiguration): PropertyDefinition {
-                $type = $propertyDatas->type;
+            ->map(function (PropertyDefinition $propertyDefinition) use ($makerConfiguration): PropertyDefinition {
+                $type = $propertyDefinition->type;
 
-                if ($propertyDatas->typeIsPrimitive()) {
-                    return $propertyDatas;
+                if ($propertyDefinition->typeIsPrimitive()) {
+                    return $propertyDefinition;
                 }
 
                 $namespaceFromPath = Str::namespaceFromPath($type, $makerConfiguration->rootDir());
                 $rootNamespace = $makerConfiguration->rootNamespace();
-                $propertyDatas->type = Str::prefixByRootNamespace($namespaceFromPath, $rootNamespace);
+                $propertyDefinition->type = Str::prefixByRootNamespace($namespaceFromPath, $rootNamespace);
 
-                return $propertyDatas;
+                return $propertyDefinition;
             })
             ->toArray();
 
@@ -48,18 +48,18 @@ final class TraitForEntityBuilder extends AbstractBuilder
             Mapping::class => 'ORM',
         ];
 
-        $nullableProperties = array_filter($traitProperties, fn(PropertyDefinition $property) => !$property->nullable);
+        $nullableProperties = array_filter($traitProperties, fn(PropertyDefinition $propertyDefinition) => !$propertyDefinition->nullable);
         if ($nullableProperties !== []) {
             $uses[Assert::class] = null;
         }
 
-        $dateTimeInterfaceProperties = array_filter($traitProperties, fn(PropertyDefinition $property) => $property->typeIsDateTimeInterface());
+        $dateTimeInterfaceProperties = array_filter($traitProperties, fn(PropertyDefinition $propertyDefinition) => $propertyDefinition->typeIsDateTimeInterface());
         if ($dateTimeInterfaceProperties !== []) {
             $uses[Types::class] = null;
         }
 
         $properties = array_map(
-            fn(PropertyDefinition $propertyDatas) => $this->defineProperty($propertyDatas, $makerConfiguration),
+            fn(PropertyDefinition $propertyDefinition) => $this->defineProperty($propertyDefinition, $makerConfiguration),
             $traitProperties
         );
 
@@ -80,17 +80,17 @@ final class TraitForEntityBuilder extends AbstractBuilder
      */
     private function settersForEntity(array $traitProperties): array
     {
-        foreach ($traitProperties as $property) {
-            $method = new Method(Str::setter($property->fieldName));
+        foreach ($traitProperties as $traitProperty) {
+            $method = new Method(Str::setter($traitProperty->fieldName));
             $method->setPublic()
                 ->setReturnType('self')
-                ->addParameter($property->fieldName)
-                ->setType($property->type);
+                ->addParameter($traitProperty->fieldName)
+                ->setType($traitProperty->type);
 
-            $method->getParameter($property->fieldName)
+            $method->getParameter($traitProperty->fieldName)
                 ->setNullable();
 
-            $method->addBody('$this->' . $property->fieldName . ' = $' . $property->fieldName . ';')
+            $method->addBody('$this->' . $traitProperty->fieldName . ' = $' . $traitProperty->fieldName . ';')
                 ->addBody('return $this;');
 
             $methods[] = $method;
@@ -105,25 +105,25 @@ final class TraitForEntityBuilder extends AbstractBuilder
      */
     private function gettersForEntity(array $traitProperties): array
     {
-        foreach ($traitProperties as $property) {
-            if (!$property->nullable) {
-                $fieldName = Str::getter($property->fieldName);
+        foreach ($traitProperties as $traitProperty) {
+            if (!$traitProperty->nullable) {
+                $fieldName = Str::getter($traitProperty->fieldName);
                 $method = new Method($fieldName);
                 $method->setPublic()
-                    ->setReturnType($property->type)
-                    ->setReturnNullable($property->nullable);
+                    ->setReturnType($traitProperty->type)
+                    ->setReturnNullable($traitProperty->nullable);
 
-                $method->addBody('Assert::notNull($this->' . $property->fieldName . ');');
-                $method->addBody('return $this->' . $property->fieldName . ';');
+                $method->addBody('Assert::notNull($this->' . $traitProperty->fieldName . ');');
+                $method->addBody('return $this->' . $traitProperty->fieldName . ';');
 
                 $methods[] = $method;
             }
 
-            $method = new Method(Str::getter($property->fieldName));
+            $method = new Method(Str::getter($traitProperty->fieldName));
             $method->setPublic()
-                ->setReturnType($property->type)
+                ->setReturnType($traitProperty->type)
                 ->setReturnNullable()
-                ->setBody('return $this->' . $property->fieldName . ';');
+                ->setBody('return $this->' . $traitProperty->fieldName . ';');
 
             $methods[] = $method;
         }
@@ -131,11 +131,11 @@ final class TraitForEntityBuilder extends AbstractBuilder
         return $methods ?? [];
     }
 
-    private function defineProperty(PropertyDefinition $propertyDatas, TraitForEntityMakerConfiguration $makerConfiguration): Property
+    private function defineProperty(PropertyDefinition $propertyDefinition, TraitForEntityMakerConfiguration $traitForEntityMakerConfiguration): Property
     {
-        $type = $propertyDatas->type;
-        $fieldNameRaw = $propertyDatas->fieldName;
-        $correspondingTypes = $this->correspondingTypes($makerConfiguration);
+        $type = $propertyDefinition->type;
+        $fieldNameRaw = $propertyDefinition->fieldName;
+        $correspondingTypes = $this->correspondingTypes($traitForEntityMakerConfiguration);
         $correspondingTypes = array_combine(array_values($correspondingTypes), array_values($correspondingTypes));
 
         Assert::inArray(

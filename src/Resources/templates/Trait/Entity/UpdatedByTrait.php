@@ -19,9 +19,9 @@ trait UpdatedByTrait
         return $this->updatedBy;
     }
 
-    public function setUpdatedBy(UserInterface $updatedBy): self
+    public function setUpdatedBy(UserInterface $user): self
     {
-        $this->updatedBy = $updatedBy;
+        $this->updatedBy = $user;
         return $this;
     }
 }

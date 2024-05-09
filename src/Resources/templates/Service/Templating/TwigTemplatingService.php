@@ -9,13 +9,13 @@ use Twig\Environment;
 final class TwigTemplatingService implements TemplatingInterface
 {
 	function __construct(
-		private readonly Environment $twig,
+		private readonly Environment $twigEnvironment,
 	) {
 	}
 
 
 	public function render(string $template, array $parameters = []): string
 	{
-		return $this->twig->render($template, $parameters);
+		return $this->twigEnvironment->render($template, $parameters);
 	}
 }

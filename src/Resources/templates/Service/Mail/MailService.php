@@ -9,8 +9,8 @@ use App\Contracts\Mail\SendMailInterface;
 final class MailService
 {
     public function __construct(
-        private readonly SendMailInterface $mailer,
-        private readonly MailerConfiguration $configuration,
+        private readonly SendMailInterface $sendMail,
+        private readonly MailerConfiguration $mailerConfiguration,
     ) {
     }
 
@@ -19,11 +19,11 @@ final class MailService
      */
     public function send($message, $envelope = null): void
     {
-        $this->mailer->send($message, $envelope);
+        $this->sendMail->send($message, $envelope);
     }
 
     public function getConfiguration(): MailerConfiguration
     {
-        return $this->configuration;
+        return $this->mailerConfiguration;
     }
 }

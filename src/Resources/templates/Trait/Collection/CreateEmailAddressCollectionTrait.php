@@ -10,11 +10,11 @@ trait CreateEmailAddressCollectionTrait
 {
     protected function createEmailCollection(array $emails): EmailAddressCollection
     {
-        $emailCollection = EmailAddressCollection::createAsList($emails)
+        $map = EmailAddressCollection::createAsList($emails)
             ->toMap()
             ->map(fn(string $email): EmailAddress => EmailAddress::fromString($email));
 
-        return EmailAddressCollection::createAsList($emailCollection->toArray());
+        return EmailAddressCollection::createAsList($map->toArray());
     }
 
 }

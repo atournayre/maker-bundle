@@ -41,29 +41,29 @@ final class CollectionBuilder extends AbstractBuilder
         ;
     }
 
-    private function extendsClass(CollectionMakerConfiguration $makerConfiguration): string
+    private function extendsClass(CollectionMakerConfiguration $collectionMakerConfiguration): string
     {
-        if ($makerConfiguration->ofDecimals()) {
+        if ($collectionMakerConfiguration->ofDecimals()) {
             return DecimalValueCollection::class;
         }
 
-        return $makerConfiguration->isImmutable()
+        return $collectionMakerConfiguration->isImmutable()
             ? TypedCollectionImmutable::class
             : TypedCollection::class;
     }
 
-    private function collectionType(CollectionMakerConfiguration $makerConfiguration): string
+    private function collectionType(CollectionMakerConfiguration $collectionMakerConfiguration): string
     {
-        if ($makerConfiguration->ofDecimals()) {
+        if ($collectionMakerConfiguration->ofDecimals()) {
             return DecimalValue::class;
         }
 
-        return $makerConfiguration->relatedObject();
+        return $collectionMakerConfiguration->relatedObject();
     }
 
-    private function propertyType(CollectionMakerConfiguration $makerConfiguration): Property
+    private function propertyType(CollectionMakerConfiguration $collectionMakerConfiguration): Property
     {
-        $type = $this->collectionType($makerConfiguration);
+        $type = $this->collectionType($collectionMakerConfiguration);
 
         return (new Property('type'))
             ->setVisibility('protected')
@@ -76,15 +76,15 @@ final class CollectionBuilder extends AbstractBuilder
     /**
      * @return string[]
      */
-    private function comments(CollectionMakerConfiguration $makerConfiguration): array
+    private function comments(CollectionMakerConfiguration $collectionMakerConfiguration): array
     {
-        $extendsTypeShortName = Str::classNameFromNamespace($this->extendsClass($makerConfiguration), '');
-        $collectionTypeShortName = Str::classNameFromNamespace($this->collectionType($makerConfiguration), '');
+        $extendsTypeShortName = Str::classNameFromNamespace($this->extendsClass($collectionMakerConfiguration), '');
+        $collectionTypeShortName = Str::classNameFromNamespace($this->collectionType($collectionMakerConfiguration), '');
 
         return [
             '@extends '.$extendsTypeShortName.'<'.$collectionTypeShortName.'>',
             '',
-            '@method ' . $makerConfiguration->classname() . ' add(' . $collectionTypeShortName . ' $value)',
+            '@method ' . $collectionMakerConfiguration->classname() . ' add(' . $collectionTypeShortName . ' $value)',
             '@method ' . $collectionTypeShortName . '[] values()',
             '@method ' . $collectionTypeShortName . ' first()',
             '@method ' . $collectionTypeShortName . ' last()',

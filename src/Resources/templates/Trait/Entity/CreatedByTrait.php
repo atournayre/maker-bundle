@@ -19,9 +19,9 @@ trait CreatedByTrait
         return $this->createdBy;
     }
 
-    public function setCreatedBy(UserInterface $createdBy): self
+    public function setCreatedBy(UserInterface $user): self
     {
-        $this->createdBy = $createdBy;
+        $this->createdBy = $user;
         return $this;
     }
 }

@@ -26,7 +26,7 @@ final class TraitForObjectBuilder extends AbstractBuilder
         $traitProperties = $makerConfiguration->properties();
 
         $properties = array_map(
-            fn(PropertyDefinition $propertyDatas) => $this->defineProperty($propertyDatas, $makerConfiguration),
+            fn(PropertyDefinition $propertyDefinition) => $this->defineProperty($propertyDefinition, $makerConfiguration),
             $traitProperties
         );
 
@@ -44,17 +44,17 @@ final class TraitForObjectBuilder extends AbstractBuilder
      * @param PropertyDefinition[] $traitProperties
      * @return Method[]
      */
-    private function gettersForObject(array $traitProperties, TraitForObjectMakerConfiguration $makerConfiguration): array
+    private function gettersForObject(array $traitProperties, TraitForObjectMakerConfiguration $traitForObjectMakerConfiguration): array
     {
-        foreach ($traitProperties as $property) {
-            $fieldName = Str::getter($property->fieldName);
-            $propertyType = $this->correspondingTypes($makerConfiguration)[$property->type];
+        foreach ($traitProperties as $traitProperty) {
+            $fieldName = Str::getter($traitProperty->fieldName);
+            $propertyType = $this->correspondingTypes($traitForObjectMakerConfiguration)[$traitProperty->type];
 
             $method = new Method($fieldName);
             $method->setPublic()
                 ->setReturnType($propertyType)
-                ->setReturnNullable($property->nullable)
-                ->setBody('return $this->' . $property->fieldName . ';');
+                ->setReturnNullable($traitProperty->nullable)
+                ->setBody('return $this->' . $traitProperty->fieldName . ';');
 
             $methods[] = $method;
         }
@@ -66,20 +66,20 @@ final class TraitForObjectBuilder extends AbstractBuilder
      * @param PropertyDefinition[] $traitProperties
      * @return Method[]
      */
-    private function withersForObject(array $traitProperties, TraitForObjectMakerConfiguration $makerConfiguration): array
+    private function withersForObject(array $traitProperties, TraitForObjectMakerConfiguration $traitForObjectMakerConfiguration): array
     {
-        foreach ($traitProperties as $property) {
-            $fieldName = Str::property($property->fieldName);
-            $propertyType = $this->correspondingTypes($makerConfiguration)[$property->type];
+        foreach ($traitProperties as $traitProperty) {
+            $fieldName = Str::property($traitProperty->fieldName);
+            $propertyType = $this->correspondingTypes($traitForObjectMakerConfiguration)[$traitProperty->type];
 
             $method = new Method(Str::wither($fieldName));
             $method->setPublic()
                 ->setReturnType('self')
-                ->addParameter($property->fieldName)
+                ->addParameter($traitProperty->fieldName)
                 ->setType($propertyType);
 
             $method->addBody('$clone = clone $this;')
-                ->addBody('$clone->' . $property->fieldName . ' = $' . $property->fieldName . ';')
+                ->addBody('$clone->' . $traitProperty->fieldName . ' = $' . $traitProperty->fieldName . ';')
                 ->addBody('return $clone;');
 
             $methods[] = $method;
@@ -88,19 +88,19 @@ final class TraitForObjectBuilder extends AbstractBuilder
         return $methods ?? [];
     }
 
-    private function defineProperty(PropertyDefinition $propertyDatas, TraitForObjectMakerConfiguration $makerConfiguration): Property
+    private function defineProperty(PropertyDefinition $propertyDefinition, TraitForObjectMakerConfiguration $traitForObjectMakerConfiguration): Property
     {
-        $type = $propertyDatas->type;
-        $fieldNameRaw = $propertyDatas->fieldName;
-        $nullable = $propertyDatas->nullable;
+        $type = $propertyDefinition->type;
+        $fieldNameRaw = $propertyDefinition->fieldName;
+        $nullable = $propertyDefinition->nullable;
 
         Assert::inArray(
             $type,
-            array_keys($this->correspondingTypes($makerConfiguration)),
-            Str::sprintf('Property "%s" should be of type %s; %s given', $fieldNameRaw, Str::implode(', ', array_keys($this->correspondingTypes($makerConfiguration))), $type)
+            array_keys($this->correspondingTypes($traitForObjectMakerConfiguration)),
+            Str::sprintf('Property "%s" should be of type %s; %s given', $fieldNameRaw, Str::implode(', ', array_keys($this->correspondingTypes($traitForObjectMakerConfiguration))), $type)
         );
 
-        $propertyType = $this->correspondingTypes($makerConfiguration)[$type];
+        $propertyType = $this->correspondingTypes($traitForObjectMakerConfiguration)[$type];
 
         $property = new Property(Str::property($fieldNameRaw));
         $property->setPrivate()->setType($propertyType)->setNullable($nullable);

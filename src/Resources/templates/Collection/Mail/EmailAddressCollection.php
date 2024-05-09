@@ -12,10 +12,10 @@ final class EmailAddressCollection extends TypedCollection
 
     public static function fromArray(array $emails): self
     {
-        $emailsAdresses = self::createAsList($emails)
+        $map = self::createAsList($emails)
             ->toMap()
             ->map(fn(string $email): EmailAddress => EmailAddress::fromString($email));
 
-        return self::createAsList($emailsAdresses->toArray());
+        return self::createAsList($map->toArray());
     }
 }

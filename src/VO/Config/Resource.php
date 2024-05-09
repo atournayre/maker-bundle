@@ -34,10 +34,10 @@ final class Resource
     /**
      * @return string[]
      */
-    public function allowedTypes(FilesystemService $filesystem): array
+    public function allowedTypes(FilesystemService $filesystemService): array
     {
         return Map::from($this->primitivesMapping)
-            ->merge($filesystem->findFilesInDirectory($this->resources, $this->exclude))
+            ->merge($filesystemService->findFilesInDirectory($this->resources, $this->exclude))
             ->values()
             ->unique()
             ->toArray();

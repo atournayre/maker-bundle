@@ -17,6 +17,10 @@ return RectorConfig::configure()
 //        naming: true,
         earlyReturn: true,
     )
+    ->withSkip([
+        __DIR__ . '/src/DependencyInjection',
+        __DIR__ . 'src/Maker/AbstractMaker.php',
+    ])
     ->withPhpSets()
     ->withRootFiles()
     ->withImportNames(

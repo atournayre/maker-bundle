@@ -84,19 +84,19 @@ final class ServiceCommandBuilder extends AbstractBuilder
      */
     private function implementationOfInterface(string $interface, string $objectType): array
     {
-        /** @var InterfaceType $sourceInterface */
-        $sourceInterface = InterfaceType::from($interface);
+        /** @var InterfaceType $classLike */
+        $classLike = InterfaceType::from($interface);
 
-        foreach ($sourceInterface->getMethods() as $method) {
-            $methods[] = $this->implementMethod($method->getName(), $sourceInterface, $objectType);
+        foreach ($classLike->getMethods() as $method) {
+            $methods[] = $this->implementMethod($method->getName(), $classLike, $objectType);
         }
 
         return $methods ?? [];
     }
 
-    private function implementMethod(string $method, InterfaceType $sourceInterface, string $objectType): Method
+    private function implementMethod(string $method, InterfaceType $interfaceType, string $objectType): Method
     {
-        $sourceMethod = $sourceInterface->getMethod($method);
+        $sourceMethod = $interfaceType->getMethod($method);
         return (new Method($sourceMethod->getName()))
             ->setPublic()
             ->addComment($sourceMethod->getComment())

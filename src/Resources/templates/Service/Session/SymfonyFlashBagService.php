@@ -16,7 +16,7 @@ use \Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface as Symfony
 final class SymfonyFlashBagService implements FlashBagInterface
 {
     public function __construct(
-        private readonly SymfonyFlashBagInterface $flashBag,
+        private readonly SymfonyFlashBagInterface $symfonyFlashBag,
     )
     {
     }
@@ -51,7 +51,7 @@ final class SymfonyFlashBagService implements FlashBagInterface
         $messages = is_string($message) ? [$message] : $message;
 
         foreach ($messages as $message) {
-            $this->flashBag->add($type, $message);
+            $this->symfonyFlashBag->add($type, $message);
         }
     }
 }

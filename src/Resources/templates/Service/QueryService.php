@@ -55,20 +55,20 @@ final class QueryService implements QueryServiceInterface
 		$serviceClass = $this->getServices()[$service];
 		Assert::methodExists($serviceClass, 'fetch');
 
-		$serviceReflection = new \ReflectionClass($service);
+		$reflectionClass = new \ReflectionClass($service);
 
 		$this->logger->start();
 		try {
-		    if ($serviceReflection->implementsInterface(PreConditionsChecksInterface::class)) {
+		    if ($reflectionClass->implementsInterface(PreConditionsChecksInterface::class)) {
 		        $serviceClass->preConditionsChecks($object, $context);
 		    }
-		    if ($serviceReflection->implementsInterface(FailFastInterface::class)) {
+		    if ($reflectionClass->implementsInterface(FailFastInterface::class)) {
 		        $serviceClass->failFast($object, $context);
 		    }
 
 		    $result = $serviceClass->fetch($object, $context);
 
-		    if ($serviceReflection->implementsInterface(PostConditionsChecksInterface::class)) {
+		    if ($reflectionClass->implementsInterface(PostConditionsChecksInterface::class)) {
 		        $serviceClass->postConditionsChecks($object, $context);
 		    }
 

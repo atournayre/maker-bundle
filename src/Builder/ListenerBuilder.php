@@ -37,9 +37,9 @@ final class ListenerBuilder extends AbstractBuilder
     /**
      * @return array<Attribute>
      */
-    private function attributes(ListenerMakerConfiguration $makerConfiguration): array
+    private function attributes(ListenerMakerConfiguration $listenerMakerConfiguration): array
     {
-        $eventNamespace = $makerConfiguration->eventNamespace();
+        $eventNamespace = $listenerMakerConfiguration->eventNamespace();
         $eventName = Str::classNameFromNamespace($eventNamespace, 'Event');
 
         return [
@@ -49,9 +49,9 @@ final class ListenerBuilder extends AbstractBuilder
         ];
     }
 
-    private function invoke(ListenerMakerConfiguration $makerConfiguration): Method
+    private function invoke(ListenerMakerConfiguration $listenerMakerConfiguration): Method
     {
-        $eventNamespace = $makerConfiguration->eventNamespace();
+        $eventNamespace = $listenerMakerConfiguration->eventNamespace();
 
         $method = new Method('__invoke');
         $method->addParameter('event')

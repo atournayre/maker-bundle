@@ -46,7 +46,7 @@ final class EventBuilder extends AbstractBuilder
     /**
      * @param PropertyDefinition[] $properties
      */
-    private function constructor(array $properties, EventMakerConfiguration $makerConfiguration): Method
+    private function constructor(array $properties, EventMakerConfiguration $eventMakerConfiguration): Method
     {
         $method = new Method('__construct');
         $method->setPrivate();
@@ -55,7 +55,7 @@ final class EventBuilder extends AbstractBuilder
             $method->addPromotedParameter($property->fieldName)
                 ->setPublic()
                 ->setReadOnly()
-                ->setType(self::correspondingTypes($makerConfiguration)[$property->type])
+                ->setType(self::correspondingTypes($eventMakerConfiguration)[$property->type])
             ;
         }
 
@@ -65,7 +65,7 @@ final class EventBuilder extends AbstractBuilder
     /**
      * @param PropertyDefinition[] $eventProperties
      */
-    private function namedConstructor(array $eventProperties, EventMakerConfiguration $makerConfiguration): Method
+    private function namedConstructor(array $eventProperties, EventMakerConfiguration $eventMakerConfiguration): Method
     {
         $method = new Method('create');
         $method->setStatic()
@@ -75,12 +75,12 @@ final class EventBuilder extends AbstractBuilder
 
         $properties = array_merge(
             $eventProperties,
-            [['fieldName' => 'context', 'type' => Str::absolutePathFromNamespace(ContextInterface::class, $makerConfiguration->rootNamespace(), $makerConfiguration->rootDir())]]
+            [['fieldName' => 'context', 'type' => Str::absolutePathFromNamespace(ContextInterface::class, $eventMakerConfiguration->rootNamespace(), $eventMakerConfiguration->rootDir())]]
         );
 
         foreach ($properties as $property) {
             $method->addParameter($property->fieldName)
-                ->setType(self::correspondingTypes($makerConfiguration)[$property->type])
+                ->setType(self::correspondingTypes($eventMakerConfiguration)[$property->type])
             ;
         }
 

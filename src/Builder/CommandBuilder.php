@@ -45,19 +45,19 @@ final class CommandBuilder extends AbstractBuilder
     /**
      * @return array<Attribute>
      */
-    private function attributes(CommandMakerConfiguration $makerConfiguration): array
+    private function attributes(CommandMakerConfiguration $commandMakerConfiguration): array
     {
         return [
             new Attribute(AsCommand::class, [
-                'name' => $makerConfiguration->commandName(),
-                'description' => $makerConfiguration->description(),
+                'name' => $commandMakerConfiguration->commandName(),
+                'description' => $commandMakerConfiguration->description(),
             ]),
         ];
     }
 
-    private function titleMethod(CommandMakerConfiguration $makerConfiguration): Method
+    private function titleMethod(CommandMakerConfiguration $commandMakerConfiguration): Method
     {
-        $title = $makerConfiguration->title();
+        $title = $commandMakerConfiguration->title();
 
         return (new Method('title'))
             ->setPublic()

@@ -27,15 +27,15 @@ final class ExceptionBuilder extends AbstractBuilder
         ;
     }
 
-    private function namedConstructor(ExceptionMakerConfiguration $makerConfiguration): ?Method
+    private function namedConstructor(ExceptionMakerConfiguration $exceptionMakerConfiguration): ?Method
     {
-        if (!$makerConfiguration->hasNamedConstructor()) {
+        if (!$exceptionMakerConfiguration->hasNamedConstructor()) {
             return null;
         }
 
-        $methodName = $makerConfiguration->namedConstructor();
-        $fqcn = $makerConfiguration->fqcn;
-        $className = $makerConfiguration->classname();
+        $methodName = $exceptionMakerConfiguration->namedConstructor();
+        $fqcn = $exceptionMakerConfiguration->fqcn;
+        $className = $exceptionMakerConfiguration->classname();
 
         return (new Method($methodName))
             ->setStatic()

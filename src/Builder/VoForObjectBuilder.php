@@ -28,8 +28,8 @@ final class VoForObjectBuilder extends AbstractBuilder
     {
         $voProperties = $makerConfiguration->properties();
 
-        $getters = array_map(fn(PropertyDefinition $property) => $this->defineGetter($property, $makerConfiguration), $voProperties);
-        $withers = array_map(fn(PropertyDefinition $property) => $this->defineWither($property, $makerConfiguration), $voProperties);
+        $getters = array_map(fn(PropertyDefinition $propertyDefinition) => $this->defineGetter($propertyDefinition, $makerConfiguration), $voProperties);
+        $withers = array_map(fn(PropertyDefinition $propertyDefinition) => $this->defineWither($propertyDefinition, $makerConfiguration), $voProperties);
 
         $nullableTrait = $this->nullableTrait($makerConfiguration);
 
@@ -57,14 +57,14 @@ final class VoForObjectBuilder extends AbstractBuilder
     /**
      * @param PropertyDefinition[] $voProperties
      */
-    private function constructor(array $voProperties, VoForObjectMakerConfiguration $makerConfiguration): Method
+    private function constructor(array $voProperties, VoForObjectMakerConfiguration $voForObjectMakerConfiguration): Method
     {
         $method = new Method('__construct');
         $method->setPrivate();
 
-        foreach ($voProperties as $property) {
-            $method->addPromotedParameter($property->fieldName)
-                ->setType($this->correspondingTypes($makerConfiguration)[$property->type])
+        foreach ($voProperties as $voProperty) {
+            $method->addPromotedParameter($voProperty->fieldName)
+                ->setType($this->correspondingTypes($voForObjectMakerConfiguration)[$voProperty->type])
             ;
         }
 
@@ -74,7 +74,7 @@ final class VoForObjectBuilder extends AbstractBuilder
     /**
      * @param PropertyDefinition[] $voProperties
      */
-    private function namedConstructor(array $voProperties, VoForObjectMakerConfiguration $makerConfiguration): Method
+    private function namedConstructor(array $voProperties, VoForObjectMakerConfiguration $voForObjectMakerConfiguration): Method
     {
         $method = new Method('create');
         $method->setStatic()
@@ -84,7 +84,7 @@ final class VoForObjectBuilder extends AbstractBuilder
 
         foreach ($voProperties as $property) {
             $method->addParameter($property->fieldName)
-                ->setType($this->correspondingTypes($makerConfiguration)[$property->type])
+                ->setType($this->correspondingTypes($voForObjectMakerConfiguration)[$property->type])
             ;
         }
 
@@ -98,33 +98,33 @@ final class VoForObjectBuilder extends AbstractBuilder
         return $method;
     }
 
-    private function defineGetter(PropertyDefinition $property, VoForObjectMakerConfiguration $makerConfiguration): Method
+    private function defineGetter(PropertyDefinition $propertyDefinition, VoForObjectMakerConfiguration $voForObjectMakerConfiguration): Method
     {
-        $propertyType = $this->correspondingTypes($makerConfiguration)[$property->type];
+        $propertyType = $this->correspondingTypes($voForObjectMakerConfiguration)[$propertyDefinition->type];
 
-        return (new Method(Str::getter($property->fieldName)))
+        return (new Method(Str::getter($propertyDefinition->fieldName)))
             ->setPublic()
             ->setReturnType($propertyType)
-            ->setBody('return $this->' . $property->fieldName . ';');
+            ->setBody('return $this->' . $propertyDefinition->fieldName . ';');
     }
 
-    private function defineWither(PropertyDefinition $property, VoForObjectMakerConfiguration $makerConfiguration): Method
+    private function defineWither(PropertyDefinition $propertyDefinition, VoForObjectMakerConfiguration $voForObjectMakerConfiguration): Method
     {
-        $propertyType = $this->correspondingTypes($makerConfiguration)[$property->type];
+        $propertyType = $this->correspondingTypes($voForObjectMakerConfiguration)[$propertyDefinition->type];
 
-        $fieldName = Str::property($property->fieldName);
+        $fieldName = Str::property($propertyDefinition->fieldName);
 
         $method = new Method(Str::wither($fieldName));
         $method
             ->setPublic()
             ->setReturnType('self')
-            ->addParameter($property->fieldName)
+            ->addParameter($propertyDefinition->fieldName)
             ->setType($propertyType)
         ;
 
         $method
             ->addBody('$clone = clone $this;')
-            ->addBody('$clone->' . $property->fieldName . ' = $' . $property->fieldName . ';')
+            ->addBody('$clone->' . $propertyDefinition->fieldName . ' = $' . $propertyDefinition->fieldName . ';')
             ->addBody('return $clone;');
         return $method;
     }
@@ -156,9 +156,9 @@ final class VoForObjectBuilder extends AbstractBuilder
         ];
     }
 
-    private function nullableTrait(VoForObjectMakerConfiguration $makerConfiguration): string
+    private function nullableTrait(VoForObjectMakerConfiguration $voForObjectMakerConfiguration): string
     {
-        if (Str::startsWith($makerConfiguration->classname(), 'Null')) {
+        if (Str::startsWith($voForObjectMakerConfiguration->classname(), 'Null')) {
             return NullableTrait::class;
         }
 

@@ -34,11 +34,11 @@ class ControllerBuilder extends FromTemplateBuilder
 
     private function updateVoMethod(
         Method $method,
-        ControllerMakerConfiguration $makerConfiguration
+        ControllerMakerConfiguration $controllerMakerConfiguration
     ): Method
     {
-        $entityClassName = Str::classNameFromNamespace($makerConfiguration->entityClassName(), '');
-        $voNamespace = $makerConfiguration->voClassName();
+        $entityClassName = Str::classNameFromNamespace($controllerMakerConfiguration->entityClassName(), '');
+        $voNamespace = $controllerMakerConfiguration->voClassName();
         $voClassName = Str::classNameFromNamespace($voNamespace, '');
 
         $method->setComment('@param '.$entityClassName.' $entity');
@@ -49,14 +49,14 @@ class ControllerBuilder extends FromTemplateBuilder
 
     private function updateFormMethod(
         Method $method,
-        ControllerMakerConfiguration $makerConfiguration
+        ControllerMakerConfiguration $controllerMakerConfiguration
     ): Method
     {
-        $voClassName = Str::classNameFromNamespace($makerConfiguration->voClassName(), '');
+        $voClassName = Str::classNameFromNamespace($controllerMakerConfiguration->voClassName(), '');
         $method->setComment('@param ' . $voClassName . '|null $data');
 
         // Replace FormType by the form type class name in the body
-        $formTypeNamespace = $makerConfiguration->formTypeClassName();
+        $formTypeNamespace = $controllerMakerConfiguration->formTypeClassName();
         $formType = FormType::class;
         $body = $method->getBody();
         $body = Str::replace($body, $formType, $formTypeNamespace);
