@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
+use Atournayre\Bundle\MakerBundle\Maker\Carbon\Carbon;
 use Atournayre\Bundle\MakerBundle\Config\MakerConfiguration;
 use App\Logger\DefaultLogger;
 use App\Contracts\Service\CommandServiceInterface;
@@ -138,6 +139,7 @@ class MakeProjectInstall extends AbstractMaker
             UnicodeString::class => 'symfony/string',
             Environment::class => 'twig/twig',
             Assert::class => 'webmozart/assert',
+            Carbon::class => 'nesbot/carbon',
         ];
     }
 
