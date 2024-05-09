@@ -56,6 +56,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('dispatcher')->defaultValue('App\Dispatcher')->end()
                         ->scalarNode('dto')->defaultValue('App\DTO')->end()
                         ->scalarNode('entity')->defaultValue('App\Entity')->end()
+                        ->scalarNode('enum')->defaultValue('App\Enum')->end()
                         ->scalarNode('event')->defaultValue('App\Event')->end()
                         ->scalarNode('event_listener')->defaultValue('App\EventListener')->end()
                         ->scalarNode('exception')->defaultValue('App\Exception')->end()

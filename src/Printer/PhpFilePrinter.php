@@ -28,6 +28,18 @@ final class PhpFilePrinter
         $fqcn = $phpFileDefinition->fqcn();
         if ($phpFileDefinition->isInterface()) {
             $phpFile->addInterface($fqcn);
+        } elseif ($phpFileDefinition->isEnum()) {
+            $enum = $phpFile->addEnum($fqcn);
+            $enum->setType($phpFileDefinition->getEnumType());
+
+            foreach ($phpFileDefinition->getEnumCases() as $enumType) {
+                $enum->addCase(
+                    $enumType->getName(),
+                    $phpFileDefinition->getEnumType() === 'string'
+                        ? $enumType->getValue()
+                        : (int) $enumType->getValue()
+                );
+            }
         } elseif ($phpFileDefinition->isTrait()) {
             $phpFile->addTrait($fqcn);
         } else {
@@ -59,7 +71,7 @@ final class PhpFilePrinter
             ;
         }
 
-        if (!$class->isInterface()) {
+        if (!$class->isInterface() && !$class->isEnum()) {
             $class
                 ->setProperties($phpFileDefinition->getProperties())
             ;

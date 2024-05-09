@@ -6,6 +6,7 @@ use Atournayre\Bundle\MakerBundle\Maker\MakeCollection;
 use Atournayre\Bundle\MakerBundle\Maker\MakeCommand;
 use Atournayre\Bundle\MakerBundle\Maker\MakeController;
 use Atournayre\Bundle\MakerBundle\Maker\MakeDto;
+use Atournayre\Bundle\MakerBundle\Maker\MakeEnum;
 use Atournayre\Bundle\MakerBundle\Maker\MakeEvent;
 use Atournayre\Bundle\MakerBundle\Maker\MakeException;
 use Atournayre\Bundle\MakerBundle\Maker\MakeInterface;
@@ -31,6 +32,7 @@ return static function (ContainerConfigurator $container): void {
         MakeCommand::class,
         MakeController::class,
         MakeDto::class,
+        MakeEnum::class,
         MakeEvent::class,
         MakeException::class,
         MakeInterface::class,

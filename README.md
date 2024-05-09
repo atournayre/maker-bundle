@@ -58,6 +58,7 @@ Legend:
 | ⚠️     | `make:new:controller`         | [Create a new Controller](docs/new-default.md)                          |
 | ✅️     | `make:new:collection`         | [Create a new Collection](docs/new-default.md)                          |
 | ✅      | `make:new:dto`                | [Create a new DTO](docs/new-default.md)                                 |
+| ✅      | `make:new:enum`               | [Create a new Enum](docs/new-default.md)                                |
 | ✅      | `make:new:event`              | [Create a new Event and Listener](docs/new-default.md)                  |
 | ✅      | `make:new:exception`          | [Create a new Exception](docs/new-default.md)                           |
 | ✅      | `make:new:interface`          | [Create a new Interface](docs/new-default.md)                           |
@@ -66,3 +67,24 @@ Legend:
 | ✅      | `make:new:trait`              | [Create a new Trait](docs/new-default.md)                               |
 | ✅      | `make:new:vo`                 | [Create a new VO](docs/new-default.md)                                  |
 | ✅      | `project:getting-started`     | [Add minimal files to start a project](docs/project-getting-started.md) |
+
+## Create a new Maker
+
+### Step 1: Create the Configuration class
+1. Create a new class in the `Config` directory.
+2. Extend the `MakerConfiguration` class.
+3. If you need extra configuration, create as many properties, getters and withers as needed.
+4. If you want to add suffixes to the class name, override the `classNameSuffix` method.
+
+### Step 2: Create the Builder class
+1. Create a new class in the `Builder` directory.
+2. Extend the `AbstractBuilder` class.
+3. Implement the methods.
+4. Add the `#[AutoconfigureTag('atournayre_maker.php_file_builder')]` attribute to the class.
+
+### Step 3: Create the Maker class
+1. Create a new class in the `Maker` directory.
+2. Extend the `AbstractMaker` class.
+3. Implement the methods.
+4. Add the `#[AutoconfigureTag('maker.command')]` attribute to the class.
+

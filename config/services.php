@@ -6,6 +6,7 @@ use Atournayre\Bundle\MakerBundle\Builder\CollectionBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\CommandBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\ControllerBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\DtoBuilder;
+use Atournayre\Bundle\MakerBundle\Builder\EnumBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\EventBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\ExceptionBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\FromTemplateBuilder;
@@ -60,6 +61,7 @@ return static function (ContainerConfigurator $container): void {
         CommandBuilder::class,
         ControllerBuilder::class,
         DtoBuilder::class,
+        EnumBuilder::class,
         EventBuilder::class,
         ExceptionBuilder::class,
         FromTemplateBuilder::class,

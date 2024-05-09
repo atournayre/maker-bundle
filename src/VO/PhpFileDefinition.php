@@ -5,6 +5,7 @@ namespace Atournayre\Bundle\MakerBundle\VO;
 
 use Nette\PhpGenerator\Attribute;
 use Nette\PhpGenerator\Constant;
+use Nette\PhpGenerator\EnumCase;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\Property;
 use Nette\PhpGenerator\TraitUse;
@@ -33,6 +34,8 @@ final class PhpFileDefinition
 
     private bool $trait = false;
 
+    private bool $enum = false;
+
     private bool $readonly = false;
 
     private bool $final = true;
@@ -55,6 +58,11 @@ final class PhpFileDefinition
 
     /** @var Method[] */
     private array $methods = [];
+
+    /** @return EnumCase[] */
+    private array $enumCases = [];
+
+    private ?string $enumType = null;
 
     private function __construct(
         public readonly string $namespace,
@@ -207,6 +215,17 @@ final class PhpFileDefinition
     public function setTrait(bool $trait = true): self
     {
         $this->trait = $trait;
+        return $this;
+    }
+
+    public function isEnum(): bool
+    {
+        return $this->enum;
+    }
+
+    public function setEnum(bool $enum = true): self
+    {
+        $this->enum = $enum;
         return $this;
     }
 
@@ -443,6 +462,34 @@ final class PhpFileDefinition
     public function renameClass(string $name): self
     {
         $this->className = $name;
+        return $this;
+    }
+
+    /**
+     * @return EnumCase[]
+     */
+    public function getEnumCases(): array
+    {
+        return $this->enumCases;
+    }
+
+    /**
+     * @param EnumCase[] $enumCases
+     */
+    public function setEnumCases(array $enumCases): self
+    {
+        $this->enumCases = $enumCases;
+        return $this;
+    }
+
+    public function getEnumType(): ?string
+    {
+        return $this->enumType;
+    }
+
+    public function setEnumType(?string $enumType): self
+    {
+        $this->enumType = $enumType;
         return $this;
     }
 }
