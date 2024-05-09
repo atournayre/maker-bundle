@@ -37,6 +37,8 @@ interface MakerConfigurationInterface
 
     public function classname(): string;
 
+    public function fqcn(): string;
+
     public function rootDir(): string;
 
     public function rootNamespace(): string;
@@ -51,4 +53,9 @@ interface MakerConfigurationInterface
      * @return array<string>
      */
     public function allowedTypes(): array;
+
+    /**
+     * @return array<string>
+     */
+    public function propertiesAllowedTypes(): array;
 }

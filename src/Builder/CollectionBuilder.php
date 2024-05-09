@@ -73,6 +73,9 @@ final class CollectionBuilder extends AbstractBuilder
         ;
     }
 
+    /**
+     * @return string[]
+     */
     private function comments(CollectionMakerConfiguration $makerConfiguration): array
     {
         $extendsTypeShortName = Str::classNameFromNamespace($this->extendsClass($makerConfiguration), '');

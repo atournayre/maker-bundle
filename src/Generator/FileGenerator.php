@@ -32,7 +32,6 @@ final class FileGenerator
         foreach ($makerConfigurationCollection->values() as $configuration) {
             $configurationClass = $configuration::class;
 
-            /** @var PhpFileBuilderInterface $builder */
             foreach ($this->builders as $builder) {
                 if (!$builder->supports($configurationClass)) {
                     continue;
@@ -40,7 +39,7 @@ final class FileGenerator
 
                 $phpFileDefinition = $builder->createPhpFileDefinition($configuration);
                 $sourceCode = PhpFilePrinter::create($phpFileDefinition)->print();
-                $newMakerConfigurationCollection[$configuration->fqcn] = $configuration->withSourceCode($sourceCode);
+                $newMakerConfigurationCollection[$configuration->fqcn()] = $configuration->withSourceCode($sourceCode);
             }
         }
 

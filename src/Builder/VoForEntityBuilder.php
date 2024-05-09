@@ -47,8 +47,8 @@ final class VoForEntityBuilder extends AbstractBuilder
             })
             ->toArray();
 
-        $properties = array_map(fn(array $property): Property => $this->defineProperty($property, $makerConfiguration), $voProperties);
-        $getters = array_map(fn(array $property): Method => $this->defineGetter($property, $makerConfiguration), $voProperties);
+        $properties = array_map(fn(PropertyDefinition $property): Property => $this->defineProperty($property, $makerConfiguration), $voProperties);
+        $getters = array_map(fn(PropertyDefinition $property): Method => $this->defineGetter($property, $makerConfiguration), $voProperties);
         $nullableTrait = $this->nullableTrait($makerConfiguration);
 
         return parent::createPhpFileDefinition($makerConfiguration)

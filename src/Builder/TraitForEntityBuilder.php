@@ -59,7 +59,7 @@ final class TraitForEntityBuilder extends AbstractBuilder
         }
 
         $properties = array_map(
-            fn(array $propertyDatas) => $this->defineProperty($propertyDatas, $makerConfiguration),
+            fn(PropertyDefinition $propertyDatas) => $this->defineProperty($propertyDatas, $makerConfiguration),
             $traitProperties
         );
 

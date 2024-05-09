@@ -105,6 +105,11 @@ abstract class MakerConfiguration implements MakerConfigurationInterface
         return $this->className;
     }
 
+    public function fqcn(): string
+    {
+        return $this->fqcn;
+    }
+
     public function rootDir(): string
     {
         return $this->rootDir;
@@ -133,6 +138,14 @@ abstract class MakerConfiguration implements MakerConfigurationInterface
     }
 
     public function allowedTypes(): array
+    {
+        return [];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function propertiesAllowedTypes(): array
     {
         return [];
     }

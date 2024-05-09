@@ -8,7 +8,7 @@ use Atournayre\Bundle\MakerBundle\VO\PhpFileDefinition;
 
 interface PhpFileBuilderInterface
 {
-    public function createPhpFileDefinition(MakerConfiguration $makerConfiguration): PhpFileDefinition;
+    public function createPhpFileDefinition(MakerConfiguration|MakerConfigurationInterface $makerConfiguration): PhpFileDefinition;
 
     public function supports(string $makerConfigurationClassName): bool;
 }
