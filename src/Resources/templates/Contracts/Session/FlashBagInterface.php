@@ -6,8 +6,11 @@ namespace App\Contracts\Session;
 interface FlashBagInterface
 {
     public const SUCCESS = 'success';
+
     public const WARNING = 'warning';
+
     public const ERROR = 'danger';
+
     public const INFO = 'info';
 
     public function success(string|array $message): void;

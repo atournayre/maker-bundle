@@ -15,11 +15,17 @@ use Symfony\Component\Stopwatch\Stopwatch;
 abstract class AbstractCommand extends Command implements CommandInterface
 {
     private static string $STOPWATCH_EXECUTION = 'execution';
+
     private static string $STOPWATCH_EXECUTION_PRE_CONDITIONS = 'pre_conditions';
+
     private static string $STOPWATCH_EXECUTION_POST_CONDITIONS = 'post_conditions';
+
     private static string $STOPWATCH_EXECUTION_FAIL_FAST = 'fail_fast';
+
     private static string $STOPWATCH_EXECUTION_EXECUTE = 'execute';
+
     private SymfonyStyle $io;
+
     protected bool $force;
 
     public function __construct(
@@ -46,7 +52,7 @@ abstract class AbstractCommand extends Command implements CommandInterface
     /**
      * @return void
      */
-    public function interact(InputInterface $input, OutputInterface $output)
+    protected function interact(InputInterface $input, OutputInterface $output)
     {
     }
 
@@ -88,12 +94,12 @@ abstract class AbstractCommand extends Command implements CommandInterface
             $stopwatch->stop(self::$STOPWATCH_EXECUTION);
             $this->writeLogs($input, $stopwatch);
             return Command::SUCCESS;
-        } catch (\Exception $e) {
-            $this->logger->exception($e);
+        } catch (\Exception $exception) {
+            $this->logger->exception($exception);
             $this->logger->end();
             $stopwatch->stop(self::$STOPWATCH_EXECUTION);
             $this->writeLogs($input, $stopwatch);
-            $this->io->error($e->getMessage());
+            $this->io->error($exception->getMessage());
             return Command::FAILURE;
         }
     }
@@ -120,19 +126,16 @@ abstract class AbstractCommand extends Command implements CommandInterface
             ];
         }
 
-        $this->io->table(['Section', 'Started', 'Ended', 'Duration', 'Memory'], array_map(function ($section) use ($stopwatch): array {
+        $this->io->table(['Section', 'Started', 'Ended', 'Duration', 'Memory'], array_map(static function ($section) use ($stopwatch) : array {
             $eventsNames = array_keys(current($stopwatch->getSections())->getEvents());
-
             if (!in_array($section, $eventsNames)) {
                 return [$section, 'N/A', 'N/A', 'N/A', 'N/A'];
             }
-
             $event = $stopwatch->getEvent($section);
             $dateTime = new \DateTime();
             $originInSec = (int)($event->getOrigin() / 1000);
             $durationInSec = (int)($event->getDuration() / 1000);
             $endInSec = $originInSec + $durationInSec;
-
             return [
                 $section,
                 (clone $dateTime)->setTimestamp($originInSec)->format('Y-m-d H:i:s'),

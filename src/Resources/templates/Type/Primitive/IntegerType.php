@@ -31,6 +31,7 @@ class IntegerType implements ScalarObjectInterface
         if (is_int($value)) {
             return self::fromInt($value, $precision);
         }
+
         if (is_float($value)) {
             return self::fromFloat($value, $precision);
         }

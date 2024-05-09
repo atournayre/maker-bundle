@@ -14,7 +14,7 @@ final class SymfonyRoutingService implements RoutingInterface
 	}
 
 
-	function generate(string $name, array $parameters = [], int $referenceType = RoutingInterface::ABSOLUTE_PATH): string
+	public function generate(string $name, array $parameters = [], int $referenceType = RoutingInterface::ABSOLUTE_PATH): string
 	{
 		return $this->router->generate($name, $parameters, $referenceType);
 	}

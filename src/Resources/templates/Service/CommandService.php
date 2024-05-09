@@ -17,7 +17,7 @@ use Webmozart\Assert\Assert;
 
 final class CommandService implements CommandServiceInterface
 {
-	function __construct(
+	public function __construct(
 		private readonly LoggerInterface $logger,
 		#[TaggedIterator(TagCommandServiceInterface::class)]
 		private readonly iterable $services = [],
@@ -59,6 +59,7 @@ final class CommandService implements CommandServiceInterface
 		    if ($reflectionClass->implementsInterface(PreConditionsChecksInterface::class)) {
 		        $serviceClass->preConditionsChecks($object, $context);
 		    }
+
 		    if ($reflectionClass->implementsInterface(FailFastInterface::class)) {
 		        $serviceClass->failFast($object, $context);
 		    }
@@ -71,10 +72,10 @@ final class CommandService implements CommandServiceInterface
 
 		    $this->logger->success();
 		    $this->logger->end();
-		} catch (\Exception $e) {
-		    $this->logger->exception($e);
+		} catch (\Exception $exception) {
+		    $this->logger->exception($exception);
 		    $this->logger->end();
-		    throw $e;
+		    throw $exception;
 		}
 	}
 
@@ -120,7 +121,7 @@ final class CommandService implements CommandServiceInterface
 		    $services = iterator_to_array($this->services);
 		}
 
-		$servicesNames = array_map(fn($object) => $object::class, $services);
+		$servicesNames = array_map(static fn($object) => $object::class, $services);
 
 		return array_combine($servicesNames, $services);
 	}

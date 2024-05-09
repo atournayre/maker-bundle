@@ -88,7 +88,7 @@ final class VoForObjectBuilder extends AbstractBuilder
             ;
         }
 
-        $fieldNames = array_map(fn(PropertyDefinition $property): string => $property->fieldName, $voProperties);
+        $fieldNames = array_map(static fn(PropertyDefinition $property): string => $property->fieldName, $voProperties);
         $selfContent = implode(', $', $fieldNames);
 
         $method->addBody('// Add assertions');

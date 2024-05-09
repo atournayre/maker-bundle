@@ -12,6 +12,7 @@ use function Symfony\Component\String\u;
 final class FileManager implements FileManagerInterface
 {
     public readonly Finder $finder;
+
     public readonly Filesystem $filesystem;
 
     private function __construct(

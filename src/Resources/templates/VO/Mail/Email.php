@@ -22,13 +22,21 @@ class Email implements NullableInterface
     use IsTrait;
 
     private ?MailerConfiguration $configuration = null;
+
     private ?EmailAddressCollection $to = null;
+
     private ?EmailAddressCollection $cc = null;
+
     private ?EmailAddressCollection $bcc = null;
+
     private ?EmailAddressCollection $replyTo = null;
+
     private ?SplFileInfoCollection $attachments = null;
+
     private ?TagCollection $tags = null;
+
     private ?string $text = null;
+
     private ?string $html = null;
 
     private function __construct(

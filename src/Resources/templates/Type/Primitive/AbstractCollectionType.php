@@ -27,6 +27,7 @@ abstract class AbstractCollectionType implements \ArrayAccess, \Countable
         if (is_string($offset)) {
             Assert::isMap($this->collection, 'Adding element to collection (list) using string key is not supported.');
         }
+
         if (is_int($offset)) {
             Assert::isList($this->collection, 'Adding element to collection (map) using integer key is not supported.');
         }

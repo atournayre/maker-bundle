@@ -10,7 +10,7 @@ abstract class AbstractLogger implements LoggerInterface
 	private ?string $logIdentifier = null;
 
 
-	function __construct(
+	public function __construct(
 		protected LoggerInterface $logger,
 	) {
 	}

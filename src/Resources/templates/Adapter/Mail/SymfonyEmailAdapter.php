@@ -58,7 +58,7 @@ class SymfonyEmailAdapter
 
         return $emailAddressCollection
             ->toMap()
-            ->map(fn($email): Address => new Address($email->toString()))
+            ->map(static fn($email): Address => new Address($email->toString()))
             ->toArray();
     }
 }

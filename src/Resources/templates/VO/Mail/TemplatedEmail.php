@@ -11,7 +11,9 @@ use Webmozart\Assert\Assert;
 class TemplatedEmail extends Email
 {
     public ?string $htmlTemplate = null;
+
     public ?string $textTemplate = null;
+
     public array $context = [];
 
 	public function htmlTemplate(): ?string

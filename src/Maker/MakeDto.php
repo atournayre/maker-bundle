@@ -51,16 +51,14 @@ class MakeDto extends AbstractMaker
             $questionText = 'Add another property? Enter the property name (or press <return> to stop adding fields)';
         }
 
-        $fieldName = $io->ask($questionText, null, function ($name) use ($fields) {
+        $fieldName = $io->ask($questionText, null, static function ($name) use ($fields) {
             // allow it to be empty
             if (!$name) {
                 return $name;
             }
-
             if (\in_array($name, $fields)) {
                 throw new \InvalidArgumentException(sprintf('The "%s" property already exists.', $name));
             }
-
             return $name;
         });
 

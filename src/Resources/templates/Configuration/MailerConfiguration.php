@@ -10,9 +10,13 @@ use Atournayre\Types\EmailAddress;
 final class MailerConfiguration
 {
     private ?EmailAddress $fromAddress = null;
+
     private ?string $fromName = null;
+
     private ?EmailAddress $replyToAddress = null;
+
     private ?string $replyToName = null;
+
     private ?IntegerType $attachmentsMaxSize = null;
 
     public function fromAddress(): ?EmailAddress

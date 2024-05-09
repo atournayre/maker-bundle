@@ -21,7 +21,9 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 class MakeCollection extends AbstractMaker
 {
     private ?string $collectionRelatedObject = null;
+
     private bool $collectionIsImmutable = true;
+
     private bool $collectionOfDecimals = false;
 
     public static function getCommandName(): string

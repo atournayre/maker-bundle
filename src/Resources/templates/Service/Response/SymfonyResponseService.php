@@ -29,14 +29,14 @@ final class SymfonyResponseService implements ResponseInterface
 	}
 
 
-	function redirectToUrl(string $url): RedirectResponse
+	public function redirectToUrl(string $url): RedirectResponse
 	{
 		$this->logger->info('Redirecting to URL: ' . $url);
 		return new RedirectResponse($url);
 	}
 
 
-	function redirectToRoute(string $route, array $parameters = []): RedirectResponse
+	public function redirectToRoute(string $route, array $parameters = []): RedirectResponse
 	{
 		$url = $this->routing->generate($route, $parameters);
 		$this->logger->info('Redirecting to route: ' . $route, ['parameters' => $parameters]);
@@ -44,7 +44,7 @@ final class SymfonyResponseService implements ResponseInterface
 	}
 
 
-	function render(string $view, array $parameters = []): Response
+	public function render(string $view, array $parameters = []): Response
 	{
 		try {
 		    $this->logger->info('Rendering view: ' . $view, ['parameters' => $parameters]);
@@ -57,7 +57,7 @@ final class SymfonyResponseService implements ResponseInterface
 	}
 
 
-	function json(array $data, int $status = 200, array $headers = [], bool $json = false): JsonResponse
+	public function json(array $data, int $status = 200, array $headers = [], bool $json = false): JsonResponse
 	{
 		try {
 		    $this->logger->info('Returning JSON response', ['data' => $data, 'status' => $status, 'headers' => $headers]);
@@ -69,14 +69,14 @@ final class SymfonyResponseService implements ResponseInterface
 	}
 
 
-	function jsonError(array $data, int $status = 400, array $headers = [], bool $json = false): JsonResponse
+	public function jsonError(array $data, int $status = 400, array $headers = [], bool $json = false): JsonResponse
 	{
 		$this->logger->error('Returning JSON error response', ['data' => $data, 'status' => $status, 'headers' => $headers]);
 		return new JsonResponse($data, $status, $headers, $json);
 	}
 
 
-	function file(string $file, string $filename, array $headers = []): BinaryFileResponse
+	public function file(string $file, string $filename, array $headers = []): BinaryFileResponse
 	{
 		$contentDisposition = $headers['Content-Disposition'] ?? 'attachment';
 		$headers['Content-Disposition'] = sprintf('%s; filename="%s"', $contentDisposition, $filename);
@@ -85,14 +85,14 @@ final class SymfonyResponseService implements ResponseInterface
 	}
 
 
-	function empty(int $status = 204, array $headers = []): Response
+	public function empty(int $status = 204, array $headers = []): Response
 	{
 		$this->logger->info('Returning empty response', ['status' => $status, 'headers' => $headers]);
 		return new Response(null, $status, $headers);
 	}
 
 
-	function error(string $view, array $parameters = [], int $status = 500): Response
+	public function error(string $view, array $parameters = [], int $status = 500): Response
 	{
 		$this->logger->info('Returning error response', ['view' => $view, 'parameters' => $parameters, 'status' => $status]);
 		$render = $this->templating->render($view, $parameters);

@@ -8,7 +8,9 @@ use Atournayre\Bundle\MakerBundle\Helper\Str;
 class ControllerMakerConfiguration extends FromTemplateMakerConfiguration
 {
     public string $entityPath = '';
+
     public string $formTypePath = '';
+
     public string $voPath = '';
 
     protected static function classNameSuffix(): string

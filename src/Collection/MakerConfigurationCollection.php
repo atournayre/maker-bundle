@@ -40,6 +40,6 @@ class MakerConfigurationCollection extends TypedCollection
     {
         return $this
             ->toMap()
-            ->map(fn(MakerConfigurationInterface $makerConfiguration): string => $makerConfiguration->absolutePath());
+            ->map(static fn(MakerConfigurationInterface $makerConfiguration): string => $makerConfiguration->absolutePath());
     }
 }

@@ -8,7 +8,7 @@ use Twig\Environment;
 
 final class TwigTemplatingService implements TemplatingInterface
 {
-	function __construct(
+	public function __construct(
 		private readonly Environment $twigEnvironment,
 	) {
 	}

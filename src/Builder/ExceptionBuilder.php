@@ -41,6 +41,6 @@ final class ExceptionBuilder extends AbstractBuilder
             ->setStatic()
             ->setPublic()
             ->setReturnType($fqcn)
-            ->addBody("return new {$className}('Oops, an error occured.');");
+            ->addBody(sprintf('return new %s(\'Oops, an error occured.\');', $className));
     }
 }

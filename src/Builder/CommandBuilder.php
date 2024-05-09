@@ -62,7 +62,7 @@ final class CommandBuilder extends AbstractBuilder
         return (new Method('title'))
             ->setPublic()
             ->setReturnType('string')
-            ->setBody('return \''.$title.'\';')
+            ->setBody("return '".$title."';")
             ;
     }
 

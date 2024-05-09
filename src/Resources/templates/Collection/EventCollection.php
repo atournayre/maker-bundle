@@ -26,7 +26,7 @@ final class EventCollection extends TypedCollection
 
         return $this
             ->toMap()
-            ->filter(fn (Event $event): bool => $event instanceof $type)
+            ->filter(static fn(Event $event): bool => $event instanceof $type)
             ->toArray();
     }
 }

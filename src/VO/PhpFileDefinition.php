@@ -13,30 +13,46 @@ use Webmozart\Assert\Assert;
 final class PhpFileDefinition
 {
     private bool $strictTypes = true;
+
     /** @var string[] */
     private array $comments = [];
+
     /** @var string[] */
     private array $classComments = [];
+
     /** @var array<string, null|string> */
     private array $uses = [];
+
     /** @var string[] */
     private array $usesFunctions = [];
+
     /** @var Attribute[] */
     private array $attributes = [];
+
     private bool $interface = false;
+
     private bool $trait = false;
+
     private bool $readonly = false;
+
     private bool $final = true;
+
     private bool $abstract = false;
+
     private ?string $extends = null;
+
     /** @var string[] */
     private array $implements = [];
+
     /** @var Constant[] */
     private array $constants = [];
+
     /** @var string[]|TraitUse[] */
     private array $traits = [];
+
     /** @var Property[] */
     private array $properties = [];
+
     /** @var Method[] */
     private array $methods = [];
 
@@ -125,6 +141,7 @@ final class PhpFileDefinition
 
             $usesWithAlias[$use] = $alias;
         }
+
         ksort($usesWithAlias);
 
         $this->uses = $usesWithAlias;
@@ -165,7 +182,7 @@ final class PhpFileDefinition
     {
         Assert::allIsInstanceOf($attributes, Attribute::class, 'Attributes must be an array of Attribute');
 
-        usort($attributes, fn (Attribute $a, Attribute $b): int => $a->getName() <=> $b->getName());
+        usort($attributes, static fn(Attribute $a, Attribute $b): int => $a->getName() <=> $b->getName());
 
         $this->attributes = $attributes;
         return $this;
@@ -283,7 +300,7 @@ final class PhpFileDefinition
     public function setTraits(array $traits): self
     {
         $traits = array_map(
-            fn (string|TraitUse $trait): string => $trait instanceof TraitUse ? $trait->getName() : $trait,
+            static fn(string|TraitUse $trait): string => $trait instanceof TraitUse ? $trait->getName() : $trait,
             $traits
         );
 
@@ -306,7 +323,7 @@ final class PhpFileDefinition
      */
     public function setProperties(array $properties): self
     {
-        usort($properties, fn (Property $a, Property $b): int => $a->getName() <=> $b->getName());
+        usort($properties, static fn(Property $a, Property $b): int => $a->getName() <=> $b->getName());
 
         $this->properties = $properties;
         return $this;
@@ -326,9 +343,9 @@ final class PhpFileDefinition
      */
     public function setMethods(array $methods): self
     {
-        usort($methods, fn (Method $a, Method $b): int => $a->getName() <=> $b->getName());
+        usort($methods, static fn(Method $a, Method $b): int => $a->getName() <=> $b->getName());
 
-        $names = array_map(fn (Method $method): string => $method->getName(), $methods);
+        $names = array_map(static fn(Method $method): string => $method->getName(), $methods);
 
         $this->methods = array_combine($names, $methods);
         return $this;

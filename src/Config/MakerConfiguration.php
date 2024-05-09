@@ -11,6 +11,7 @@ use Atournayre\Bundle\MakerBundle\Helper\UStr;
 abstract class MakerConfiguration implements MakerConfigurationInterface
 {
     protected string $absolutePath;
+
     protected ?string $sourceCode = null;
 
     protected function __construct(

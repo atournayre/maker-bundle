@@ -17,9 +17,10 @@ use Webmozart\Assert\Assert;
 final class TagCollection extends TypedCollection
 {
     private const TAG_MIN_LENGTH = 3;
+
     private const TAG_MAX_LENGTH = 5;
 
-    public function validateElement(mixed $value): void
+    protected function validateElement(mixed $value): void
     {
         Assert::lengthBetween(
             $value,

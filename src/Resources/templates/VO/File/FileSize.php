@@ -49,7 +49,7 @@ class FileSize
 
         while ($value >= self::KB && $unit < count($units) - 1) {
             $value /= self::KB;
-            $unit++;
+            ++$unit;
         }
 
         return round($value, 2) . ' ' . $units[$unit];

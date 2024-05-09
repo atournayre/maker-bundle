@@ -60,6 +60,7 @@ class ControllerBuilder extends FromTemplateBuilder
         $formType = FormType::class;
         $body = $method->getBody();
         $body = Str::replace($body, $formType, $formTypeNamespace);
+
         $method->setBody($body);
         return $method;
     }

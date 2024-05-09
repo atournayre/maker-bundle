@@ -9,6 +9,7 @@ use Webmozart\Assert\Assert;
 class AddAttributeMakerConfiguration extends MakerConfiguration
 {
     private string $serviceNamespace;
+
     /** @var array<Attribute|null> */
     private array $attributes = [];
 

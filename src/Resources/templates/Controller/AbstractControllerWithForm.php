@@ -36,6 +36,7 @@ abstract class AbstractControllerWithForm
                 if (!$form->isValid()) {
                     $this->whenFormIsInvalid($form, $data, $context);
                 }
+
                 if ($form->isValid()) {
                     return $this->whenFormIsValid($form, $data, $context);
                 }

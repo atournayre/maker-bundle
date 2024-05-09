@@ -21,7 +21,9 @@ use Symfony\Component\Finder\SplFileInfo;
 class MakeController extends AbstractMaker
 {
     private ?string $controllerRelatedEntity = null;
+
     private ?string $controllerRelatedFormType = null;
+
     private ?string $controllerRelatedVO = null;
 
     public static function getCommandName(): string

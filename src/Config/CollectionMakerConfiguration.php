@@ -6,7 +6,9 @@ namespace Atournayre\Bundle\MakerBundle\Config;
 class CollectionMakerConfiguration extends MakerConfiguration
 {
     private bool $ofDecimals = false;
+
     private bool $isImmutable = false;
+
     private ?string $relatedObject = null;
 
     protected static function classNameSuffix(): string

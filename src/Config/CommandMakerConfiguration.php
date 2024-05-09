@@ -8,7 +8,9 @@ use function Symfony\Component\String\u;
 class CommandMakerConfiguration extends MakerConfiguration
 {
     private string $title = '';
+
     private string $description = '';
+
     private string $commandName = '';
 
     protected static function classNameSuffix(): string

@@ -6,6 +6,7 @@ namespace Atournayre\Bundle\MakerBundle\Config;
 class ExceptionMakerConfiguration extends MakerConfiguration
 {
     private string $type = '';
+
     private ?string $namedConstructor = null;
 
     public function type(): string

@@ -15,7 +15,7 @@ trait IdTrait
 	private int $id;
 
 
-	function getId(): int
+	public function getId(): int
 	{
 		return $this->id;
 	}

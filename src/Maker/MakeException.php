@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 class MakeException extends AbstractMaker
 {
     private string $exceptionType;
+
     private ?string $exceptionNamedConstructor = null;
 
     public static function getCommandName(): string

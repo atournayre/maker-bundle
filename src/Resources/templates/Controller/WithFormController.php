@@ -43,6 +43,7 @@ final class WithFormController extends AbstractControllerWithForm
     {
         return $this->formFactory->create(FormType::class, $data, []);
     }
+
     protected function successTemplate(): string
     {
         return 'template/success.html.twig';

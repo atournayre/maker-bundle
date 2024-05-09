@@ -39,11 +39,13 @@ abstract class AbstractBuilder implements PhpFileBuilderInterface
                 $allowedTypesMapping[$allowedType] = $allowedType;
                 continue;
             }
+
             $namespaceFromPath = Str::namespaceFromPath($allowedType, $rootDir);
             $rootNamespace = $makerConfiguration->rootNamespace();
             $namespace = Str::prefixByRootNamespace($namespaceFromPath, $rootNamespace);
             $allowedTypesMapping[$allowedType] = $namespace;
         }
+
         return $allowedTypesMapping;
     }
 }

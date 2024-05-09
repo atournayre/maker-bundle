@@ -12,7 +12,7 @@ trait CreateEmailAddressCollectionTrait
     {
         $map = EmailAddressCollection::createAsList($emails)
             ->toMap()
-            ->map(fn(string $email): EmailAddress => EmailAddress::fromString($email));
+            ->map(static fn(string $email): EmailAddress => EmailAddress::fromString($email));
 
         return EmailAddressCollection::createAsList($map->toArray());
     }

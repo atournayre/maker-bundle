@@ -18,7 +18,9 @@ use Symfony\Component\Console\Input\InputInterface;
 abstract class AbstractMaker extends \Symfony\Bundle\MakerBundle\Maker\AbstractMaker
 {
     protected readonly string $rootNamespace;
+
     protected readonly Namespaces $configNamespaces;
+
     protected readonly Resources $configResources;
 
     public function __construct(

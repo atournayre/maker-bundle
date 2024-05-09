@@ -29,10 +29,13 @@ use Symfony\Component\Yaml\Yaml;
 class MakeService extends AbstractMaker
 {
     private const COMMAND = 'Command';
+
     private const QUERY = 'Query';
 
     private ?string $vo = null;
+
     private ?string $serviceType = null;
+
     private ?string $attributeName = null;
 
     public static function getCommandName(): string

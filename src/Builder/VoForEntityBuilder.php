@@ -32,17 +32,14 @@ final class VoForEntityBuilder extends AbstractBuilder
     {
         $entityNamespace = self::entityNamespace($makerConfiguration);
         $voProperties = Map::from($makerConfiguration->properties())
-            ->map(function (PropertyDefinition $propertyDefinition) use ($makerConfiguration): PropertyDefinition {
+            ->map(static function (PropertyDefinition $propertyDefinition) use ($makerConfiguration) : PropertyDefinition {
                 $type = $propertyDefinition->type;
-
                 if ($propertyDefinition->typeIsPrimitive()) {
                     return $propertyDefinition;
                 }
-
                 $namespaceFromPath = Str::namespaceFromPath($type, $makerConfiguration->rootDir());
                 $rootNamespace = $makerConfiguration->rootNamespace();
                 $propertyDefinition->type = Str::prefixByRootNamespace($namespaceFromPath, $rootNamespace);
-
                 return $propertyDefinition;
             })
             ->toArray();

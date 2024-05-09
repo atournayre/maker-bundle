@@ -18,7 +18,9 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 class MakeCommand extends AbstractMaker
 {
     private string $commandTitle = '';
+
     private string $commandDescription = '';
+
     private string $commandName = '';
 
     public static function getCommandName(): string
@@ -46,8 +48,8 @@ class MakeCommand extends AbstractMaker
         $title = new Question('Choose a title for your command?');
         try {
             $this->commandTitle = $io->askQuestion($title);
-        } catch (\Throwable $e) {
-            throw new \RuntimeException('A title is required.', 0, $e);
+        } catch (\Throwable $throwable) {
+            throw new \RuntimeException('A title is required.', 0, $throwable);
         }
 
         $description = new Question('Choose a description for your command. Press <Enter> to skip.');

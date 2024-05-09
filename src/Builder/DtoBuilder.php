@@ -86,6 +86,7 @@ final class DtoBuilder extends AbstractBuilder
         foreach ($dtoProperties as $dtoProperty) {
             $bodyParts[] = Str::sprintf('$dto->%s = $data[\'%s\'];', $dtoProperty->fieldName, $dtoProperty->fieldName);
         }
+
         $bodyParts[] = '';
         $bodyParts[] = 'return $dto;';
 
@@ -109,8 +110,8 @@ final class DtoBuilder extends AbstractBuilder
         foreach ($dtoProperties as $dtoProperty) {
             $if = 'if (%s) {'.PHP_EOL.'    $errors[\'%s\'] = \'validation.%s.%s.empty\';'.PHP_EOL.'}';
             $ifTest = match ($dtoProperty->type) {
-                'datetime' => "null === \$this->{$dtoProperty->fieldName}",
-                default => "'' == \$this->{$dtoProperty->fieldName}",
+                'datetime' => 'null === $this->' . $dtoProperty->fieldName,
+                default => '\'\' == $this->' . $dtoProperty->fieldName,
             };
             $fieldName = Str::property($dtoProperty->fieldName);
             $dtoName = Str::asCamelCase($className);
