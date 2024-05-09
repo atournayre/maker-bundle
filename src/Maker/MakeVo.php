@@ -60,9 +60,11 @@ class MakeVo extends AbstractMaker
             if (!$name) {
                 return $name;
             }
+
             if (\in_array($name, $fields)) {
                 throw new \InvalidArgumentException(sprintf('The "%s" property already exists.', $name));
             }
+
             return $name;
         });
 

@@ -131,6 +131,7 @@ abstract class AbstractCommand extends Command implements CommandInterface
             if (!in_array($section, $eventsNames)) {
                 return [$section, 'N/A', 'N/A', 'N/A', 'N/A'];
             }
+
             $event = $stopwatch->getEvent($section);
             $dateTime = new \DateTime();
             $originInSec = (int)($event->getOrigin() / 1000);

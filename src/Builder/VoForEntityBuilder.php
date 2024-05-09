@@ -37,6 +37,7 @@ final class VoForEntityBuilder extends AbstractBuilder
                 if ($propertyDefinition->typeIsPrimitive()) {
                     return $propertyDefinition;
                 }
+
                 $namespaceFromPath = Str::namespaceFromPath($type, $makerConfiguration->rootDir());
                 $rootNamespace = $makerConfiguration->rootNamespace();
                 $propertyDefinition->type = Str::prefixByRootNamespace($namespaceFromPath, $rootNamespace);
