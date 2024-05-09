@@ -30,7 +30,7 @@ final class SplFileInfoCollection extends TypedCollection
     {
         $array = $this
             ->toMap()
-            ->filter(fn(SplFileInfo $file) => $file->getExtension() === $extension)
+            ->filter(fn(SplFileInfo $file): bool => $file->getExtension() === $extension)
             ->toArray();
 
         return self::createAsList($array);
@@ -40,7 +40,7 @@ final class SplFileInfoCollection extends TypedCollection
     {
         $array = $this
             ->toMap()
-            ->filter(fn(SplFileInfo $file) => $file->getSize() === $size)
+            ->filter(fn(SplFileInfo $file): bool => $file->getSize() === $size)
             ->toArray();
 
         return self::createAsList($array);
@@ -50,7 +50,7 @@ final class SplFileInfoCollection extends TypedCollection
     {
         $array = $this
             ->toMap()
-            ->filter(fn(SplFileInfo $file) => str_contains($file->getContents(), $content))
+            ->filter(fn(SplFileInfo $file): bool => str_contains($file->getContents(), $content))
             ->toArray();
 
         return self::createAsList($array);

@@ -120,7 +120,7 @@ abstract class AbstractCommand extends Command implements CommandInterface
             ];
         }
 
-        $this->io->table(['Section', 'Started', 'Ended', 'Duration', 'Memory'], array_map(function ($section) use ($stopwatch) {
+        $this->io->table(['Section', 'Started', 'Ended', 'Duration', 'Memory'], array_map(function ($section) use ($stopwatch): array {
             $eventsNames = array_keys(current($stopwatch->getSections())->getEvents());
 
             if (!in_array($section, $eventsNames)) {

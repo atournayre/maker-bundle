@@ -28,8 +28,8 @@ final class VoForObjectBuilder extends AbstractBuilder
     {
         $voProperties = $makerConfiguration->properties();
 
-        $getters = array_map(fn(PropertyDefinition $propertyDefinition) => $this->defineGetter($propertyDefinition, $makerConfiguration), $voProperties);
-        $withers = array_map(fn(PropertyDefinition $propertyDefinition) => $this->defineWither($propertyDefinition, $makerConfiguration), $voProperties);
+        $getters = array_map(fn(PropertyDefinition $propertyDefinition): Method => $this->defineGetter($propertyDefinition, $makerConfiguration), $voProperties);
+        $withers = array_map(fn(PropertyDefinition $propertyDefinition): Method => $this->defineWither($propertyDefinition, $makerConfiguration), $voProperties);
 
         $nullableTrait = $this->nullableTrait($makerConfiguration);
 
@@ -88,7 +88,7 @@ final class VoForObjectBuilder extends AbstractBuilder
             ;
         }
 
-        $fieldNames = array_map(fn(PropertyDefinition $property) => $property->fieldName, $voProperties);
+        $fieldNames = array_map(fn(PropertyDefinition $property): string => $property->fieldName, $voProperties);
         $selfContent = implode(', $', $fieldNames);
 
         $method->addBody('// Add assertions');

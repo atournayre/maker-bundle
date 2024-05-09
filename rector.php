@@ -14,7 +14,6 @@ return RectorConfig::configure()
 //        codingStyle: true,
 //        typeDeclarations: true,
         privatization: true,
-//        naming: true,
         earlyReturn: true,
     )
     ->withSkip([

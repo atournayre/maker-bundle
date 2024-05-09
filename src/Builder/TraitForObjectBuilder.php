@@ -26,7 +26,7 @@ final class TraitForObjectBuilder extends AbstractBuilder
         $traitProperties = $makerConfiguration->properties();
 
         $properties = array_map(
-            fn(PropertyDefinition $propertyDefinition) => $this->defineProperty($propertyDefinition, $makerConfiguration),
+            fn(PropertyDefinition $propertyDefinition): Property => $this->defineProperty($propertyDefinition, $makerConfiguration),
             $traitProperties
         );
 

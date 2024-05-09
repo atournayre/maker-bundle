@@ -16,7 +16,7 @@ class Str
     public static function absolutePathFromNamespace(string $namespace, string $rootNamespace, string $rootDirectory, ?string $extension = '.php'): string
     {
         $normalizedNamespace = Map::from(UStr::create($namespace)->split('\\'))
-            ->map(fn(AbstractString $string) => $string->title()->toString())
+            ->map(fn(AbstractString $string): string => $string->title()->toString())
             ->join('\\')
         ;
 

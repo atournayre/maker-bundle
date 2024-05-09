@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
+use Atournayre\Bundle\MakerBundle\Config\MakerConfiguration;
 use Webmozart\Assert\Assert;
 use App\Contracts\Event\HasEventsInterface;
 use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
@@ -39,7 +40,7 @@ class MakeAddEventsToEntities extends AbstractMaker
     {
         $configurations = $this->entitiesWithoutEvents()
             ->toMap()
-            ->map(function (SplFileInfo $entityFile) {
+            ->map(function (SplFileInfo $entityFile): MakerConfiguration {
                 $fqcn = Str::prefixByRootNamespace(Str::namespaceFromPath($entityFile->getRealPath(), $this->rootDir), $this->rootNamespace);
 
                 return AddEventsToEntitiesMakerConfiguration::fromFqcn(

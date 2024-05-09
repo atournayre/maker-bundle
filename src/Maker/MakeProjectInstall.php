@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
+use Atournayre\Bundle\MakerBundle\Config\MakerConfiguration;
 use App\Logger\DefaultLogger;
 use App\Contracts\Service\CommandServiceInterface;
 use App\Contracts\Service\QueryServiceInterface;
@@ -70,7 +71,7 @@ class MakeProjectInstall extends AbstractMaker
     {
         $configurations = $this->getTemplates()
             ->toMap()
-            ->map(function (SplFileInfo $template) {
+            ->map(function (SplFileInfo $template): MakerConfiguration {
                 $templatePath = u($template->getRealPath())
                     ->afterLast('Resources/templates/')
                     ->prepend($this->rootDir)

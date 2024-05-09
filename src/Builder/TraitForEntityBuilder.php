@@ -48,18 +48,18 @@ final class TraitForEntityBuilder extends AbstractBuilder
             Mapping::class => 'ORM',
         ];
 
-        $nullableProperties = array_filter($traitProperties, fn(PropertyDefinition $propertyDefinition) => !$propertyDefinition->nullable);
+        $nullableProperties = array_filter($traitProperties, fn(PropertyDefinition $propertyDefinition): bool => !$propertyDefinition->nullable);
         if ($nullableProperties !== []) {
             $uses[Assert::class] = null;
         }
 
-        $dateTimeInterfaceProperties = array_filter($traitProperties, fn(PropertyDefinition $propertyDefinition) => $propertyDefinition->typeIsDateTimeInterface());
+        $dateTimeInterfaceProperties = array_filter($traitProperties, fn(PropertyDefinition $propertyDefinition): bool => $propertyDefinition->typeIsDateTimeInterface());
         if ($dateTimeInterfaceProperties !== []) {
             $uses[Types::class] = null;
         }
 
         $properties = array_map(
-            fn(PropertyDefinition $propertyDefinition) => $this->defineProperty($propertyDefinition, $makerConfiguration),
+            fn(PropertyDefinition $propertyDefinition): Property => $this->defineProperty($propertyDefinition, $makerConfiguration),
             $traitProperties
         );
 

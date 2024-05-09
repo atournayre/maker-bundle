@@ -84,7 +84,7 @@ final class EventBuilder extends AbstractBuilder
             ;
         }
 
-        $fieldNames = array_map(fn(PropertyDefinition $property) => $property->fieldName, $eventProperties);
+        $fieldNames = array_map(fn(PropertyDefinition $property): string => $property->fieldName, $eventProperties);
         $selfContent = implode(', $', $fieldNames);
 
         $method->addBody('// Add assertions');

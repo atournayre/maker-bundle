@@ -10,7 +10,7 @@ class AttributeHelper
 		$reflectionClass = new \ReflectionClass($objectOrClass::class);
 		$attributes = $reflectionClass->getAttributes();
 
-		$attributes = array_filter($attributes, fn($attribute) => $attribute->getName() === $attributeName);
+		$attributes = array_filter($attributes, fn($attribute): bool => $attribute->getName() === $attributeName);
 
 		$namedArguments = [];
 		foreach ($attributes as $attribute) {

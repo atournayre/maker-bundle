@@ -73,7 +73,7 @@ class MakeCollection extends AbstractMaker
         $exclude = $this->bundleConfiguration->resources->collection->exclude;
 
         return array_map(
-            fn(string $file) => Str::namespaceFromPath($file, $this->rootDir),
+            fn(string $file): string => Str::namespaceFromPath($file, $this->rootDir),
             $this->filesystem->findFilesInDirectory($directories, $exclude)
         );
     }

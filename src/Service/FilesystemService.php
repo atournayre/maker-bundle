@@ -20,7 +20,7 @@ final class FilesystemService
     {
         $directories = array_filter(
             is_array($includedDirectory) ? $includedDirectory : [$includedDirectory],
-            fn($directory) => (new Filesystem())->exists($directory)
+            fn($directory): bool => (new Filesystem())->exists($directory)
         );
 
         if ([] === $directories) {
@@ -30,7 +30,7 @@ final class FilesystemService
         if (null !== $excludedDirectory) {
             $excludedDirectories = array_filter(
                 is_array($excludedDirectory) ? $excludedDirectory : [$excludedDirectory],
-                fn($directory) => (new Filesystem())->exists($directory)
+                fn($directory): bool => (new Filesystem())->exists($directory)
             );
         }
 
