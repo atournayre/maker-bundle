@@ -6,6 +6,14 @@ namespace App\Collection;
 use Atournayre\Collection\TypedCollection;
 use Webmozart\Assert\Assert;
 
+/**
+ * @extends TypedCollection<string>
+ *
+ * @method SplFileInfoCollection add(string $value)
+ * @method string[] values()
+ * @method string first()
+ * @method string last()
+ */
 final class TagCollection extends TypedCollection
 {
     private const TAG_MIN_LENGTH = 3;

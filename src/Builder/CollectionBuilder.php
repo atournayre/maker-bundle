@@ -37,6 +37,7 @@ final class CollectionBuilder extends AbstractBuilder
             ->setProperties([
                 $this->propertyType($makerConfiguration),
             ])
+            ->setComments($this->comments($makerConfiguration))
         ;
     }
 
@@ -70,5 +71,20 @@ final class CollectionBuilder extends AbstractBuilder
             ->setType('string')
             ->setValue(new Literal(Str::classNameSemiColonFromNamespace($type)))
         ;
+    }
+
+    private function comments(CollectionMakerConfiguration $makerConfiguration): array
+    {
+        $extendsTypeShortName = Str::classNameFromNamespace($this->extendsClass($makerConfiguration), '');
+        $collectionTypeShortName = Str::classNameFromNamespace($this->collectionType($makerConfiguration), '');
+
+        return [
+            '@extends '.$extendsTypeShortName.'<'.$collectionTypeShortName.'>',
+            '',
+            '@method ' . $makerConfiguration->classname() . ' add(' . $collectionTypeShortName . ' $value)',
+            '@method ' . $collectionTypeShortName . '[] values()',
+            '@method ' . $collectionTypeShortName . ' first()',
+            '@method ' . $collectionTypeShortName . ' last()',
+        ];
     }
 }

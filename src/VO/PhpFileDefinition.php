@@ -15,6 +15,8 @@ final class PhpFileDefinition
     private bool $strictTypes = true;
     /** @var string[] */
     private array $comments = [];
+    /** @var string[] */
+    private array $classComments = [];
     /** @var array<string, null|string> */
     private array $uses = [];
     /** @var string[] */
@@ -78,6 +80,25 @@ final class PhpFileDefinition
     {
         Assert::allString($comments, 'Comments must be an array of strings');
         $this->comments = $comments;
+        return $this;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getClassComments(): array
+    {
+        return $this->classComments;
+    }
+
+    /**
+     * @param string[] $classComments
+     * @return $this
+     */
+    public function setClassComments(array $classComments): self
+    {
+        Assert::allString($classComments, 'Class comments must be an array of strings');
+        $this->classComments = $classComments;
         return $this;
     }
 

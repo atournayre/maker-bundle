@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Atournayre\Bundle\MakerBundle\Printer;
 
 use Atournayre\Bundle\MakerBundle\VO\PhpFileDefinition;
-use Nette\PhpGenerator\Attribute;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\Property;
 use Webmozart\Assert\Assert;
@@ -21,6 +20,10 @@ final class PhpFilePrinter
     {
         $phpFile = new PhpFile();
         $phpFile->setStrictTypes($phpFileDefinition->isStrictTypes());
+
+        foreach ($phpFileDefinition->getComments() as $comment) {
+            $phpFile->addComment($comment);
+        }
 
         $fqcn = $phpFileDefinition->fqcn();
         if ($phpFileDefinition->isInterface()) {
@@ -69,8 +72,8 @@ final class PhpFilePrinter
             $namespace->addUse($trait);
         }
 
-        foreach ($phpFileDefinition->getComments() as $comment) {
-            $phpFile->addComment($comment);
+        foreach ($phpFileDefinition->getClassComments() as $comment) {
+            $class->addComment($comment);
         }
 
         foreach ($phpFileDefinition->getUses() as $use => $alias) {
@@ -81,7 +84,6 @@ final class PhpFilePrinter
             $namespace->addUseFunction($use, $alias);
         }
 
-        /** @var Attribute $attribute */
         foreach ($phpFileDefinition->getAttributes() as $attribute) {
             $namespace->addUse($attribute->getName());
             $class->addAttribute($attribute->getName(), $attribute->getArguments());

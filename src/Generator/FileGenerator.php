@@ -29,7 +29,6 @@ final class FileGenerator
     ): MakerConfigurationCollection
     {
         $newMakerConfigurationCollection = [];
-        /** @var MakerConfiguration $configuration */
         foreach ($makerConfigurationCollection->values() as $configuration) {
             $configurationClass = $configuration::class;
 

@@ -6,6 +6,14 @@ namespace App\Collection;
 use Atournayre\Collection\TypedCollection;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * @extends TypedCollection<Event>
+ *
+ * @method SplFileInfoCollection add(Event $value)
+ * @method Event[] values()
+ * @method Event first()
+ * @method Event last()
+ */
 final class EventCollection extends TypedCollection
 {
     protected static string $type = Event::class;

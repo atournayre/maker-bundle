@@ -3,19 +3,15 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Config;
 
-use function Symfony\Component\String\u;
-
 class CollectionMakerConfiguration extends MakerConfiguration
 {
     private bool $ofDecimals = false;
     private bool $isImmutable = false;
     private ?string $relatedObject = null;
 
-    public static function fromFqcn(string $rootDir, string $rootNamespace, string $fqcn,): static
+    protected static function classNameSuffix(): string
     {
-        $fqcn = u($fqcn)->ensureEnd('Collection')->toString();
-
-        return self::fromFqcn($rootDir, $rootNamespace, $fqcn);
+        return 'Collection';
     }
 
     public function ofDecimals(): bool

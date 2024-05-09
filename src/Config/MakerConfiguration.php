@@ -34,7 +34,10 @@ abstract class MakerConfiguration implements MakerConfigurationInterface
         string $className,
     ): static
     {
-        $fqcn = $namespace . '\\' . $className;
+        $fqcn = UStr::create($namespace)
+            ->append('\\', $className)
+            ->ensureEnd(static::classNameSuffix())
+            ->toString();
 
         return static::fromFqcn(
             rootDir: $rootDir,
@@ -52,10 +55,11 @@ abstract class MakerConfiguration implements MakerConfigurationInterface
         string $fqcn,
     ): self
     {
-        $uFqcn = UStr::create($fqcn)
-            ->split('\\');
+        $fqcn = UStr::create($fqcn)
+            ->ensureEnd(static::classNameSuffix())
+            ->toString();
 
-        $fqcnMap = Map::from($uFqcn);
+        $fqcnMap = Map::explode('\\', $fqcn);
 
         $namespace = $fqcnMap->copy()
             ->slice(0, -1)
@@ -67,7 +71,7 @@ abstract class MakerConfiguration implements MakerConfigurationInterface
             rootNamespace: $rootNamespace,
             rootDir: $rootDir,
             namespace: $namespace,
-            className: $className->toString(),
+            className: $className,
             fqcn: $fqcn,
         );
     }
@@ -83,6 +87,11 @@ abstract class MakerConfiguration implements MakerConfigurationInterface
             rootNamespace: $rootNamespace,
             fqcn: Str::prefixByRootNamespace(Str::namespaceFromPath($templatePath, $rootDir), $rootNamespace),
         );
+    }
+
+    protected static function classNameSuffix(): string
+    {
+        return '';
     }
 
 
