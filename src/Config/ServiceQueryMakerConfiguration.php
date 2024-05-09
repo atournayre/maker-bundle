@@ -3,17 +3,13 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Config;
 
-use function Symfony\Component\String\u;
-
 class ServiceQueryMakerConfiguration extends MakerConfiguration
 {
     private string $vo = '';
 
-    public static function fromFqcn(string $rootDir, string $rootNamespace, string $fqcn,): static
+    protected static function classNameSuffix(): string
     {
-        $fqcn = u($fqcn)->ensureEnd('QueryService')->toString();
-
-        return self::fromFqcn($rootDir, $rootNamespace, $fqcn);
+        return 'QueryService';
     }
 
     public function vo(): string

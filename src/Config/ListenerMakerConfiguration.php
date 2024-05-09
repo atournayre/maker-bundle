@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Atournayre\Bundle\MakerBundle\Config;
 
 use Atournayre\Bundle\MakerBundle\Traits\Config\PropertiesAllowedTypesTrait;
-use function Symfony\Component\String\u;
 
 class ListenerMakerConfiguration extends MakerConfiguration
 {
@@ -12,11 +11,9 @@ class ListenerMakerConfiguration extends MakerConfiguration
 
     private string $eventNamespace = '';
 
-    public static function fromFqcn(string $rootDir, string $rootNamespace, string $fqcn,): static
+    protected static function classNameSuffix(): string
     {
-        $fqcn = u($fqcn)->ensureEnd('Listener')->toString();
-
-        return self::fromFqcn($rootDir, $rootNamespace, $fqcn);
+        return 'Listener';
     }
 
     public function eventNamespace(): string

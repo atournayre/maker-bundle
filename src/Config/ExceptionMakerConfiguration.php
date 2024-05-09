@@ -3,19 +3,10 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Config;
 
-use function Symfony\Component\String\u;
-
 class ExceptionMakerConfiguration extends MakerConfiguration
 {
     private string $type = '';
     private ?string $namedConstructor = null;
-
-    public static function fromFqcn(string $rootDir, string $rootNamespace, string $fqcn,): static
-    {
-        $fqcn = u($fqcn)->trimSuffix('Exception')->toString();
-
-        return self::fromFqcn($rootDir, $rootNamespace, $fqcn);
-    }
 
     public function type(): string
     {

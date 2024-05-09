@@ -6,7 +6,6 @@ namespace Atournayre\Bundle\MakerBundle\Config;
 use Atournayre\Bundle\MakerBundle\Traits\Config\EnableApiPlatformTrait;
 use Atournayre\Bundle\MakerBundle\Traits\Config\PropertiesAllowedTypesTrait;
 use Atournayre\Bundle\MakerBundle\Traits\Config\PropertiesAccessorsTrait;
-use function Symfony\Component\String\u;
 
 class TraitForEntityMakerConfiguration extends MakerConfiguration
 {
@@ -16,11 +15,9 @@ class TraitForEntityMakerConfiguration extends MakerConfiguration
 
     private bool $isUsedByEntity = false;
 
-    public static function fromFqcn(string $rootDir, string $rootNamespace, string $fqcn,): static
+    protected static function classNameSuffix(): string
     {
-        $fqcn = u($fqcn)->ensureEnd('Trait')->toString();
-
-        return self::fromFqcn($rootDir, $rootNamespace, $fqcn);
+        return 'Trait';
     }
 
     public function isUsedByEntity(): bool

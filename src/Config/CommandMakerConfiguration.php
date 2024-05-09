@@ -11,11 +11,9 @@ class CommandMakerConfiguration extends MakerConfiguration
     private string $description = '';
     private string $commandName = '';
 
-    public static function fromFqcn(string $rootDir, string $rootNamespace, string $fqcn,): static
+    protected static function classNameSuffix(): string
     {
-        $fqcn = u($fqcn)->ensureEnd('Command')->toString();
-
-        return self::fromFqcn($rootDir, $rootNamespace, $fqcn);
+        return 'Command';
     }
 
     public function title(): string
