@@ -56,7 +56,10 @@ final class VoForEntityBuilder extends AbstractBuilder
             ])
             ->setComments($this->comment())
             ->setProperties($properties)
-            ->setMethods(array_merge([$this->namedConstructor($voProperties, $entityNamespace)], $getters))
+            ->setMethods([
+                ...[$this->namedConstructor($voProperties, $entityNamespace)],
+                ...$getters
+            ])
             ->setImplements([NullableInterface::class])
             ->setTraits([
                 $nullableTrait,

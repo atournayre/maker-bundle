@@ -18,6 +18,7 @@ use Atournayre\Bundle\MakerBundle\Builder\ServiceQueryBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\TraitForEntityBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\TraitForObjectBuilder;
 use Atournayre\Bundle\MakerBundle\Builder\VoForEntityBuilder;
+use Atournayre\Bundle\MakerBundle\Builder\VoForObjectBuilder;
 use Atournayre\Bundle\MakerBundle\DTO\Config\BundleConfiguration;
 use Atournayre\Bundle\MakerBundle\Generator\FileGenerator;
 use Atournayre\Bundle\MakerBundle\Service\FilesystemService;
@@ -73,6 +74,7 @@ return static function (ContainerConfigurator $container): void {
         TraitForEntityBuilder::class,
         TraitForObjectBuilder::class,
         VoForEntityBuilder::class,
+        VoForObjectBuilder::class,
     ];
 
     foreach ($builders as $builder) {

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Maker;
 
+use ArchTech\Enums\Comparable;
 use Atournayre\Bundle\MakerBundle\Collection\MakerConfigurationCollection;
 use Atournayre\Bundle\MakerBundle\Config\EnumMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\DTO\CaseDefinition;
@@ -118,7 +119,7 @@ class MakeEnum extends AbstractMaker
     protected function dependencies(): array
     {
         return [
-            \ArchTech\Enums\Comparable::class => 'archtech/enums',
+            Comparable::class => 'archtech/enums',
         ];
     }
 }

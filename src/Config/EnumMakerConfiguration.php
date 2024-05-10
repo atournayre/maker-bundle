@@ -27,6 +27,11 @@ class EnumMakerConfiguration extends MakerConfiguration
         return $this->cases;
     }
 
+    /**
+     * @param array|CaseDefinition[] $cases
+     *
+     * @return $this
+     */
     public function withCases(array $cases): self
     {
         $config = clone $this;
@@ -88,7 +93,7 @@ class EnumMakerConfiguration extends MakerConfiguration
     public function enumCases(): array
     {
         return Map::from($this->cases())
-            ->map(fn (CaseDefinition $case) => (new EnumCase($case->name))->setValue($case->value))
+            ->map(static fn(CaseDefinition $case) => (new EnumCase($case->name))->setValue($case->value))
             ->toArray();
     }
 }

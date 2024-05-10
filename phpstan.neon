@@ -10,6 +10,14 @@ parameters:
         - src/Maker/MakeController.php
     ignoreErrors:
         - '#Class ApiPlatform\\Metadata\\ApiProperty not found.#'
+        - '#Class ArchTech\\Enums\\Comparable not found.#'
+        - '#Class ArchTech\\Enums\\From not found.#'
+        - '#Class ArchTech\\Enums\\InvokableCases not found.#'
+        - '#Class ArchTech\\Enums\\Metadata not found.#'
+        - '#Class ArchTech\\Enums\\Names not found.#'
+        - '#Class ArchTech\\Enums\\Options not found.#'
+        - '#Class ArchTech\\Enums\\Values not found.#'
+        - '#Class Carbon\\Carbon not found.#'
         - '#Class Doctrine\\DBAL\\Types\\Types not found.#'
         - '#Class Doctrine\\ORM\\Mapping not found.#'
         - '#Class Doctrine\\ORM\\Mapping\\Column not found.#'
@@ -17,5 +25,4 @@ parameters:
         - '#Class Psr\\Clock\\ClockInterface not found.#'
         - '#Class Symfony\\Bundle\\SecurityBundle\\Security not found.#'
         - '#Class Symfony\\Component\\Form\\Extension\\Core\\Type\\FormType not found.#'
-#        - '#Class Symfony\\Component\\Form\\FormInterface not found.#'
     treatPhpDocTypesAsCertain: false

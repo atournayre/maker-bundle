@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\VO;
 
+use Aimeos\Map;
 use Nette\PhpGenerator\Attribute;
 use Nette\PhpGenerator\Constant;
 use Nette\PhpGenerator\EnumCase;
@@ -59,7 +60,7 @@ final class PhpFileDefinition
     /** @var Method[] */
     private array $methods = [];
 
-    /** @return EnumCase[] */
+    /** @var EnumCase[] */
     private array $enumCases = [];
 
     private ?string $enumType = null;
@@ -362,11 +363,11 @@ final class PhpFileDefinition
      */
     public function setMethods(array $methods): self
     {
-        usort($methods, static fn(Method $a, Method $b): int => $a->getName() <=> $b->getName());
-
-        $names = array_map(static fn(Method $method): string => $method->getName(), $methods);
-
-        $this->methods = array_combine($names, $methods);
+        $this->methods = Map::from($methods)
+            ->usort(static fn(Method $a, Method $b): int => $a->getName() <=> $b->getName())
+            ->map(static fn(Method $method): string => $method->getName())
+            ->combine($methods)
+            ->toArray();
         return $this;
     }
 
@@ -413,7 +414,7 @@ final class PhpFileDefinition
 
     public function hasMethod(string $name): bool
     {
-        return array_key_exists($name, $this->methods);
+        return Map::from($this->methods)->offsetExists($name);
     }
 
     public function updateMethod(string $string, Method $method): self
@@ -491,5 +492,10 @@ final class PhpFileDefinition
     {
         $this->enumType = $enumType;
         return $this;
+    }
+
+    public function isStringEnumType(): bool
+    {
+        return $this->enumType === 'string';
     }
 }

@@ -3,6 +3,13 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Builder;
 
+use ArchTech\Enums\Comparable;
+use ArchTech\Enums\From;
+use ArchTech\Enums\InvokableCases;
+use ArchTech\Enums\Metadata;
+use ArchTech\Enums\Names;
+use ArchTech\Enums\Options;
+use ArchTech\Enums\Values;
 use Atournayre\Bundle\MakerBundle\Config\EnumMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\VO\PhpFileDefinition;
 
@@ -15,7 +22,6 @@ final class EnumBuilder extends AbstractBuilder
 
     /**
      * @param EnumMakerConfiguration $makerConfiguration
-     * @return PhpFileDefinition
      */
     public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {
@@ -24,13 +30,13 @@ final class EnumBuilder extends AbstractBuilder
             ->setEnumCases($makerConfiguration->enumCases())
             ->setEnumType($makerConfiguration->enumType())
             ->setTraits([
-                \ArchTech\Enums\Comparable::class,
-                \ArchTech\Enums\From::class,
-                \ArchTech\Enums\InvokableCases::class,
-                \ArchTech\Enums\Metadata::class,
-                \ArchTech\Enums\Names::class,
-                \ArchTech\Enums\Options::class,
-                \ArchTech\Enums\Values::class,
+                Comparable::class,
+                From::class,
+                InvokableCases::class,
+                Metadata::class,
+                Names::class,
+                Options::class,
+                Values::class,
             ])
         ;
     }

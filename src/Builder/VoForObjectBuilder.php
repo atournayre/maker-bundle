@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Builder;
 
+use Aimeos\Map;
 use Webmozart\Assert\Assert;
 use App\Contracts\Null\NullableInterface;
 use App\Trait\IsTrait;
@@ -28,8 +29,19 @@ final class VoForObjectBuilder extends AbstractBuilder
     {
         $voProperties = $makerConfiguration->properties();
 
-        $getters = array_map(fn(PropertyDefinition $propertyDefinition): Method => $this->defineGetter($propertyDefinition, $makerConfiguration), $voProperties);
-        $withers = array_map(fn(PropertyDefinition $propertyDefinition): Method => $this->defineWither($propertyDefinition, $makerConfiguration), $voProperties);
+        $constructor = $this->constructor($voProperties, $makerConfiguration);
+        $namedConstructor = $this->namedConstructor($voProperties, $makerConfiguration);
+
+        $methods = Map::from([
+            $constructor->getName() => $constructor,
+            $namedConstructor->getName() => $namedConstructor,
+        ]);
+        foreach ($voProperties as $voProperty) {
+            $getter = $this->defineGetter($voProperty, $makerConfiguration);
+            $methods->set($getter->getName(), $getter);
+            $wither = $this->defineWither($voProperty, $makerConfiguration);
+            $methods->set($wither->getName(), $wither);
+        }
 
         $nullableTrait = $this->nullableTrait($makerConfiguration);
 
@@ -38,12 +50,7 @@ final class VoForObjectBuilder extends AbstractBuilder
                 Assert::class,
             ])
             ->setComments($this->comment())
-            ->setMethods([
-                $this->constructor($voProperties, $makerConfiguration),
-                $this->namedConstructor($voProperties, $makerConfiguration),
-                ...$getters,
-                ...$withers,
-            ])
+            ->setMethods($methods->toArray())
             ->setImplements([
                 NullableInterface::class,
             ])
@@ -64,6 +71,7 @@ final class VoForObjectBuilder extends AbstractBuilder
 
         foreach ($voProperties as $voProperty) {
             $method->addPromotedParameter($voProperty->fieldName)
+                ->setPrivate()
                 ->setType($this->correspondingTypes($voForObjectMakerConfiguration)[$voProperty->type])
             ;
         }
