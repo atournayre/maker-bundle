@@ -28,7 +28,7 @@ final class AllowedTypeDefinitionCollection extends TypedCollectionImmutable
 
         return $this
             ->toMap()
-            ->map(fn (AllowedTypeDefinition $allowedTypeDefinition) => $allowedTypeDefinition->getType())
+             ->map(static fn(AllowedTypeDefinition $allowedTypeDefinition) => $allowedTypeDefinition->getType())
             ->in($type)
         ;
     }
@@ -37,7 +37,7 @@ final class AllowedTypeDefinitionCollection extends TypedCollectionImmutable
     {
         return $this
             ->toMap()
-            ->map(fn (AllowedTypeDefinition $allowedTypeDefinition) => $allowedTypeDefinition->getType())
+            ->map(static fn(AllowedTypeDefinition $allowedTypeDefinition) => $allowedTypeDefinition->getType())
             ->join($glue)
         ;
     }

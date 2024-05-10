@@ -17,8 +17,6 @@ final class PropertyDefinition
 
     /**
      * @param array{fieldName: string, type: string, nullable?: bool} $data
-     * @param string $rootDir
-     * @param string $rootNamespace
      */
     public static function fromArray(array $data, string $rootDir, string $rootNamespace): self
     {

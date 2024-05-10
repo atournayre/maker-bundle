@@ -62,9 +62,6 @@ interface MakerConfigurationInterface
      */
     public function propertiesAllowedTypes(): array;
 
-    /**
-     * @return AllowedTypeDefinitionCollection
-     */
     public function correspondingTypes(): AllowedTypeDefinitionCollection;
 
     public function correspondingType(string $type): string;

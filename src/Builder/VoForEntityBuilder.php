@@ -93,6 +93,7 @@ final class VoForEntityBuilder extends AbstractBuilder
         $fieldNameRaw = $propertyDefinition->fieldName;
         $correspondingTypes = $voForEntityMakerConfiguration->correspondingTypes();
         $correspondingTypes->assertTypeExists($type, $fieldNameRaw);
+
         $propertyType = $correspondingTypes[$type];
 
         $propertyDefinition = new Property(Str::property($fieldNameRaw));

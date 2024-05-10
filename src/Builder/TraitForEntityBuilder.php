@@ -121,6 +121,7 @@ final class TraitForEntityBuilder extends AbstractBuilder
         $fieldNameRaw = $propertyDefinition->fieldName;
         $correspondingTypes = $traitForEntityMakerConfiguration->correspondingTypes();
         $correspondingTypes->assertTypeExists($type, $propertyDefinition->fieldName);
+
         $propertyType = $correspondingTypes[$type];
         $fieldName = Str::property($fieldNameRaw);
 

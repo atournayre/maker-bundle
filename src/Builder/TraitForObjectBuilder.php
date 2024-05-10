@@ -95,6 +95,7 @@ final class TraitForObjectBuilder extends AbstractBuilder
         $nullable = $propertyDefinition->nullable;
         $correspondingTypes = $traitForObjectMakerConfiguration->correspondingTypes();
         $correspondingTypes->assertTypeExists($type, $propertyDefinition->fieldName);
+
         $propertyType = $traitForObjectMakerConfiguration->correspondingType($type);
 
         $property = new Property(Str::property($fieldNameRaw));

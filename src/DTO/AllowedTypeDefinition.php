@@ -6,7 +6,7 @@ namespace Atournayre\Bundle\MakerBundle\DTO;
 
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 
-final class AllowedTypeDefinition
+final class AllowedTypeDefinition implements \Stringable
 {
 	private function __construct(
 		private string $type,
