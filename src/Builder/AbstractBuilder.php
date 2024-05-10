@@ -5,7 +5,6 @@ namespace Atournayre\Bundle\MakerBundle\Builder;
 
 use Atournayre\Bundle\MakerBundle\Contracts\MakerConfigurationInterface;
 use Atournayre\Bundle\MakerBundle\Contracts\PhpFileBuilderInterface;
-use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\PhpFileDefinition;
 
 abstract class AbstractBuilder implements PhpFileBuilderInterface
@@ -23,29 +22,5 @@ abstract class AbstractBuilder implements PhpFileBuilderInterface
         )->setComments([
             'This file has been auto-generated',
         ]);
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    protected function correspondingTypes(MakerConfigurationInterface $makerConfiguration): array
-    {
-        $rootDir = $makerConfiguration->rootDir();
-        $allowedTypes = $makerConfiguration->propertiesAllowedTypes();
-
-        $allowedTypesMapping = [];
-        foreach ($allowedTypes as $allowedType) {
-            if (!str_contains((string) $allowedType, '/')) {
-                $allowedTypesMapping[$allowedType] = $allowedType;
-                continue;
-            }
-
-            $namespaceFromPath = Str::namespaceFromPath($allowedType, $rootDir);
-            $rootNamespace = $makerConfiguration->rootNamespace();
-            $namespace = Str::prefixByRootNamespace($namespaceFromPath, $rootNamespace);
-            $allowedTypesMapping[$allowedType] = $namespace;
-        }
-
-        return $allowedTypesMapping;
     }
 }

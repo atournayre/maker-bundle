@@ -75,7 +75,7 @@ final class VoForEntityBuilder extends AbstractBuilder
 
     private function defineGetter(PropertyDefinition $propertyDefinition, VoForEntityMakerConfiguration $voForEntityMakerConfiguration): Method
     {
-        $correspondingTypes = $this->correspondingTypes($voForEntityMakerConfiguration);
+        $correspondingTypes = $voForEntityMakerConfiguration->correspondingTypes();
         $propertyType = $correspondingTypes[$propertyDefinition->type];
 
         $body = 'return $this->__FIELD_NAME__;';
@@ -83,7 +83,7 @@ final class VoForEntityBuilder extends AbstractBuilder
 
         return (new Method(Str::getter($propertyDefinition->fieldName)))
             ->setPublic()
-            ->setReturnType($propertyType)
+            ->setReturnType($propertyType->getType())
             ->setBody($body);
     }
 
@@ -91,19 +91,12 @@ final class VoForEntityBuilder extends AbstractBuilder
     {
         $type = $propertyDefinition->type;
         $fieldNameRaw = $propertyDefinition->fieldName;
-        $correspondingTypes = $this->correspondingTypes($voForEntityMakerConfiguration);
-        $correspondingTypes = array_combine(array_values($correspondingTypes), array_values($correspondingTypes));
-
-        Assert::inArray(
-            $type,
-            $correspondingTypes,
-            Str::sprintf('Property "%s" should be of type %s; %s given', $fieldNameRaw, Str::implode(', ', $correspondingTypes), $type)
-        );
-
+        $correspondingTypes = $voForEntityMakerConfiguration->correspondingTypes();
+        $correspondingTypes->assertTypeExists($type, $fieldNameRaw);
         $propertyType = $correspondingTypes[$type];
 
         $propertyDefinition = new Property(Str::property($fieldNameRaw));
-        $propertyDefinition->setPrivate()->setType($propertyType);
+        $propertyDefinition->setPrivate()->setType($propertyType->getType());
 
         return $propertyDefinition;
     }

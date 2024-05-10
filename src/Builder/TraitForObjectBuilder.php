@@ -10,7 +10,6 @@ use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\PhpFileDefinition;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\Property;
-use Webmozart\Assert\Assert;
 
 final class TraitForObjectBuilder extends AbstractBuilder
 {
@@ -49,7 +48,7 @@ final class TraitForObjectBuilder extends AbstractBuilder
     {
         foreach ($traitProperties as $traitProperty) {
             $fieldName = Str::getter($traitProperty->fieldName);
-            $propertyType = $this->correspondingTypes($traitForObjectMakerConfiguration)[$traitProperty->type];
+            $propertyType = $traitForObjectMakerConfiguration->correspondingType($traitProperty->type);
 
             $method = new Method($fieldName);
             $method->setPublic()
@@ -71,7 +70,7 @@ final class TraitForObjectBuilder extends AbstractBuilder
     {
         foreach ($traitProperties as $traitProperty) {
             $fieldName = Str::property($traitProperty->fieldName);
-            $propertyType = $this->correspondingTypes($traitForObjectMakerConfiguration)[$traitProperty->type];
+            $propertyType = $traitForObjectMakerConfiguration->correspondingType($traitProperty->type);
 
             $method = new Method(Str::wither($fieldName));
             $method->setPublic()
@@ -94,14 +93,9 @@ final class TraitForObjectBuilder extends AbstractBuilder
         $type = $propertyDefinition->type;
         $fieldNameRaw = $propertyDefinition->fieldName;
         $nullable = $propertyDefinition->nullable;
-
-        Assert::inArray(
-            $type,
-            array_keys($this->correspondingTypes($traitForObjectMakerConfiguration)),
-            Str::sprintf('Property "%s" should be of type %s; %s given', $fieldNameRaw, Str::implode(', ', array_keys($this->correspondingTypes($traitForObjectMakerConfiguration))), $type)
-        );
-
-        $propertyType = $this->correspondingTypes($traitForObjectMakerConfiguration)[$type];
+        $correspondingTypes = $traitForObjectMakerConfiguration->correspondingTypes();
+        $correspondingTypes->assertTypeExists($type, $propertyDefinition->fieldName);
+        $propertyType = $traitForObjectMakerConfiguration->correspondingType($type);
 
         $property = new Property(Str::property($fieldNameRaw));
         $property->setPrivate()->setType($propertyType)->setNullable($nullable);

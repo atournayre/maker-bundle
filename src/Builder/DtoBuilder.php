@@ -12,7 +12,6 @@ use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\VO\PhpFileDefinition;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\Property;
-use Webmozart\Assert\Assert;
 
 final class DtoBuilder extends AbstractBuilder
 {
@@ -47,18 +46,15 @@ final class DtoBuilder extends AbstractBuilder
     private function property(PropertyDefinition $propertyDefinition, DtoMakerConfiguration $dtoMakerConfiguration): Property
     {
         $type = $propertyDefinition->type;
-        Assert::inArray(
-            $type,
-            array_keys($this->correspondingTypes($dtoMakerConfiguration)),
-            Str::sprintf('Property "%s" should be of type %s; %s given', $propertyDefinition->fieldName, Str::implode(', ', array_keys($this->correspondingTypes($dtoMakerConfiguration))), $type)
-        );
+        $correspondingTypes = $dtoMakerConfiguration->correspondingTypes();
+        $correspondingTypes->assertTypeExists($type, $propertyDefinition->fieldName);
 
         $property = new Property($propertyDefinition->fieldName);
-        $property->setVisibility('public')->setType($this->correspondingTypes($dtoMakerConfiguration)[$type]);
+        $property->setVisibility('public')->setType($dtoMakerConfiguration->correspondingType($type));
 
         $defaultValue = match ($type) {
             'string' => '',
-            'integer' => 0,
+            'int' => 0,
             'float' => 0.0,
             'bool' => false,
             default => null,
@@ -67,6 +63,7 @@ final class DtoBuilder extends AbstractBuilder
         $property->setValue($defaultValue);
 
         if (null === $defaultValue) {
+            $property->addComment('Nullable because this object has no default value.');
             $property->setNullable();
         }
 

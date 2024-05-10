@@ -72,7 +72,7 @@ final class VoForObjectBuilder extends AbstractBuilder
         foreach ($voProperties as $voProperty) {
             $method->addPromotedParameter($voProperty->fieldName)
                 ->setPrivate()
-                ->setType($this->correspondingTypes($voForObjectMakerConfiguration)[$voProperty->type])
+                ->setType($voForObjectMakerConfiguration->correspondingType($voProperty->type))
             ;
         }
 
@@ -92,7 +92,7 @@ final class VoForObjectBuilder extends AbstractBuilder
 
         foreach ($voProperties as $property) {
             $method->addParameter($property->fieldName)
-                ->setType($this->correspondingTypes($voForObjectMakerConfiguration)[$property->type])
+                ->setType($voForObjectMakerConfiguration->correspondingType($property->type))
             ;
         }
 
@@ -108,7 +108,7 @@ final class VoForObjectBuilder extends AbstractBuilder
 
     private function defineGetter(PropertyDefinition $propertyDefinition, VoForObjectMakerConfiguration $voForObjectMakerConfiguration): Method
     {
-        $propertyType = $this->correspondingTypes($voForObjectMakerConfiguration)[$propertyDefinition->type];
+        $propertyType = $voForObjectMakerConfiguration->correspondingType($propertyDefinition->type);
 
         return (new Method(Str::getter($propertyDefinition->fieldName)))
             ->setPublic()
@@ -118,7 +118,7 @@ final class VoForObjectBuilder extends AbstractBuilder
 
     private function defineWither(PropertyDefinition $propertyDefinition, VoForObjectMakerConfiguration $voForObjectMakerConfiguration): Method
     {
-        $propertyType = $this->correspondingTypes($voForObjectMakerConfiguration)[$propertyDefinition->type];
+        $propertyType = $voForObjectMakerConfiguration->correspondingType($propertyDefinition->type);
 
         $fieldName = Str::property($propertyDefinition->fieldName);
 

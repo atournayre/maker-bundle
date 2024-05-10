@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Builder;
 
+use Aimeos\Map;
 use Symfony\Contracts\EventDispatcher\Event;
 use Webmozart\Assert\Assert;
 use App\Contracts\VO\ContextInterface;
@@ -55,7 +56,7 @@ final class EventBuilder extends AbstractBuilder
             $method->addPromotedParameter($property->fieldName)
                 ->setPublic()
                 ->setReadOnly()
-                ->setType(self::correspondingTypes($eventMakerConfiguration)[$property->type])
+                ->setType($eventMakerConfiguration->correspondingType($property->type))
             ;
         }
 
@@ -73,14 +74,19 @@ final class EventBuilder extends AbstractBuilder
             ->setReturnType('self')
         ;
 
-        $properties = array_merge(
-            $eventProperties,
-            [['fieldName' => 'context', 'type' => Str::absolutePathFromNamespace(ContextInterface::class, $eventMakerConfiguration->rootNamespace(), $eventMakerConfiguration->rootDir())]]
-        );
+        $properties = Map::from($eventProperties)
+            ->merge([
+                PropertyDefinition::fromArray(
+                    ['fieldName' => 'context', 'type' => Str::absolutePathFromNamespace(ContextInterface::class, $eventMakerConfiguration->rootNamespace(), $eventMakerConfiguration->rootDir())],
+                    $eventMakerConfiguration->rootDir(),
+                    $eventMakerConfiguration->rootNamespace(),
+                )
+            ])
+            ->toArray();
 
         foreach ($properties as $property) {
             $method->addParameter($property->fieldName)
-                ->setType(self::correspondingTypes($eventMakerConfiguration)[$property->type])
+                ->setType($eventMakerConfiguration->correspondingType($property->type))
             ;
         }
 

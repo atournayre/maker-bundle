@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Contracts;
 
+use Atournayre\Bundle\MakerBundle\Collection\AllowedTypeDefinitionCollection;
+
 interface MakerConfigurationInterface
 {
     /**
@@ -56,6 +58,14 @@ interface MakerConfigurationInterface
 
     /**
      * @return array<string>
+     * @deprecated
      */
     public function propertiesAllowedTypes(): array;
+
+    /**
+     * @return AllowedTypeDefinitionCollection
+     */
+    public function correspondingTypes(): AllowedTypeDefinitionCollection;
+
+    public function correspondingType(string $type): string;
 }

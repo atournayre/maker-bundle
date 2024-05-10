@@ -88,6 +88,8 @@ final class CollectionBuilder extends AbstractBuilder
             '@method ' . $collectionTypeShortName . '[] values()',
             '@method ' . $collectionTypeShortName . ' first()',
             '@method ' . $collectionTypeShortName . ' last()',
+            '@method ' . $collectionTypeShortName . ' offsetGet(mixed $offset)',
+            '@method ' . $collectionMakerConfiguration->classname() . ' offsetSet(mixed $offset, ' . $collectionTypeShortName . ' $value)',
         ];
     }
 }

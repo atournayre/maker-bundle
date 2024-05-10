@@ -119,21 +119,14 @@ final class TraitForEntityBuilder extends AbstractBuilder
     {
         $type = $propertyDefinition->type;
         $fieldNameRaw = $propertyDefinition->fieldName;
-        $correspondingTypes = $this->correspondingTypes($traitForEntityMakerConfiguration);
-
-        Assert::inArray(
-            $type,
-            $correspondingTypes,
-            Str::sprintf('Property "%s" should be of type %s; %s given', $fieldNameRaw, Str::implode(', ', $correspondingTypes), $type)
-        );
-
+        $correspondingTypes = $traitForEntityMakerConfiguration->correspondingTypes();
+        $correspondingTypes->assertTypeExists($type, $propertyDefinition->fieldName);
         $propertyType = $correspondingTypes[$type];
-
         $fieldName = Str::property($fieldNameRaw);
 
         $property = new Property($fieldName);
         $property->setPrivate()
-            ->setType($propertyType)
+            ->setType($propertyType->getType())
             ->setNullable()
             ->setValue(null)
         ;

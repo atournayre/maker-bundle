@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Atournayre\Bundle\MakerBundle\Config;
 
 use Aimeos\Map;
+use Atournayre\Bundle\MakerBundle\Collection\AllowedTypeDefinitionCollection;
 use Atournayre\Bundle\MakerBundle\Contracts\MakerConfigurationInterface;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 use Atournayre\Bundle\MakerBundle\Helper\UStr;
@@ -149,5 +150,18 @@ abstract class MakerConfiguration implements MakerConfigurationInterface
     public function propertiesAllowedTypes(): array
     {
         return [];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function correspondingTypes(): AllowedTypeDefinitionCollection
+    {
+        return AllowedTypeDefinitionCollection::createAsMap([]);
+    }
+
+    public function correspondingType(string $type): string
+    {
+        return '';
     }
 }
