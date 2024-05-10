@@ -96,7 +96,7 @@ class MakeEvent extends AbstractMaker
         return PropertyDefinition::fromArray([
             'fieldName' => $fieldName,
             'type' => $type,
-        ]);
+        ], $this->rootDir, $this->rootNamespace);
     }
 
     public function interact(InputInterface $input, ConsoleStyle $io, Command $command): void

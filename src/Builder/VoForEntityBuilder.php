@@ -31,40 +31,40 @@ final class VoForEntityBuilder extends AbstractBuilder
     public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {
         $entityNamespace = self::entityNamespace($makerConfiguration);
-        $voProperties = Map::from($makerConfiguration->properties())
-            ->map(static function (PropertyDefinition $propertyDefinition) use ($makerConfiguration) : PropertyDefinition {
-                $type = $propertyDefinition->type;
-                if ($propertyDefinition->typeIsPrimitive()) {
-                    return $propertyDefinition;
-                }
 
-                $namespaceFromPath = Str::namespaceFromPath($type, $makerConfiguration->rootDir());
-                $rootNamespace = $makerConfiguration->rootNamespace();
-                $propertyDefinition->type = Str::prefixByRootNamespace($namespaceFromPath, $rootNamespace);
-                return $propertyDefinition;
-            })
-            ->toArray();
+        $voPropertiesMap = Map::from($makerConfiguration->properties());
 
-        $properties = array_map(fn(PropertyDefinition $propertyDefinition): Property => $this->defineProperty($propertyDefinition, $makerConfiguration), $voProperties);
-        $getters = array_map(fn(PropertyDefinition $propertyDefinition): Method => $this->defineGetter($propertyDefinition, $makerConfiguration), $voProperties);
+        $voProperties = $voPropertiesMap->toArray();
+
+        $properties = $voPropertiesMap
+            ->map(fn(PropertyDefinition $propertyDefinition): Property => $this->defineProperty($propertyDefinition, $makerConfiguration));
+
+        $getters = $voPropertiesMap
+            ->map(fn(PropertyDefinition $propertyDefinition): Method => $this->defineGetter($propertyDefinition, $makerConfiguration));
+
         $nullableTrait = $this->nullableTrait($makerConfiguration);
 
+        $uses = [
+            Assert::class,
+            $entityNamespace->toString(),
+        ];
+        $methods = [
+            ...[$this->namedConstructor($voProperties, $entityNamespace)],
+            ...$getters->toArray()
+        ];
+        $implements = [NullableInterface::class];
+        $traits = [
+            $nullableTrait,
+            IsTrait::class,
+        ];
+
         return parent::createPhpFileDefinition($makerConfiguration)
-            ->setUses([
-                Assert::class,
-                $entityNamespace->toString(),
-            ])
+            ->setUses($uses)
             ->setComments($this->comment())
-            ->setProperties($properties)
-            ->setMethods([
-                ...[$this->namedConstructor($voProperties, $entityNamespace)],
-                ...$getters
-            ])
-            ->setImplements([NullableInterface::class])
-            ->setTraits([
-                $nullableTrait,
-                IsTrait::class,
-            ])
+            ->setProperties($properties->toArray())
+            ->setMethods($methods)
+            ->setImplements($implements)
+            ->setTraits($traits)
         ;
     }
 

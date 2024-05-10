@@ -167,14 +167,14 @@ class MakeTrait extends AbstractMaker
         $data = ['fieldName' => $fieldName, 'type' => $type, 'nullable' => false];
 
         if ('datetime' === $type) {
-            return PropertyDefinition::fromArray($data);
+            return PropertyDefinition::fromArray($data, $this->rootDir, $this->rootNamespace);
         }
 
         if ($io->confirm('Can this field be null (nullable)', false)) {
             $data['nullable'] = true;
         }
 
-        return PropertyDefinition::fromArray($data);
+        return PropertyDefinition::fromArray($data, $this->rootDir, $this->rootNamespace);
     }
 
     /**

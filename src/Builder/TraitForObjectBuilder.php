@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Builder;
 
+use Aimeos\Map;
 use Atournayre\Bundle\MakerBundle\Config\TraitForObjectMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\DTO\PropertyDefinition;
 use Atournayre\Bundle\MakerBundle\Helper\Str;
@@ -25,18 +26,18 @@ final class TraitForObjectBuilder extends AbstractBuilder
     {
         $traitProperties = $makerConfiguration->properties();
 
-        $properties = array_map(
-            fn(PropertyDefinition $propertyDefinition): Property => $this->defineProperty($propertyDefinition, $makerConfiguration),
-            $traitProperties
-        );
+        $properties = Map::from($traitProperties)
+            ->map(fn(PropertyDefinition $propertyDefinition): Property => $this->defineProperty($propertyDefinition, $makerConfiguration));
+
+        $methods = [
+            ...$this->gettersForObject($traitProperties, $makerConfiguration),
+            ...$this->withersForObject($traitProperties, $makerConfiguration),
+        ];
 
         return parent::createPhpFileDefinition($makerConfiguration)
             ->setTrait()
-            ->setProperties($properties)
-            ->setMethods([
-                ...$this->gettersForObject($traitProperties, $makerConfiguration),
-                ...$this->withersForObject($traitProperties, $makerConfiguration),
-            ])
+            ->setProperties($properties->toArray())
+            ->setMethods($methods)
         ;
     }
 

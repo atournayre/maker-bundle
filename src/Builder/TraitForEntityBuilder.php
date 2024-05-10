@@ -28,47 +28,33 @@ final class TraitForEntityBuilder extends AbstractBuilder
      */
     public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {
-        $traitProperties = Map::from($makerConfiguration->properties())
-            ->map(static function (PropertyDefinition $propertyDefinition) use ($makerConfiguration) : PropertyDefinition {
-                $type = $propertyDefinition->type;
-                if ($propertyDefinition->typeIsPrimitive()) {
-                    return $propertyDefinition;
-                }
+        $traitPropertiesMap = Map::from($makerConfiguration->properties());
 
-                $namespaceFromPath = Str::namespaceFromPath($type, $makerConfiguration->rootDir());
-                $rootNamespace = $makerConfiguration->rootNamespace();
-                $propertyDefinition->type = Str::prefixByRootNamespace($namespaceFromPath, $rootNamespace);
-                return $propertyDefinition;
-            })
-            ->toArray();
-
-        $uses = [
+        $uses = Map::from([
             Mapping::class => 'ORM',
+        ]);
+
+        $nullableProperties = $traitPropertiesMap
+            ->filter(static fn(PropertyDefinition $propertyDefinition): bool => !$propertyDefinition->nullable);
+        $nullableProperties->empty() ?: $uses->set(Assert::class, null);
+
+        $dateTimeInterfaceProperties = $traitPropertiesMap
+            ->filter(static fn(PropertyDefinition $propertyDefinition): bool => $propertyDefinition->isDateTime());
+        $dateTimeInterfaceProperties->empty() ?: $uses->set(Types::class, null);
+
+        $properties = $traitPropertiesMap->copy()
+            ->map(fn(PropertyDefinition $propertyDefinition): Property => $this->defineProperty($propertyDefinition, $makerConfiguration));
+
+        $methods = [
+            ...$this->gettersForEntity($traitPropertiesMap->toArray()),
+            ...$this->settersForEntity($traitPropertiesMap->toArray()),
         ];
-
-        $nullableProperties = array_filter($traitProperties, static fn(PropertyDefinition $propertyDefinition): bool => !$propertyDefinition->nullable);
-        if ($nullableProperties !== []) {
-            $uses[Assert::class] = null;
-        }
-
-        $dateTimeInterfaceProperties = array_filter($traitProperties, static fn(PropertyDefinition $propertyDefinition): bool => $propertyDefinition->typeIsDateTimeInterface());
-        if ($dateTimeInterfaceProperties !== []) {
-            $uses[Types::class] = null;
-        }
-
-        $properties = array_map(
-            fn(PropertyDefinition $propertyDefinition): Property => $this->defineProperty($propertyDefinition, $makerConfiguration),
-            $traitProperties
-        );
 
         return parent::createPhpFileDefinition($makerConfiguration)
             ->setTrait()
-            ->setUses($uses)
-            ->setProperties($properties)
-            ->setMethods([
-                ...$this->gettersForEntity($traitProperties),
-                ...$this->settersForEntity($traitProperties),
-            ])
+            ->setUses($uses->toArray())
+            ->setProperties($properties->toArray())
+            ->setMethods($methods)
         ;
     }
 
@@ -134,7 +120,6 @@ final class TraitForEntityBuilder extends AbstractBuilder
         $type = $propertyDefinition->type;
         $fieldNameRaw = $propertyDefinition->fieldName;
         $correspondingTypes = $this->correspondingTypes($traitForEntityMakerConfiguration);
-        $correspondingTypes = array_combine(array_values($correspondingTypes), array_values($correspondingTypes));
 
         Assert::inArray(
             $type,
