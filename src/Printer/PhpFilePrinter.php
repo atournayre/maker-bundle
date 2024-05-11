@@ -115,7 +115,16 @@ final class PhpFilePrinter
         $enum->setType($phpFileDefinition->getEnumType());
 
         foreach ($phpFileDefinition->getEnumCases() as $enumType) {
-            $enumTypeValue = $phpFileDefinition->isStringEnumType() ? $enumType->getValue() : (int)$enumType->getValue();
+            $valueIsNull = $enumType->getValue() === null;
+            if ($valueIsNull) {
+                $enum->addCase($enumType->getName());
+                continue;
+            }
+
+            $enumTypeValue = $phpFileDefinition->isStringEnumType()
+                ? $enumType->getValue()
+                : (int)$enumType->getValue();
+
             $enum->addCase($enumType->getName(), $enumTypeValue);
         }
 

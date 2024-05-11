@@ -93,7 +93,15 @@ class EnumMakerConfiguration extends MakerConfiguration
     public function enumCases(): array
     {
         return Map::from($this->cases())
-            ->map(static fn(CaseDefinition $case) => (new EnumCase($case->name))->setValue($case->value))
+            ->map(static function (CaseDefinition $case) {
+                $enumCase = new EnumCase($case->name);
+
+                if ($case->valueIsNull()) {
+                    return $enumCase;
+                }
+
+                return $enumCase->setValue($case->value);
+            })
             ->toArray();
     }
 }
