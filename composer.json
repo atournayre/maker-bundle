@@ -41,6 +41,11 @@
     "scripts": {
         "test": "phpunit",
         "phpstan": "phpstan analyse src",
-        "rector": "rector process src"
+        "rector": "rector process src",
+        "qa": [
+            "@phpstan",
+            "@rector",
+            "@test"
+        ]
     }
 }
