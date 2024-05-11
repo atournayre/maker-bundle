@@ -5,7 +5,7 @@ namespace Atournayre\Bundle\MakerBundle\Printer;
 
 final class Printer extends \Nette\PhpGenerator\Printer
 {
-    public string $indentation = "\t";
+    public string $indentation = "    ";
 
     public int $linesBetweenMethods = 1;
 
