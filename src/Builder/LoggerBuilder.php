@@ -30,20 +30,20 @@ final class LoggerBuilder extends AbstractBuilder
                 LoggerInterface::class,
             ])
             ->setMethods([
-                $this->methodException(),
-                $this->methodByName('error'),
-                $this->methodByName('emergency'),
                 $this->methodByName('alert'),
                 $this->methodByName('critical'),
-                $this->methodByName('warning'),
-                $this->methodByName('notice'),
-                $this->methodByName('info'),
                 $this->methodByName('debug'),
-                $this->methodLog(),
-                $this->methodWithInfoLog('start', 'start'),
+                $this->methodByName('emergency'),
                 $this->methodWithInfoLog('end', 'end'),
-                $this->methodWithInfoLog('success', 'success'),
+                $this->methodByName('error'),
+                $this->methodException(),
                 $this->methodWithInfoLog('failFast', 'fail fast'),
+                $this->methodByName('info'),
+                $this->methodLog(),
+                $this->methodByName('notice'),
+                $this->methodWithInfoLog('start', 'start'),
+                $this->methodWithInfoLog('success', 'success'),
+                $this->methodByName('warning'),
             ])
         ;
     }
