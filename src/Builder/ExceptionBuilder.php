@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Builder;
 
+use Aimeos\Map;
 use Atournayre\Bundle\MakerBundle\Config\ExceptionMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\VO\PhpFileDefinition;
 use Nette\PhpGenerator\Method;
@@ -19,11 +20,13 @@ final class ExceptionBuilder extends AbstractBuilder
      */
     public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {
+        $methods = Map::from([
+            $this->namedConstructor($makerConfiguration),
+        ])->filter();
+
         return parent::createPhpFileDefinition($makerConfiguration)
             ->setExtends($makerConfiguration->type())
-            ->setMethods([
-                $this->namedConstructor($makerConfiguration),
-            ])
+            ->setMethods($methods->toArray())
         ;
     }
 
