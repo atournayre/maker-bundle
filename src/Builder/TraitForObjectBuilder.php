@@ -26,17 +26,21 @@ final class TraitForObjectBuilder extends AbstractBuilder
         $traitProperties = $makerConfiguration->properties();
 
         $properties = Map::from($traitProperties)
-            ->map(fn(PropertyDefinition $propertyDefinition): Property => $this->defineProperty($propertyDefinition, $makerConfiguration));
+            ->map(fn(PropertyDefinition $propertyDefinition): Property => $this->defineProperty($propertyDefinition, $makerConfiguration))
+            ->usort(static fn(Property $a, Property $b): int => $a->getName() <=> $b->getName())
+        ;
 
-        $methods = [
+        $methods = Map::from([
             ...$this->gettersForObject($traitProperties, $makerConfiguration),
             ...$this->withersForObject($traitProperties, $makerConfiguration),
-        ];
+        ])
+            ->usort(static fn(Method $a, Method $b): int => $a->getName() <=> $b->getName())
+            ;
 
         return parent::createPhpFileDefinition($makerConfiguration)
             ->setTrait()
             ->setProperties($properties->toArray())
-            ->setMethods($methods)
+            ->setMethods($methods->toArray())
         ;
     }
 

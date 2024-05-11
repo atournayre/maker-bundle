@@ -43,18 +43,22 @@ final class TraitForEntityBuilder extends AbstractBuilder
         $dateTimeInterfaceProperties->empty() ?: $uses->set(Types::class, null);
 
         $properties = $traitPropertiesMap->copy()
-            ->map(fn(PropertyDefinition $propertyDefinition): Property => $this->defineProperty($propertyDefinition, $makerConfiguration));
+            ->map(fn(PropertyDefinition $propertyDefinition): Property => $this->defineProperty($propertyDefinition, $makerConfiguration))
+            ->usort(static fn(Property $a, Property $b): int => $a->getName() <=> $b->getName())
+        ;
 
-        $methods = [
+        $methods = Map::from([
             ...$this->gettersForEntity($traitPropertiesMap->toArray()),
             ...$this->settersForEntity($traitPropertiesMap->toArray()),
-        ];
+        ])
+            ->usort(static fn(Method $a, Method $b): int => $a->getName() <=> $b->getName())
+        ;
 
         return parent::createPhpFileDefinition($makerConfiguration)
             ->setTrait()
             ->setUses($uses->toArray())
             ->setProperties($properties->toArray())
-            ->setMethods($methods)
+            ->setMethods($methods->toArray())
         ;
     }
 
@@ -156,9 +160,7 @@ final class TraitForEntityBuilder extends AbstractBuilder
     private function matchDoctrineType(string $type): Literal|null
     {
         return match ($type) {
-            '\DateTimeInterface' => class_exists(Types::class)
-                ? new Literal('Types::DATETIME_MUTABLE')
-                : null,
+            '\DateTimeInterface' => new Literal('Types::DATETIME_MUTABLE'),
             default => null,
         };
     }
