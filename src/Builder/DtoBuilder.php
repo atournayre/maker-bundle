@@ -40,6 +40,7 @@ final class DtoBuilder extends AbstractBuilder
             ])
             ->setImplements([NullableInterface::class])
             ->setTraits([$nullableTrait])
+            ->setClassComments($this->classComments())
             ;
     }
 
@@ -139,5 +140,27 @@ return $errors;';
         }
 
         return NotNullableTrait::class;
+    }
+
+    /**
+     * @return string[]
+     */
+    private function classComments(): array
+    {
+        return [
+            '',
+            'Use only for request/response data structure',
+            '',
+            'ONLY',
+            '- public properties',
+            '- primitive types : string, int, float, bool, array, null, \DateTimeInterface or DTO',
+            '',
+            'MUST NOT',
+            '- have getter/setter',
+            '- have methods except `validate`',
+            '- have logic in the class',
+            '',
+            '@object-type DTO',
+        ];
     }
 }
