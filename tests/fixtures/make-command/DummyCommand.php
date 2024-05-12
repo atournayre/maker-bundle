@@ -15,19 +15,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(name: 'app:dummy:command', description: 'Run me to see what happens')]
 final class DummyCommand extends AbstractCommand
 {
-    public function title(): string
-    {
-        return 'I am a dummy command';
-    }
-
     public function doExecute(InputInterface $input, SymfonyStyle $io): void
     {
         // Add your logic here
-    }
-
-    protected function preConditionsChecks(InputInterface $input, SymfonyStyle $io): void
-    {
-        // Implement method or remove it if not needed
     }
 
     protected function failFast(InputInterface $input, SymfonyStyle $io): void
@@ -38,5 +28,15 @@ final class DummyCommand extends AbstractCommand
     protected function postConditionsChecks(InputInterface $input, SymfonyStyle $io): void
     {
         // Implement method or remove it if not needed
+    }
+
+    protected function preConditionsChecks(InputInterface $input, SymfonyStyle $io): void
+    {
+        // Implement method or remove it if not needed
+    }
+
+    public function title(): string
+    {
+        return 'I am a dummy command';
     }
 }

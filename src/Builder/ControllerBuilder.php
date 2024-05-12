@@ -25,9 +25,9 @@ class ControllerBuilder extends FromTemplateBuilder
         $phpFileDefinition->renameClass($makerConfiguration->classname());
         $phpFileDefinition->updateMethod('createVo', $this->updateVoMethod($phpFileDefinition->getMethod('createVo'), $makerConfiguration));
         $phpFileDefinition->updateMethod('createForm', $this->updateFormMethod($phpFileDefinition->getMethod('createForm'), $makerConfiguration));
-        $phpFileDefinition->addUse($makerConfiguration->entityClassName());
-        $phpFileDefinition->addUse($makerConfiguration->formTypeClassName());
-        $phpFileDefinition->addUse($makerConfiguration->voClassName());
+        $phpFileDefinition->addUse($makerConfiguration->entityNamespace());
+        $phpFileDefinition->addUse($makerConfiguration->formTypeNamespace());
+        $phpFileDefinition->addUse($makerConfiguration->voNamespace());
         $phpFileDefinition->removeUse(FormType::class);
         return $phpFileDefinition;
     }
@@ -37,9 +37,9 @@ class ControllerBuilder extends FromTemplateBuilder
         ControllerMakerConfiguration $controllerMakerConfiguration
     ): Method
     {
-        $entityClassName = Str::classNameFromNamespace($controllerMakerConfiguration->entityClassName(), '');
-        $voNamespace = $controllerMakerConfiguration->voClassName();
-        $voClassName = Str::classNameFromNamespace($voNamespace, '');
+        $entityClassName = $controllerMakerConfiguration->entityClassName();
+        $voNamespace = $controllerMakerConfiguration->voNamespace();
+        $voClassName = $controllerMakerConfiguration->voClassName();
 
         $method->setComment('@param '.$entityClassName.' $entity');
         $method->setReturnType($voNamespace);
@@ -52,11 +52,11 @@ class ControllerBuilder extends FromTemplateBuilder
         ControllerMakerConfiguration $controllerMakerConfiguration
     ): Method
     {
-        $voClassName = Str::classNameFromNamespace($controllerMakerConfiguration->voClassName(), '');
+        $voClassName = $controllerMakerConfiguration->voClassName();
         $method->setComment('@param ' . $voClassName . '|null $data');
 
         // Replace FormType by the form type class name in the body
-        $formTypeNamespace = $controllerMakerConfiguration->formTypeClassName();
+        $formTypeNamespace = $controllerMakerConfiguration->formTypeNamespace();
         $formType = FormType::class;
         $body = $method->getBody();
         $body = Str::replace($body, $formType, $formTypeNamespace);

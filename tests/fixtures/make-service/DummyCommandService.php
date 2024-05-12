@@ -22,18 +22,18 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 final readonly class DummyCommandService implements CommandServiceInterface, FailFastInterface, PostConditionsChecksInterface, PreConditionsChecksInterface
 {
     /**
-     * @param FixtureVo $object
+     * This service is not meant to be used directly
+     * @throws \RuntimeException
      */
-    public function execute($object, ContextInterface $context, ?string $service = null): void
+    public function __invoke()
     {
+        throw new \RuntimeException('This service is not meant to be used directly');
     }
 
     /**
-     * Use assertions, or remove method and interface from the class if not needed.
-     * @throws \Exception
      * @param FixtureVo $object
      */
-    public function preConditionsChecks($object, ContextInterface $context): void
+    public function execute($object, ContextInterface $context, ?string $service = null): void
     {
     }
 
@@ -56,11 +56,11 @@ final readonly class DummyCommandService implements CommandServiceInterface, Fai
     }
 
     /**
-     * This service is not meant to be used directly
-     * @throws \RuntimeException
+     * Use assertions, or remove method and interface from the class if not needed.
+     * @throws \Exception
+     * @param FixtureVo $object
      */
-    public function __invoke()
+    public function preConditionsChecks($object, ContextInterface $context): void
     {
-        throw new \RuntimeException('This service is not meant to be used directly');
     }
 }

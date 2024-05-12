@@ -22,19 +22,12 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 final readonly class DummyQueryService implements FailFastInterface, PostConditionsChecksInterface, PreConditionsChecksInterface, QueryServiceInterface
 {
     /**
-     * @param FixtureVo $object
+     * This service is not meant to be used directly
+     * @throws \RuntimeException
      */
-    public function fetch($object, ContextInterface $context, ?string $service = null)
+    public function __invoke()
     {
-    }
-
-    /**
-     * Use assertions, or remove method and interface from the class if not needed.
-     * @throws \Exception
-     * @param FixtureVo $object
-     */
-    public function preConditionsChecks($object, ContextInterface $context): void
-    {
+        throw new \RuntimeException('This service is not meant to be used directly');
     }
 
     /**
@@ -43,6 +36,13 @@ final readonly class DummyQueryService implements FailFastInterface, PostConditi
      * @param FixtureVo $object
      */
     public function failFast($object, ContextInterface $context): void
+    {
+    }
+
+    /**
+     * @param FixtureVo $object
+     */
+    public function fetch($object, ContextInterface $context, ?string $service = null)
     {
     }
 
@@ -56,11 +56,11 @@ final readonly class DummyQueryService implements FailFastInterface, PostConditi
     }
 
     /**
-     * This service is not meant to be used directly
-     * @throws \RuntimeException
+     * Use assertions, or remove method and interface from the class if not needed.
+     * @throws \Exception
+     * @param FixtureVo $object
      */
-    public function __invoke()
+    public function preConditionsChecks($object, ContextInterface $context): void
     {
-        throw new \RuntimeException('This service is not meant to be used directly');
     }
 }

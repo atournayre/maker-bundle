@@ -365,8 +365,7 @@ final class PhpFileDefinition
     {
         $this->methods = Map::from($methods)
             ->usort(static fn(Method $a, Method $b): int => $a->getName() <=> $b->getName())
-            ->map(static fn(Method $method): string => $method->getName())
-            ->combine($methods)
+            ->rekey(static fn(Method $method): string => $method->getName())
             ->toArray();
         return $this;
     }
