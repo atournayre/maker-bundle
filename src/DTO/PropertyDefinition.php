@@ -5,7 +5,7 @@ namespace Atournayre\Bundle\MakerBundle\DTO;
 
 use Atournayre\Bundle\MakerBundle\Helper\Str;
 
-final class PropertyDefinition
+final class PropertyDefinition implements \Stringable
 {
     private function __construct(
         public string $fieldName,
@@ -35,7 +35,7 @@ final class PropertyDefinition
 
     private static function doIsPrimitive(string $type): bool
     {
-        return in_array($type, ['string', 'int', 'float', 'bool', 'array']);
+        return in_array($type, ['string', 'int', 'float', 'bool', 'array'], true);
     }
 
     public function isDateTime(): bool
@@ -57,5 +57,10 @@ final class PropertyDefinition
     {
         return !self::doIsPrimitive($type)
             && !self::doIsDateTime($type);
+    }
+
+    public function __toString(): string
+    {
+        return $this->fieldName;
     }
 }

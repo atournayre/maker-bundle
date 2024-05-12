@@ -11,6 +11,7 @@ use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\Property;
 use Nette\PhpGenerator\TraitType;
 use Webmozart\Assert\Assert;
+use function Symfony\Component\String\u;
 
 final class PhpFilePrinter
 {
@@ -193,7 +194,7 @@ final class PhpFilePrinter
         }
 
         foreach ($phpFileDefinition->getProperties() as $property) {
-            if (str_contains((string)$property->getType(), '\\')) {
+            if (u((string)$property->getType())->containsAny('\\')) {
                 $namespace->addUse($property->getType());
             }
         }

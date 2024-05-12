@@ -7,6 +7,7 @@ use Atournayre\Bundle\MakerBundle\Config\FromTemplateMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\VO\PhpFileDefinition;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PhpNamespace;
+use function Symfony\Component\String\u;
 
 class FromTemplateBuilder extends AbstractBuilder
 {
@@ -31,7 +32,7 @@ class FromTemplateBuilder extends AbstractBuilder
 
         return [
             ...$defaultComments,
-            ...explode(PHP_EOL, $comment),
+            ...u($comment)->split(PHP_EOL),
         ];
     }
 

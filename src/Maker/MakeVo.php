@@ -61,7 +61,7 @@ class MakeVo extends AbstractMaker
                 return $name;
             }
 
-            if (\in_array($name, $fields)) {
+            if (\in_array($name, $fields, true)) {
                 throw new \InvalidArgumentException(sprintf('The "%s" property already exists.', $name));
             }
 
@@ -85,7 +85,7 @@ class MakeVo extends AbstractMaker
                 $io->writeln('');
 
                 $type = null;
-            } elseif (!\in_array($type, $allowedTypes)) {
+            } elseif (!\in_array($type, $allowedTypes, true)) {
                 $io->writeln($allowedTypes);
                 $io->error(sprintf('Invalid type "%s".', $type));
                 $io->writeln('');

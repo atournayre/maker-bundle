@@ -1,5 +1,7 @@
 includes:
     - vendor/phpstan/phpstan-symfony/extension.neon
+    - vendor/spaze/phpstan-disallowed-calls/extension.neon
+    - tools/phpstan/disallowed-calls.neon
 
 parameters:
     level: 6

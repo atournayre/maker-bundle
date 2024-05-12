@@ -8,7 +8,7 @@ use Atournayre\Bundle\MakerBundle\DTO\Config\BundleConfiguration;
 use Atournayre\Bundle\MakerBundle\DTO\Config\Namespaces;
 use Atournayre\Bundle\MakerBundle\DTO\Config\Resources;
 use Atournayre\Bundle\MakerBundle\Generator\FileGenerator;
-use Atournayre\Bundle\MakerBundle\Helper\Str;
+use Atournayre\Bundle\MakerBundle\Helper\UStr;
 use Atournayre\Bundle\MakerBundle\Service\FilesystemService;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
@@ -57,10 +57,8 @@ abstract class AbstractMaker extends \Symfony\Bundle\MakerBundle\Maker\AbstractM
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
     {
         $namespace = $input->hasArgument('namespace')
-            ? Str::cleanNamespace($input->getArgument('namespace'))
+            ? UStr::cleanNamespace($input->getArgument('namespace'))->title()->toString()
             : '';
-
-        $namespace = ucfirst($namespace);
 
         $configurations = $this->configurations($namespace);
 

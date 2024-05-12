@@ -13,6 +13,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
+use function Symfony\Component\String\u;
 
 #[AutoconfigureTag('maker.command')]
 class MakeCommand extends AbstractMaker
@@ -55,7 +56,7 @@ class MakeCommand extends AbstractMaker
         $description = new Question('Choose a description for your command. Press <Enter> to skip.');
         $this->commandDescription = $io->askQuestion($description) ?? '';
 
-        $this->commandName = trim((string) $input->getArgument('name'));
+        $this->commandName = u((string) $input->getArgument('name'))->trim()->toString();
     }
 
     /**

@@ -9,6 +9,7 @@ use App\Trait\EventsTrait;
 use Atournayre\Bundle\MakerBundle\Config\AddEventsToEntitiesMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\VO\PhpFileDefinition;
 use Nette\PhpGenerator\Method;
+use function Symfony\Component\String\u;
 
 class AddEventsToEntityBuilder extends FromTemplateBuilder
 {
@@ -47,7 +48,7 @@ class AddEventsToEntityBuilder extends FromTemplateBuilder
 
     private function updateConstructorMethod(Method $method): Method
     {
-        $bodyContainsEventCollection = str_contains($method->getBody(), 'EventCollection::createAsList');
+        $bodyContainsEventCollection = u($method->getBody())->containsAny('EventCollection::createAsList');
 
         if ($bodyContainsEventCollection) {
             return $method;

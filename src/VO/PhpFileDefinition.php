@@ -11,6 +11,7 @@ use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\Property;
 use Nette\PhpGenerator\TraitUse;
 use Webmozart\Assert\Assert;
+use function Symfony\Component\String\u;
 
 final class PhpFileDefinition
 {
@@ -74,7 +75,7 @@ final class PhpFileDefinition
 
     public static function create(string $namespace, string $className): self
     {
-        $className = ucfirst($className);
+        $className = u($className)->title()->toString();
         return new self($namespace, $className);
     }
 

@@ -75,7 +75,7 @@ class MakeEnum extends AbstractMaker
                 return $name;
             }
 
-            if (\in_array($name, $fields)) {
+            if (\in_array($name, $fields, true)) {
                 throw new \InvalidArgumentException(sprintf('The "%s" case already exists.', $name));
             }
 
@@ -113,7 +113,6 @@ class MakeEnum extends AbstractMaker
         }
 
         $this->cases = $currentFields;
-        dump($currentFields);
     }
 
     protected function dependencies(): array

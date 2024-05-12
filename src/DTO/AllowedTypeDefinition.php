@@ -48,7 +48,7 @@ final class AllowedTypeDefinition implements \Stringable
 
     private static function doIsPrimitive(string $type): bool
     {
-        return in_array($type, ['string', 'int', 'float', 'bool', 'array']);
+        return in_array($type, ['string', 'int', 'float', 'bool', 'array'], true);
     }
 
     public function isDateTime(): bool

@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\DTO;
 
-final class CaseDefinition
+use function Symfony\Component\String\u;
+
+final class CaseDefinition implements \Stringable
 {
     private function __construct(
         public string $name,
@@ -18,7 +20,7 @@ final class CaseDefinition
     public static function fromArray(array $data): self
     {
         return new self(
-            strtoupper($data['name']),
+            u($data['name'])->upper()->toString(),
             $data['value'],
         );
     }
@@ -26,5 +28,10 @@ final class CaseDefinition
     public function valueIsNull(): bool
     {
         return null === $this->value;
+    }
+
+    public function __toString(): string
+    {
+        return $this->name;
     }
 }

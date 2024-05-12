@@ -1,0 +1,95 @@
+includes:
+    - ../../vendor/spaze/phpstan-disallowed-calls/disallowed-dangerous-calls.neon
+    - ../../vendor/spaze/phpstan-disallowed-calls/disallowed-execution-calls.neon
+    - ../../vendor/spaze/phpstan-disallowed-calls/disallowed-insecure-calls.neon
+    - ../../vendor/spaze/phpstan-disallowed-calls/disallowed-loose-calls.neon
+
+parameters:
+    disallowedFunctionCalls:
+        -
+            function:
+                - 'trim()'
+                - 'ltrim()'
+                - 'rtrim()'
+                - 'join()'
+                - 'split()'
+                - 'str_contains()'
+                - 'str_ends_with()'
+                - 'str_pad()'
+                - 'str_repeat()'
+                - 'str_replace()'
+                - 'str_shuffle()'
+                - 'str_split()'
+                - 'str_starts_with()'
+                - 'explode()'
+                - 'strlen()'
+                - 'strtolower()'
+                - 'strtoupper()'
+                - 'substr()'
+                - 'ucfirst()'
+                - 'ucwords()'
+            message: 'use Symfony\Component\String\u() instead, because it is more secure and toString() performs assertion'
+        -
+            function:
+                - 'dump()'
+                - 'dd()'
+            message: 'use some logger instead'
+        -
+            function:
+                - 'ini_set()'
+                - 'ini_get()'
+                - 'ini_restore()'
+            message: 'ini_* functions are not allowed'
+#            allowIn:
+#                - path/to/some/file-*.php
+        -
+            function:
+                - 'phpinfo()'
+            message: 'Exposing the PHP configuration is a security risk'
+        -
+            function:
+                - 'die()'
+                - 'exit()'
+            message: 'die() and exit() are not allowed'
+
+    disallowedMethodCalls:
+        -
+            method: 'Carbon::createFromFormat()'
+            message: 'use CarbonHelper::createFromFormat() or another helper instead because assertion is mandatory'
+        -
+            method: 'Carbon::create()'
+            message: 'use CarbonHelper::create() or another helper instead because assertion is mandatory'
+
+    disallowedSuperglobals:
+        -
+            superglobal: '$_GET'
+            message: 'use the Symfony\Component\HttpFoundation\Request methods instead'
+            errorTip: 'see https://symfony.com/doc/current/components/http_foundation.html#request'
+        -
+            superglobal: '$_POST'
+            message: 'use the Symfony\Component\HttpFoundation\Request methods instead'
+            errorTip: 'see https://symfony.com/doc/current/components/http_foundation.html#request'
+        -
+            superglobal: '$_REQUEST'
+            message: 'use the Symfony\Component\HttpFoundation\Request methods instead'
+            errorTip: 'see https://symfony.com/doc/current/components/http_foundation.html#request'
+        -
+            superglobal: '$_SERVER'
+            message: 'use the Symfony\Component\HttpFoundation\Request methods instead'
+            errorTip: 'see https://symfony.com/doc/current/components/http_foundation.html#request'
+        -
+            superglobal: '$_SESSION'
+            message: 'use the Symfony\Component\HttpFoundation\Request methods instead'
+            errorTip: 'see https://symfony.com/doc/current/components/http_foundation.html#request'
+        -
+            superglobal: '$_COOKIE'
+            message: 'use the Symfony\Component\HttpFoundation\Request methods instead'
+            errorTip: 'see https://symfony.com/doc/current/components/http_foundation.html#request'
+        -
+            superglobal: '$_FILES'
+            message: 'use the Symfony\Component\HttpFoundation\Request methods instead'
+            errorTip: 'see https://symfony.com/doc/current/components/http_foundation.html#request'
+        -
+            superglobal: '$_ENV'
+            message: 'use the Symfony\Component\HttpFoundation\Request methods instead'
+            errorTip: 'see https://symfony.com/doc/current/components/http_foundation.html#request'
