@@ -21,7 +21,7 @@ final class PropertyDefinition
     public static function fromArray(array $data, string $rootDir, string $rootNamespace): self
     {
         $type = $data['type'];
-        if (self::isVo($type)) {
+        if (self::doIsVo($type)) {
             $namespaceFromPath = Str::namespaceFromPath($type, $rootDir);
             $type = Str::prefixByRootNamespace($namespaceFromPath, $rootNamespace);
         }
@@ -48,7 +48,12 @@ final class PropertyDefinition
         return $type === '\DateTimeInterface';
     }
 
-    private static function isVo(string $type): bool
+    public function isVo(): bool
+    {
+        return self::doIsVo($this->type);
+    }
+
+    private static function doIsVo(string $type): bool
     {
         return !self::doIsPrimitive($type)
             && !self::doIsDateTime($type);

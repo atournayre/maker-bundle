@@ -27,7 +27,16 @@ final class VoForObjectBuilder extends AbstractBuilder
      */
     public function createPhpFileDefinition($makerConfiguration): PhpFileDefinition
     {
-        $voProperties = $makerConfiguration->properties();
+        $voProperties = Map::from($makerConfiguration->properties())
+            ->usort(static fn(PropertyDefinition $a, PropertyDefinition $b): int => $a->fieldName <=> $b->fieldName)
+            ->toArray()
+        ;
+
+        $usesFromProperties = Map::from($voProperties)
+            ->filter(static fn(PropertyDefinition $propertyDefinition): bool => $propertyDefinition->isVo())
+            ->map(static fn(PropertyDefinition $propertyDefinition): string => $propertyDefinition->type)
+            ->toArray()
+        ;
 
         $constructor = $this->constructor($voProperties, $makerConfiguration);
         $namedConstructor = $this->namedConstructor($voProperties, $makerConfiguration);
@@ -43,21 +52,32 @@ final class VoForObjectBuilder extends AbstractBuilder
             $methods->set($wither->getName(), $wither);
         }
 
+        $methods = $methods
+            ->usort(static fn(Method $a, Method $b): int => $a->getName() <=> $b->getName());
+
         $nullableTrait = $this->nullableTrait($makerConfiguration);
 
+        $implements = [
+            NullableInterface::class,
+        ];
+
+        $traits = [
+            IsTrait::class,
+            $nullableTrait,
+        ];
+
+        $uses = Map::from([
+            Assert::class,
+        ])
+            ->merge($usesFromProperties)
+        ;
+
         return parent::createPhpFileDefinition($makerConfiguration)
-            ->setUses([
-                Assert::class,
-            ])
+            ->setUses($uses->toArray())
             ->setComments($this->comment())
             ->setMethods($methods->toArray())
-            ->setImplements([
-                NullableInterface::class,
-            ])
-            ->setTraits([
-                $nullableTrait,
-                IsTrait::class,
-            ])
+            ->setImplements($implements)
+            ->setTraits($traits)
         ;
     }
 

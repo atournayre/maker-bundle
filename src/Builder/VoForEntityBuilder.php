@@ -32,7 +32,9 @@ final class VoForEntityBuilder extends AbstractBuilder
     {
         $entityNamespace = self::entityNamespace($makerConfiguration);
 
-        $voPropertiesMap = Map::from($makerConfiguration->properties());
+        $voPropertiesMap = Map::from($makerConfiguration->properties())
+            ->usort(static fn(PropertyDefinition $a, PropertyDefinition $b): int => $a->fieldName <=> $b->fieldName)
+        ;
 
         $voProperties = $voPropertiesMap->toArray();
 
