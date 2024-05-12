@@ -1,0 +1,30 @@
+includes:
+    - vendor/phpstan/phpstan-symfony/extension.neon
+    - vendor/spaze/phpstan-disallowed-calls/extension.neon
+    - tools/phpstan/disallowed-calls.neon
+
+parameters:
+    level: 6
+    excludePaths:
+        - src/Resources/templates
+        - src/Collection/MakerConfigurationCollection.php
+        - src/Config/MakerConfiguration.php
+        - src/Maker/MakeController.php
+    ignoreErrors:
+        - '#Class ApiPlatform\\Metadata\\ApiProperty not found.#'
+        - '#Class ArchTech\\Enums\\Comparable not found.#'
+        - '#Class ArchTech\\Enums\\From not found.#'
+        - '#Class ArchTech\\Enums\\InvokableCases not found.#'
+        - '#Class ArchTech\\Enums\\Metadata not found.#'
+        - '#Class ArchTech\\Enums\\Names not found.#'
+        - '#Class ArchTech\\Enums\\Options not found.#'
+        - '#Class ArchTech\\Enums\\Values not found.#'
+        - '#Class Carbon\\Carbon not found.#'
+        - '#Class Doctrine\\DBAL\\Types\\Types not found.#'
+        - '#Class Doctrine\\ORM\\Mapping not found.#'
+        - '#Class Doctrine\\ORM\\Mapping\\Column not found.#'
+        - '#Class Doctrine\\ORM\\Mapping\\Id not found.#'
+        - '#Class Psr\\Clock\\ClockInterface not found.#'
+        - '#Class Symfony\\Bundle\\SecurityBundle\\Security not found.#'
+        - '#Class Symfony\\Component\\Form\\Extension\\Core\\Type\\FormType not found.#'
+    treatPhpDocTypesAsCertain: false
