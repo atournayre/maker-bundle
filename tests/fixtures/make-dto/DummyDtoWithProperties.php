@@ -13,6 +13,20 @@ use App\Trait\NotNullableTrait;
 use App\Type\Primitive\StringType;
 use DateTimeInterface;
 
+/**
+ * Use only for request/response data structure
+ *
+ * ONLY
+ * - public properties
+ * - primitive types : string, int, float, bool, array, null, \DateTimeInterface or DTO
+ *
+ * MUST NOT
+ * - have getter/setter
+ * - have methods except `validate`
+ * - have logic in the class
+ *
+ * @object-type DTO
+ */
 final class Dummy implements NullableInterface
 {
     use NotNullableTrait;

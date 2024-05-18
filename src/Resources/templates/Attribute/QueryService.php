@@ -6,5 +6,9 @@ namespace App\Attribute;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class QueryService
 {
-	public readonly string $serviceName;
+    public function __construct(
+        public readonly string $serviceName
+    )
+    {
+    }
 }

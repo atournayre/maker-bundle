@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\VO;
 
+use App\Contracts\Logger\LoggableInterface;
 use App\Contracts\Security\UserInterface;
 use App\Contracts\VO\ContextInterface;
 use App\Contracts\VO\DateTimeInterface;
@@ -26,7 +27,7 @@ use App\Contracts\VO\DateTimeInterface;
  *
  * @object-type VO
  */
-final class Context implements ContextInterface
+final class Context implements ContextInterface, LoggableInterface
 {
 	private function __construct(
 		private readonly UserInterface $user,
@@ -54,4 +55,12 @@ final class Context implements ContextInterface
 	{
 		return $this->createdAt;
 	}
+
+    public function toLog(): array
+    {
+        return [
+            'user' => $this->user->identifier(),
+            'createdAt' => $this->createdAt->toDateTime()->format('Y-m-d H:i:s'),
+        ];
+    }
 }

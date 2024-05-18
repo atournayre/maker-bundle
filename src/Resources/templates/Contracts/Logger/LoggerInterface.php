@@ -5,6 +5,8 @@ namespace App\Contracts\Logger;
 
 interface LoggerInterface extends \Psr\Log\LoggerInterface
 {
+    public function setLoggerIdentifier(?string $identifier): void;
+
 	public function emergency(\Stringable|string $message, array $context = []): void;
 
 
