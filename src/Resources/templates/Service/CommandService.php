@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Attribute\CommandService as AttributeCommandService;
+use App\Contracts\Logger\LoggableInterface;
 use App\Contracts\Logger\LoggerInterface;
 use App\Contracts\Service\CommandServiceInterface;
 use App\Contracts\Service\FailFastInterface;
@@ -24,7 +25,6 @@ final class CommandService implements CommandServiceInterface
 	) {
 	}
 
-
 	/**
 	 * @throws \Exception
 	 */
@@ -43,7 +43,6 @@ final class CommandService implements CommandServiceInterface
 		$this->doExecute($service, $object, $context);
 	}
 
-
 	/**
 	 * @throws \Exception
 	 */
@@ -54,31 +53,40 @@ final class CommandService implements CommandServiceInterface
 
 		$reflectionClass = new \ReflectionClass($service);
 
-		$this->logger->start();
+        $this->logger->setLoggerIdentifier($service);
+
+        $logContext = $this->logContext($serviceClass, $object, $context);
+
+        $this->logger->start($logContext);
 		try {
 		    if ($reflectionClass->implementsInterface(PreConditionsChecksInterface::class)) {
+                $this->logger->debug('PreConditionsChecks', $logContext);
 		        $serviceClass->preConditionsChecks($object, $context);
 		    }
 
 		    if ($reflectionClass->implementsInterface(FailFastInterface::class)) {
+                $this->logger->debug('FailFast', $logContext);
 		        $serviceClass->failFast($object, $context);
 		    }
 
+            $this->logger->debug('Execute', $logContext);
 		    $serviceClass->execute($object, $context);
 
 		    if ($reflectionClass->implementsInterface(PostConditionsChecksInterface::class)) {
+                $this->logger->debug('PostConditionsChecks', $logContext);
 		        $serviceClass->postConditionsChecks($object, $context);
 		    }
 
-		    $this->logger->success();
-		    $this->logger->end();
+		    $this->logger->success($logContext);
+		    $this->logger->end($logContext);
+            $this->logger->setLoggerIdentifier(null);
 		} catch (\Exception $exception) {
-		    $this->logger->exception($exception);
-		    $this->logger->end();
+		    $this->logger->exception($exception, $logContext);
+		    $this->logger->end($logContext);
+            $this->logger->setLoggerIdentifier(null);
 		    throw $exception;
 		}
 	}
-
 
 	private function supports($object, ?string $service = null): bool
 	{
@@ -92,10 +100,8 @@ final class CommandService implements CommandServiceInterface
 		    return false;
 		}
 
-		return (new \ReflectionClass($service))
-		    ->implementsInterface(TagCommandServiceInterface::class);
+        return in_array(CommandServiceInterface::class, (new \ReflectionClass($service))->getInterfaceNames());
 	}
-
 
 	private function getServiceName($object): string
 	{
@@ -107,7 +113,6 @@ final class CommandService implements CommandServiceInterface
 
 		return $serviceName;
 	}
-
 
 	private function getServices(): array
 	{
@@ -125,4 +130,22 @@ final class CommandService implements CommandServiceInterface
 
 		return array_combine($servicesNames, $services);
 	}
+
+    private function logContext($serviceClass, $object, ContextInterface $context): array
+    {
+        $logContext = [
+            'service' => $serviceClass,
+            'objectClass' => $object::class,
+        ];
+
+        if ((new \ReflectionClass($object))->implementsInterface(LoggableInterface::class)) {
+            $logContext = array_merge($logContext, $object->toLog());
+        }
+
+        if ($context instanceof LoggableInterface) {
+            $logContext = array_merge($logContext, $context->toLog());
+        }
+
+        return $logContext;
+    }
 }

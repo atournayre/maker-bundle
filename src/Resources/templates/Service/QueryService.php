@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Attribute\QueryService as AttributeQueryService;
+use App\Contracts\Logger\LoggableInterface;
 use App\Contracts\Logger\LoggerInterface;
 use App\Contracts\Service\FailFastInterface;
 use App\Contracts\Service\PostConditionsChecksInterface;
@@ -17,12 +18,12 @@ use Webmozart\Assert\Assert;
 
 final class QueryService implements QueryServiceInterface
 {
-	#[TaggedIterator(TagQueryServiceInterface::class)]public function __construct(
+	public function __construct(
 		public readonly LoggerInterface $logger,
+        #[TaggedIterator(TagQueryServiceInterface::class)]
 		public readonly iterable $services = [],
 	) {
 	}
-
 
 	/**
 	 * @throws \Exception
@@ -39,12 +40,8 @@ final class QueryService implements QueryServiceInterface
 
 		Assert::keyExists($services, $service, sprintf('Service %s not found', $service));
 
-		$serviceClass = $services[$service];
-		Assert::methodExists($serviceClass, '__invoke');
-
 		return $this->doQuery($service, $object, $context);
 	}
-
 
 	/**
 	 * @throws \Exception
@@ -56,29 +53,39 @@ final class QueryService implements QueryServiceInterface
 
 		$reflectionClass = new \ReflectionClass($service);
 
-		$this->logger->start();
+        $this->logger->setLoggerIdentifier($service);
+
+        $logContext = $this->logContext($serviceClass, $object, $context);
+
+        $this->logger->start($logContext);
 		try {
 		    if ($reflectionClass->implementsInterface(PreConditionsChecksInterface::class)) {
+                $this->logger->debug('PreConditionsChecks', $logContext);
 		        $serviceClass->preConditionsChecks($object, $context);
 		    }
 
 		    if ($reflectionClass->implementsInterface(FailFastInterface::class)) {
+                $this->logger->debug('FailFast', $logContext);
 		        $serviceClass->failFast($object, $context);
 		    }
 
+            $this->logger->debug('Fetch', $logContext);
 		    $result = $serviceClass->fetch($object, $context);
 
 		    if ($reflectionClass->implementsInterface(PostConditionsChecksInterface::class)) {
+                $this->logger->debug('PostConditionsChecks', $logContext);
 		        $serviceClass->postConditionsChecks($object, $context);
 		    }
 
-		    $this->logger->success();
-		    $this->logger->end();
+		    $this->logger->success($logContext);
+		    $this->logger->end($logContext);
+            $this->logger->setLoggerIdentifier(null);
 
 		    return $result;
 		} catch (\Exception $exception) {
-		    $this->logger->exception($exception);
-		    $this->logger->end();
+		    $this->logger->exception($exception, $logContext);
+		    $this->logger->end($logContext);
+            $this->logger->setLoggerIdentifier(null);
 		    throw $exception;
 		}
 	}
@@ -96,8 +103,7 @@ final class QueryService implements QueryServiceInterface
 		    return false;
 		}
 
-		return (new \ReflectionClass($service))
-		    ->implementsInterface(TagQueryServiceInterface::class);
+        return in_array(QueryServiceInterface::class, (new \ReflectionClass($service))->getInterfaceNames());
 	}
 
 
@@ -129,4 +135,22 @@ final class QueryService implements QueryServiceInterface
 
 		return array_combine($servicesNames, $services);
 	}
+
+    private function logContext($serviceClass, $object, ContextInterface $context): array
+    {
+        $logContext = [
+            'service' => $serviceClass,
+            'objectClass' => $object::class,
+        ];
+
+        if ((new \ReflectionClass($object))->implementsInterface(LoggableInterface::class)) {
+            $logContext = array_merge($logContext, $object->toLog());
+        }
+
+        if ($context instanceof LoggableInterface) {
+            $logContext = array_merge($logContext, $context->toLog());
+        }
+
+        return $logContext;
+    }
 }
