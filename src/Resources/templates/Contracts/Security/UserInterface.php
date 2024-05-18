@@ -18,4 +18,6 @@ interface UserInterface
 
 
 	public function eraseCredentials();
+
+    public function identifier(): string;
 }

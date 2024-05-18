@@ -41,4 +41,9 @@ final class NullUser implements UserInterface
 	{
 		// TODO: Implement eraseCredentials() method.
 	}
+
+    public function identifier(): string
+    {
+        return 'null user';
+    }
 }
