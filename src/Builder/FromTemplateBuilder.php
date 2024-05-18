@@ -3,10 +3,12 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Builder;
 
+use Aimeos\Map;
 use Atournayre\Bundle\MakerBundle\Config\FromTemplateMakerConfiguration;
 use Atournayre\Bundle\MakerBundle\VO\PhpFileDefinition;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PhpNamespace;
+use Symfony\Component\String\UnicodeString;
 use function Symfony\Component\String\u;
 
 class FromTemplateBuilder extends AbstractBuilder
@@ -30,9 +32,13 @@ class FromTemplateBuilder extends AbstractBuilder
             return array_filter($defaultComments);
         }
 
+        $comments = Map::from(u($comment)->split(PHP_EOL))
+            ->map(fn(UnicodeString $line) => $line->toString())
+            ->toArray();
+
         return [
             ...$defaultComments,
-            ...u($comment)->split(PHP_EOL),
+            ...$comments,
         ];
     }
 
