@@ -6,7 +6,11 @@
     "keywords": ["generator", "code generator", "scaffolding", "scaffold", "dev", "commands", "controllers", "collections", "DTO", "VO", "events", "interfaces", "logger", "services", "traits"],
     "minimum-stability": "stable",
     "require": {
-        "php": ">=8.2"
+        "php": ">=8.2",
+        "symfony/framework-bundle": "^6.4 || ^7.0",
+        "symfony/console": "^6.4 || ^7.0",
+        "atournayre/framework": "^1.0",
+        "twig/twig": "^3.0"
     },
     "config": {
         "sort-packages": true

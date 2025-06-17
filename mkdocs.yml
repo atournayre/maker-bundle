@@ -1,0 +1,33 @@
+site_name: Atournayre Maker Bundle
+site_description: 'A Symfony bundle for generating code based on the atournayre/framework library'
+site_author: 'Aurélien Tournayre'
+repo_url: https://github.com/atournayre/maker-bundle
+edit_uri: edit/main/docs/
+
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - Usage: usage.md
+  - Generators:
+    - Overview: generators/index.md
+    - Class Generator: generators/class.md
+  - Extending:
+    - Custom Generators: extending/custom-generators.md
+  - API Reference: api-reference.md
+
+theme:
+  name: readthedocs
+  highlightjs: true
+  hljs_languages:
+    - php
+    - yaml
+    - bash
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - toc:
+      permalink: true
+
+plugins:
+  - search

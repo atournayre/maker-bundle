@@ -1,0 +1,29 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+        bind:
+            $namespacePrefix: '%atournayre_maker.namespace_prefix%'
+            $dirPrefix: '%atournayre_maker.dir_prefix%'
+
+    # Register all services in the Generator namespace
+    Atournayre\Bundle\MakerBundle\Generator\:
+        resource: '../../Generator/*'
+        exclude: '../../Generator/{MakerInterface.php}'
+        tags: ['atournayre.maker']
+
+    # Register the template renderer
+    Atournayre\Bundle\MakerBundle\Template\TemplateRenderer:
+        arguments:
+            $twig: '@twig'
+
+    # Register commands for all makers
+    Atournayre\Bundle\MakerBundle\Command\MakerCommand:
+        factory: ['@Atournayre\Bundle\MakerBundle\Command\CommandFactory', 'createCommands']
+        tags: ['console.command']
+
+    # Command factory service
+    Atournayre\Bundle\MakerBundle\Command\CommandFactory:
+        arguments:
+            $makers: !tagged_iterator atournayre.maker

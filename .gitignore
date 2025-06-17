@@ -4,3 +4,20 @@ composer.lock
 # PHPUnit
 .phpunit.cache
 .phpunit.result.cache
+
+# IDE files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# MkDocs
+/site/
+
+# Symfony
+/var/
+/public/bundles/
