@@ -1,8 +1,10 @@
 site_name: Atournayre Maker Bundle
 site_description: 'A Symfony bundle for generating code based on the atournayre/framework library'
 site_author: 'Aurélien Tournayre'
+copyright: '2025, Aurélien Tournayre'
 repo_url: https://github.com/atournayre/maker-bundle
-edit_uri: edit/main/docs/
+repo_name: 'maker-bundle'
+edit_uri: docs/
 
 nav:
   - Home: index.md
@@ -16,16 +18,45 @@ nav:
   - API Reference: api-reference.md
 
 theme:
-  name: readthedocs
-  highlightjs: true
-  hljs_languages:
-    - php
-    - yaml
-    - bash
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - toc.integrate
+    - search.suggest
+    - search.highlight
+    - content.tabs.link
+    - content.code.annotation
+    - content.code.copy
+  palette:
+    # Palette toggle for light mode
+    - scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Palette toggle for dark mode
+    - scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
 
 markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
   - admonition
-  - codehilite
+  - pymdownx.details
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - footnotes
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde
   - toc:
       permalink: true
 
