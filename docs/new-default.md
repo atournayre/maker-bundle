@@ -1,3 +1,0 @@
-# Creating new ...
-
-Execute the command and follow the instructions in the console.

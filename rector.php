@@ -12,15 +12,12 @@ return RectorConfig::configure()
         deadCode: true,
         codeQuality: true,
         codingStyle: true,
-//        typeDeclarations: true,
         privatization: true,
         earlyReturn: true,
     )
-    ->withSkip([
-        __DIR__ . '/src/DependencyInjection',
-        __DIR__ . 'src/Maker/AbstractMaker.php',
-    ])
-    ->withPhpSets()
+    ->withPhpSets(
+        php82: true,
+    )
     ->withRootFiles()
     ->withImportNames(
         importShortClasses: false,
