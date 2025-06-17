@@ -1,6 +1,6 @@
 # Installation
 
-This guide will help you install and configure the Atournayre Maker Bundle in your Symfony application.
+This guide will help you install and configure the Elegant Maker Bundle in your Symfony application.
 
 ## Requirements
 
@@ -28,7 +28,7 @@ If you're using Symfony Flex, the bundle will be automatically enabled. If not, 
 // config/bundles.php
 return [
     // ...
-    Atournayre\Bundle\MakerBundle\AtournayeMakerBundle::class => ['dev' => true],
+    Atournayre\Bundle\MakerBundle\ElegantMakerBundle::class => ['dev' => true],
 ];
 ```
 
@@ -37,8 +37,8 @@ return [
 Create a configuration file for the bundle:
 
 ```yaml
-# config/packages/dev/atournayre_maker.yaml
-atournayre_maker:
+# config/packages/dev/elegant_maker.yaml
+elegant_maker:
     namespace_prefix: 'App'  # Default namespace prefix for generated classes
     dir_prefix: 'src'        # Default directory prefix for generated files
 ```
@@ -48,7 +48,7 @@ atournayre_maker:
 To verify that the bundle is correctly installed, run:
 
 ```bash
-php bin/console list make:atournayre
+php bin/console list make:elegant
 ```
 
 You should see a list of available maker commands provided by the bundle.

@@ -6,7 +6,7 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 /**
- * This class defines the configuration for the AtournayeMakerBundle.
+ * This class defines the configuration for the ElegantMakerBundle.
  */
 class Configuration implements ConfigurationInterface
 {
@@ -15,7 +15,7 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder(): TreeBuilder
     {
-        $treeBuilder = new TreeBuilder('atournayre_maker');
+        $treeBuilder = new TreeBuilder('elegant_maker');
         $rootNode = $treeBuilder->getRootNode();
 
         $rootNode

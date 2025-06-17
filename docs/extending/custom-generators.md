@@ -1,6 +1,6 @@
 # Creating Custom Generators
 
-This guide explains how to create your own custom generators for the Atournayre Maker Bundle.
+This guide explains how to create your own custom generators for the Elegant Maker Bundle.
 
 ## Overview
 
@@ -35,7 +35,7 @@ class CustomMaker extends AbstractMaker
 
     public function getCommandName(): string
     {
-        return 'make:atournayre:custom';
+        return 'make:elegant:custom';
     }
 
     public function getCommandDescription(): string
@@ -55,16 +55,16 @@ class CustomMaker extends AbstractMaker
     {
         $name = $input->getArgument('name');
         $option1 = $input->getOption('option1');
-        
+
         // Generate your code here
         $targetPath = $this->getPath() . '/' . $name . '.php';
-        
+
         $this->generateFile($targetPath, 'custom/template.twig', [
             'name' => $name,
             'option1' => $option1,
             // Add more parameters as needed
         ]);
-        
+
         $io->success("Custom component {$name} generated successfully!");
     }
 }
@@ -86,7 +86,7 @@ class {{ name }}
 {
     {% if option1 %}
     private string $option1 = '{{ option1 }}';
-    
+
     public function getOption1(): string
     {
         return $this->option1;
@@ -99,7 +99,7 @@ class {{ name }}
 
 ### Option 1: Using Service Configuration
 
-Register your maker as a service with the `atournayre.maker` tag:
+Register your maker as a service with the `elegant.maker` tag:
 
 ```yaml
 # config/services.yaml
@@ -107,9 +107,9 @@ services:
     App\Maker\CustomMaker:
         arguments:
             $twig: '@twig'
-            $namespacePrefix: '%atournayre_maker.namespace_prefix%'
-            $dirPrefix: '%atournayre_maker.dir_prefix%'
-        tags: ['atournayre.maker']
+            $namespacePrefix: '%elegant_maker.namespace_prefix%'
+            $dirPrefix: '%elegant_maker.dir_prefix%'
+        tags: ['elegant.maker']
 ```
 
 ### Option 2: Using Autoconfiguration
@@ -121,12 +121,12 @@ If you've set up autoconfiguration in your application, the bundle will automati
 Run your custom generator:
 
 ```bash
-php bin/console make:atournayre:custom MyComponent --option1="value"
+php bin/console make:elegant:custom MyComponent --option1="value"
 ```
 
 ## Best Practices
 
-1. **Follow Naming Conventions**: Use the prefix `make:atournayre:` for your command names.
+1. **Follow Naming Conventions**: Use the prefix `make:elegant:` for your command names.
 2. **Provide Clear Documentation**: Add detailed descriptions to your command arguments and options.
 3. **Use Input Validation**: Validate user input before generating code.
 4. **Organize Templates**: Keep your templates organized in subdirectories based on the type of code they generate.

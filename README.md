@@ -1,10 +1,10 @@
-# Atournayre Maker Bundle
+# Elegant Maker Bundle
 
 A Symfony bundle for generating code based on the atournayre/framework library.
 
 ## Overview
 
-The Atournayre Maker Bundle extends Symfony's code generation capabilities by providing commands to generate code that follows the architecture and patterns of the `atournayre/framework` library.
+The Elegant Maker Bundle extends Symfony's code generation capabilities by providing commands to generate code that follows the architecture and patterns of the `atournayre/framework` library.
 
 ## Features
 
@@ -44,7 +44,7 @@ If you're using Symfony Flex, the bundle will be automatically enabled. If not, 
 
 return [
     // ...
-    Atournayre\Bundle\MakerBundle\AtournayeMakerBundle::class => ['dev' => true],
+    Atournayre\Bundle\MakerBundle\ElegantMakerBundle::class => ['dev' => true],
 ];
 ```
 
@@ -53,8 +53,8 @@ return [
 Create a configuration file for the bundle:
 
 ```yaml
-# config/packages/dev/atournayre_maker.yaml
-atournayre_maker:
+# config/packages/dev/elegant_maker.yaml
+elegant_maker:
     namespace_prefix: 'App'  # Default namespace prefix for generated classes
     dir_prefix: 'src'        # Default directory prefix for generated files
 ```
@@ -66,37 +66,37 @@ atournayre_maker:
 List all available commands:
 
 ```console
-php bin/console list make:atournayre
+php bin/console list make:elegant
 ```
 
 ### Generate a Class
 
 ```console
-php bin/console make:atournayre:class User
+php bin/console make:elegant:class User
 ```
 
 With custom namespace:
 
 ```console
-php bin/console make:atournayre:class User --namespace="App\Domain\Model"
+php bin/console make:elegant:class User --namespace="App\Domain\Model"
 ```
 
 With parent class:
 
 ```console
-php bin/console make:atournayre:class Admin --extends="App\Domain\Model\User"
+php bin/console make:elegant:class Admin --extends="App\Domain\Model\User"
 ```
 
 With interfaces:
 
 ```console
-php bin/console make:atournayre:class Repository --implements="App\Domain\Repository\RepositoryInterface" --implements="Countable"
+php bin/console make:elegant:class Repository --implements="App\Domain\Repository\RepositoryInterface" --implements="Countable"
 ```
 
 With description:
 
 ```console
-php bin/console make:atournayre:class User --description="Represents a user in the system"
+php bin/console make:elegant:class User --description="Represents a user in the system"
 ```
 
 ## Creating Custom Generators

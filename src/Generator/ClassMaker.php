@@ -27,7 +27,7 @@ class ClassMaker extends AbstractMaker
      */
     public function getCommandName(): string
     {
-        return 'make:atournayre:class';
+        return 'make:elegant:class';
     }
 
     /**
@@ -59,14 +59,14 @@ class ClassMaker extends AbstractMaker
     {
         $className = $input->getArgument('name');
         $namespace = $this->getNamespace($input->getOption('namespace'));
-        
+
         $extends = $input->getOption('extends');
         $implements = $input->getOption('implements');
         $description = $input->getOption('description');
-        
+
         // Generate the class file
         $classPath = $this->getPath(str_replace('\\', '/', $input->getOption('namespace'))) . '/' . $className . '.php';
-        
+
         $this->generateFile($classPath, 'class/Class.twig', [
             'namespace' => $namespace,
             'class_name' => $className,
@@ -79,7 +79,7 @@ class ClassMaker extends AbstractMaker
             'constructor' => null,
             'methods' => [],
         ]);
-        
+
         $io->text([
             'Class successfully generated!',
             'Path: ' . $classPath,

@@ -1,13 +1,13 @@
 # Usage Guide
 
-This guide explains how to use the Atournayre Maker Bundle to generate code for your Symfony application.
+This guide explains how to use the Elegant Maker Bundle to generate code for your Symfony application.
 
 ## Basic Usage
 
-All commands provided by this bundle follow the naming convention `make:atournayre:*`. You can list all available commands by running:
+All commands provided by this bundle follow the naming convention `make:elegant:*`. You can list all available commands by running:
 
 ```bash
-php bin/console list make:atournayre
+php bin/console list make:elegant
 ```
 
 ## Command Structure
@@ -15,7 +15,7 @@ php bin/console list make:atournayre
 Most commands follow this general structure:
 
 ```bash
-php bin/console make:atournayre:<generator> <name> [options]
+php bin/console make:elegant:<generator> <name> [options]
 ```
 
 Where:
@@ -42,7 +42,7 @@ Most generators support these common options:
 ### Generate a Simple Class
 
 ```bash
-php bin/console make:atournayre:class User
+php bin/console make:elegant:class User
 ```
 
 This will generate a simple class named `User` in the default namespace (`App`).
@@ -50,7 +50,7 @@ This will generate a simple class named `User` in the default namespace (`App`).
 ### Generate a Class with Custom Namespace
 
 ```bash
-php bin/console make:atournayre:class User --namespace="App\Domain\Model"
+php bin/console make:elegant:class User --namespace="App\Domain\Model"
 ```
 
 This will generate a class named `User` in the `App\Domain\Model` namespace.
@@ -58,7 +58,7 @@ This will generate a class named `User` in the `App\Domain\Model` namespace.
 ### Generate a Class that Extends Another Class
 
 ```bash
-php bin/console make:atournayre:class Admin --extends="App\Domain\Model\User"
+php bin/console make:elegant:class Admin --extends="App\Domain\Model\User"
 ```
 
 This will generate a class named `Admin` that extends the `User` class.
@@ -66,7 +66,7 @@ This will generate a class named `Admin` that extends the `User` class.
 ### Generate a Class that Implements Interfaces
 
 ```bash
-php bin/console make:atournayre:class Repository --implements="App\Domain\Repository\RepositoryInterface" --implements="Countable"
+php bin/console make:elegant:class Repository --implements="App\Domain\Repository\RepositoryInterface" --implements="Countable"
 ```
 
 This will generate a class named `Repository` that implements both the `RepositoryInterface` and `Countable` interfaces.

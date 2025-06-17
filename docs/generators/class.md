@@ -5,7 +5,7 @@ The Class Generator creates a simple PHP class with customizable namespace, pare
 ## Command
 
 ```bash
-php bin/console make:atournayre:class <name> [options]
+php bin/console make:elegant:class <name> [options]
 ```
 
 ## Arguments
@@ -28,7 +28,7 @@ php bin/console make:atournayre:class <name> [options]
 ### Basic Usage
 
 ```bash
-php bin/console make:atournayre:class User
+php bin/console make:elegant:class User
 ```
 
 This will generate a simple class:
@@ -49,7 +49,7 @@ class User
 ### With Custom Namespace
 
 ```bash
-php bin/console make:atournayre:class User --namespace="App\Domain\Model"
+php bin/console make:elegant:class User --namespace="App\Domain\Model"
 ```
 
 This will generate:
@@ -70,7 +70,7 @@ class User
 ### With Parent Class
 
 ```bash
-php bin/console make:atournayre:class Admin --extends="App\Domain\Model\User"
+php bin/console make:elegant:class Admin --extends="App\Domain\Model\User"
 ```
 
 This will generate:
@@ -93,7 +93,7 @@ class Admin extends User
 ### With Interfaces
 
 ```bash
-php bin/console make:atournayre:class Repository --implements="App\Domain\Repository\RepositoryInterface" --implements="Countable"
+php bin/console make:elegant:class Repository --implements="App\Domain\Repository\RepositoryInterface" --implements="Countable"
 ```
 
 This will generate:
@@ -117,7 +117,7 @@ class Repository implements RepositoryInterface, Countable
 ### With Description
 
 ```bash
-php bin/console make:atournayre:class User --description="Represents a user in the system"
+php bin/console make:elegant:class User --description="Represents a user in the system"
 ```
 
 This will generate:

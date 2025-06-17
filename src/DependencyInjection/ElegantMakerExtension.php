@@ -10,7 +10,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 /**
  * This is the class that loads and manages the bundle configuration.
  */
-class AtournayeMakerExtension extends Extension
+class ElegantMakerExtension extends Extension
 {
     /**
      * {@inheritdoc}
@@ -20,8 +20,8 @@ class AtournayeMakerExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $container->setParameter('atournayre_maker.namespace_prefix', $config['namespace_prefix']);
-        $container->setParameter('atournayre_maker.dir_prefix', $config['dir_prefix']);
+        $container->setParameter('elegant_maker.namespace_prefix', $config['namespace_prefix']);
+        $container->setParameter('elegant_maker.dir_prefix', $config['dir_prefix']);
 
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yaml');

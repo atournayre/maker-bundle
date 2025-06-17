@@ -25,7 +25,7 @@ class ClassMakerTest extends TestCase
 
     public function testGetCommandName(): void
     {
-        $this->assertEquals('make:atournayre:class', $this->maker->getCommandName());
+        $this->assertEquals('make:elegant:class', $this->maker->getCommandName());
     }
 
     public function testGetCommandDescription(): void
@@ -36,7 +36,7 @@ class ClassMakerTest extends TestCase
     public function testConfigureCommand(): void
     {
         $command = $this->createMock(Command::class);
-        
+
         $command->expects($this->once())
             ->method('addArgument')
             ->with(
@@ -45,7 +45,7 @@ class ClassMakerTest extends TestCase
                 $this->isType('string')
             )
             ->willReturnSelf();
-            
+
         $command->expects($this->exactly(4))
             ->method('addOption')
             ->withConsecutive(
@@ -77,7 +77,7 @@ class ClassMakerTest extends TestCase
                 ]
             )
             ->willReturnSelf();
-            
+
         $this->maker->configureCommand($command);
     }
 
@@ -85,12 +85,12 @@ class ClassMakerTest extends TestCase
     {
         $input = $this->createMock(InputInterface::class);
         $io = $this->createMock(SymfonyStyle::class);
-        
+
         $input->expects($this->once())
             ->method('getArgument')
             ->with('name')
             ->willReturn('TestClass');
-            
+
         $input->expects($this->exactly(4))
             ->method('getOption')
             ->withConsecutive(
@@ -105,7 +105,7 @@ class ClassMakerTest extends TestCase
                 ['Interface1', 'Interface2'],
                 'Test description'
             );
-            
+
         $this->twig->expects($this->once())
             ->method('render')
             ->with(
@@ -119,11 +119,11 @@ class ClassMakerTest extends TestCase
                 })
             )
             ->willReturn('rendered class content');
-            
+
         $io->expects($this->once())
             ->method('text')
             ->with($this->isType('array'));
-            
+
         // Use reflection to call the protected method
         $method = new \ReflectionMethod(ClassMaker::class, 'doGenerate');
         $method->setAccessible(true);

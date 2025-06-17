@@ -4,14 +4,14 @@ services:
         autoconfigure: true
         public: false
         bind:
-            $namespacePrefix: '%atournayre_maker.namespace_prefix%'
-            $dirPrefix: '%atournayre_maker.dir_prefix%'
+            $namespacePrefix: '%elegant_maker.namespace_prefix%'
+            $dirPrefix: '%elegant_maker.dir_prefix%'
 
     # Register all services in the Generator namespace
     Atournayre\Bundle\MakerBundle\Generator\:
         resource: '../../Generator/*'
         exclude: '../../Generator/{MakerInterface.php}'
-        tags: ['atournayre.maker']
+        tags: ['elegant.maker']
 
     # Register the template renderer
     Atournayre\Bundle\MakerBundle\Template\TemplateRenderer:
@@ -26,4 +26,4 @@ services:
     # Command factory service
     Atournayre\Bundle\MakerBundle\Command\CommandFactory:
         arguments:
-            $makers: !tagged_iterator atournayre.maker
+            $makers: !tagged_iterator elegant.maker

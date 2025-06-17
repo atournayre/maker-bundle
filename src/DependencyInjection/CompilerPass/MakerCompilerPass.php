@@ -14,8 +14,8 @@ class MakerCompilerPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        // Find all services tagged with atournayre.maker
-        $taggedServices = $container->findTaggedServiceIds('atournayre.maker');
+        // Find all services tagged with elegant.maker
+        $taggedServices = $container->findTaggedServiceIds('elegant.maker');
         
         // Register all maker services that implement MakerInterface
         foreach ($container->getDefinitions() as $id => $definition) {
@@ -29,7 +29,7 @@ class MakerCompilerPass implements CompilerPassInterface
             }
             
             if (is_a($class, MakerInterface::class, true) && !isset($taggedServices[$id])) {
-                $definition->addTag('atournayre.maker');
+                $definition->addTag('elegant.maker');
             }
         }
     }

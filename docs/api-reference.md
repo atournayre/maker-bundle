@@ -1,6 +1,6 @@
 # API Reference
 
-This page provides a reference for the main classes and interfaces in the Atournayre Maker Bundle.
+This page provides a reference for the main classes and interfaces in the Elegant Maker Bundle.
 
 ## Core Interfaces
 
@@ -18,20 +18,20 @@ use Symfony\Component\Console\Output\OutputInterface;
 interface MakerInterface
 {
     /**
-     * Return the command name (e.g. make:atournayre:entity).
+     * Return the command name (e.g. make:elegant:entity).
      */
     public function getCommandName(): string;
-    
+
     /**
      * Return the command description.
      */
     public function getCommandDescription(): string;
-    
+
     /**
      * Configure the command (add arguments, options, etc.).
      */
     public function configureCommand(Command $command): void;
-    
+
     /**
      * Generate the code.
      * 
@@ -66,22 +66,22 @@ abstract class AbstractMaker implements MakerInterface
      * {@inheritdoc}
      */
     public function generate(InputInterface $input, OutputInterface $output): int;
-    
+
     /**
      * Perform the actual code generation.
      */
     abstract protected function doGenerate(InputInterface $input, SymfonyStyle $io): void;
-    
+
     /**
      * Generate a file from a Twig template.
      */
     protected function generateFile(string $targetPath, string $template, array $parameters = []): void;
-    
+
     /**
      * Get the full namespace for a class.
      */
     protected function getNamespace(string $subNamespace = ''): string;
-    
+
     /**
      * Get the full path for a file.
      */
@@ -104,11 +104,11 @@ use Symfony\Component\Console\Command\Command;
 class MakerCommand extends Command
 {
     private MakerInterface $maker;
-    
+
     public function __construct(MakerInterface $maker);
-    
+
     protected function configure(): void;
-    
+
     protected function execute(InputInterface $input, OutputInterface $output): int;
 }
 ```
@@ -128,19 +128,19 @@ class CommandFactory
      * @var iterable<MakerInterface>
      */
     private iterable $makers;
-    
+
     /**
      * @param iterable<MakerInterface> $makers
      */
     public function __construct(iterable $makers);
-    
+
     /**
      * Create a command for each maker service.
      *
      * @return array<MakerCommand>
      */
     public function createCommands(): array;
-    
+
     /**
      * Create a command for a specific maker service.
      */
@@ -162,14 +162,14 @@ use Twig\Environment;
 class TemplateRenderer
 {
     private Environment $twig;
-    
+
     public function __construct(Environment $twig);
-    
+
     /**
      * Render a template with the given parameters.
      */
     public function render(string $template, array $parameters = []): string;
-    
+
     /**
      * Generate a file from a template.
      */

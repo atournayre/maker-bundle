@@ -1,10 +1,10 @@
-# Atournayre Maker Bundle
+# Elegant Maker Bundle
 
 A Symfony bundle for generating code based on the atournayre/framework library.
 
 ## Overview
 
-The Atournayre Maker Bundle extends Symfony's code generation capabilities by providing commands to generate code that follows the architecture and patterns of the `atournayre/framework` library.
+The Elegant Maker Bundle extends Symfony's code generation capabilities by providing commands to generate code that follows the architecture and patterns of the `atournayre/framework` library.
 
 ## Features
 
@@ -27,7 +27,7 @@ The Atournayre Maker Bundle extends Symfony's code generation capabilities by pr
 composer require atournayre/maker-bundle --dev
 
 # Generate a class
-php bin/console make:atournayre:class MyClass --namespace="App\Domain\Model"
+php bin/console make:elegant:class MyClass --namespace="App\Domain\Model"
 ```
 
 ## Documentation
