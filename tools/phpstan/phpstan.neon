@@ -1,0 +1,16 @@
+includes:
+    - ../../tools/phpstan/disallowed-calls.neon
+    - ../../tools/phpstan/elegant-object.neon
+
+parameters:
+    phpVersion: 80200
+    level: 6
+    paths:
+        - ../../src/
+        - ../../tests/
+    excludePaths:
+        - ../../src/Resources/skeleton
+    unused_public:
+        methods: true
+        properties: true
+        constants: true

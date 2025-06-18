@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Atournayre\Bundle\MakerBundle\Generator;
 
 use Symfony\Component\Console\Command\Command;
@@ -28,7 +30,7 @@ interface MakerInterface
 
     /**
      * Generate the code.
-     * 
+     *
      * @return int The command exit code
      */
     public function generate(InputInterface $input, OutputInterface $output): int;

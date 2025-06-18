@@ -49,17 +49,32 @@ class AbstractMakerTest extends TestCase
         $this->twig->expects($this->once())
             ->method('render')
             ->with('test-template.twig', ['param' => 'value'])
-            ->willReturn('rendered content');
+            ->willReturn('rendered content')
+        ;
 
         // Create a test subclass that exposes the protected method
         $testMaker = new class($this->twig, 'TestApp', 'test-src') extends AbstractMaker {
-            public function getCommandName(): string { return 'test:command'; }
-            public function getCommandDescription(): string { return 'Test command'; }
-            public function configureCommand(Command $command): void {}
-            protected function doGenerate(InputInterface $input, SymfonyStyle $io): void {}
+            public function getCommandName(): string
+            {
+                return 'test:command';
+            }
+
+            public function getCommandDescription(): string
+            {
+                return 'Test command';
+            }
+
+            public function configureCommand(Command $command): void
+            {
+            }
+
+            protected function doGenerate(InputInterface $input, SymfonyStyle $io): void
+            {
+            }
 
             // Expose the protected method for testing
-            public function publicGenerateFile(string $targetPath, string $template, array $parameters = []): void {
+            public function publicGenerateFile(string $targetPath, string $template, array $parameters = []): void
+            {
                 $this->generateFile($targetPath, $template, $parameters);
             }
         };
@@ -90,7 +105,8 @@ class AbstractMakerTest extends TestCase
 
         $this->maker->expects($this->once())
             ->method('doGenerate')
-            ->with($input, $this->isInstanceOf(SymfonyStyle::class));
+            ->with($input, $this->isInstanceOf(SymfonyStyle::class))
+        ;
 
         $result = $this->maker->generate($input, $output);
 
@@ -115,7 +131,8 @@ class AbstractMakerTest extends TestCase
         $this->maker->expects($this->once())
             ->method('doGenerate')
             ->with($input, $this->isInstanceOf(SymfonyStyle::class))
-            ->willThrowException(new \Exception('Test exception'));
+            ->willThrowException(new \Exception('Test exception'))
+        ;
 
         $result = $this->maker->generate($input, $output);
 

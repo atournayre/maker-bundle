@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Atournayre\Bundle\MakerBundle\Command;
 
 use Atournayre\Bundle\MakerBundle\Generator\MakerInterface;
@@ -18,19 +20,16 @@ use Symfony\Component\Console\Output\OutputInterface;
 )]
 class MakerCommand extends Command
 {
-    private MakerInterface $maker;
-
-    public function __construct(MakerInterface $maker)
+    public function __construct(private readonly MakerInterface $maker)
     {
-        $this->maker = $maker;
-
-        parent::__construct($maker->getCommandName());
+        parent::__construct($this->maker->getCommandName());
     }
 
     protected function configure(): void
     {
         $this
-            ->setDescription($this->maker->getCommandDescription());
+            ->setDescription($this->maker->getCommandDescription())
+        ;
 
         $this->maker->configureCommand($this);
     }

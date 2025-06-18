@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Atournayre\Bundle\MakerBundle\Command;
 
 use Atournayre\Bundle\MakerBundle\Generator\MakerInterface;
@@ -10,18 +12,12 @@ use Atournayre\Bundle\MakerBundle\Generator\MakerInterface;
 class CommandFactory
 {
     /**
-     * @var iterable<MakerInterface>
-     */
-    private iterable $makers;
-    
-    /**
      * @param iterable<MakerInterface> $makers
      */
-    public function __construct(iterable $makers)
+    public function __construct(private readonly iterable $makers)
     {
-        $this->makers = $makers;
     }
-    
+
     /**
      * Create a command for each maker service.
      *
@@ -30,14 +26,14 @@ class CommandFactory
     public function createCommands(): array
     {
         $commands = [];
-        
+
         foreach ($this->makers as $maker) {
             $commands[] = new MakerCommand($maker);
         }
-        
+
         return $commands;
     }
-    
+
     /**
      * Create a command for a specific maker service.
      * This is used by the service container to create command instances.

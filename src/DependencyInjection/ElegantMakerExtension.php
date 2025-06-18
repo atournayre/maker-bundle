@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Atournayre\Bundle\MakerBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
@@ -12,9 +14,6 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
  */
 class ElegantMakerExtension extends Extension
 {
-    /**
-     * {@inheritdoc}
-     */
     public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = new Configuration();
@@ -23,7 +22,7 @@ class ElegantMakerExtension extends Extension
         $container->setParameter('elegant_maker.namespace_prefix', $config['namespace_prefix']);
         $container->setParameter('elegant_maker.dir_prefix', $config['dir_prefix']);
 
-        $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yaml');
     }
 }

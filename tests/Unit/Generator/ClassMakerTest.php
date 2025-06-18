@@ -8,7 +8,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Twig\Environment;
 
@@ -44,7 +43,8 @@ class ClassMakerTest extends TestCase
                 InputArgument::REQUIRED,
                 $this->isType('string')
             )
-            ->willReturnSelf();
+            ->willReturnSelf()
+        ;
 
         $command->expects($this->exactly(4))
             ->method('addOption')
@@ -54,29 +54,30 @@ class ClassMakerTest extends TestCase
                     null,
                     InputOption::VALUE_OPTIONAL,
                     $this->isType('string'),
-                    ''
+                    '',
                 ],
                 [
                     'extends',
                     null,
                     InputOption::VALUE_OPTIONAL,
-                    $this->isType('string')
+                    $this->isType('string'),
                 ],
                 [
                     'implements',
                     null,
                     $this->isType('int'),
                     $this->isType('string'),
-                    []
+                    [],
                 ],
                 [
                     'description',
                     null,
                     InputOption::VALUE_OPTIONAL,
-                    $this->isType('string')
+                    $this->isType('string'),
                 ]
             )
-            ->willReturnSelf();
+            ->willReturnSelf()
+        ;
 
         $this->maker->configureCommand($command);
     }
@@ -89,7 +90,8 @@ class ClassMakerTest extends TestCase
         $input->expects($this->once())
             ->method('getArgument')
             ->with('name')
-            ->willReturn('TestClass');
+            ->willReturn('TestClass')
+        ;
 
         $input->expects($this->exactly(4))
             ->method('getOption')
@@ -104,25 +106,28 @@ class ClassMakerTest extends TestCase
                 'BaseClass',
                 ['Interface1', 'Interface2'],
                 'Test description'
-            );
+            )
+        ;
 
         $this->twig->expects($this->once())
             ->method('render')
             ->with(
                 'class/Class.twig',
                 $this->callback(function ($params) {
-                    return $params['namespace'] === 'TestApp\\Domain\\Model' &&
-                           $params['class_name'] === 'TestClass' &&
-                           $params['extends'] === 'BaseClass' &&
-                           $params['implements'] === ['Interface1', 'Interface2'] &&
-                           $params['description'] === 'Test description';
+                    return 'TestApp\\Domain\\Model' === $params['namespace']
+                           && 'TestClass' === $params['class_name']
+                           && 'BaseClass' === $params['extends']
+                           && $params['implements'] === ['Interface1', 'Interface2']
+                           && 'Test description' === $params['description'];
                 })
             )
-            ->willReturn('rendered class content');
+            ->willReturn('rendered class content')
+        ;
 
         $io->expects($this->once())
             ->method('text')
-            ->with($this->isType('array'));
+            ->with($this->isType('array'))
+        ;
 
         // Use reflection to call the protected method
         $method = new \ReflectionMethod(ClassMaker::class, 'doGenerate');

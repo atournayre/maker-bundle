@@ -1,0 +1,91 @@
+services:
+    -
+      class: Atournayre\PHPStan\ElegantObject\Rules\AllPropertiesMustBePrivateRule
+      arguments:
+        excludedPaths:
+            - %currentWorkingDirectory%/tests/Fixtures
+      tags:
+        - phpstan.rules.rule
+
+    -
+      class: Atournayre\PHPStan\ElegantObject\Rules\AlwaysUseInterfaceRule
+      arguments:
+          excludedPaths:
+              - %currentWorkingDirectory%/tests
+      tags:
+        - phpstan.rules.rule
+
+    -
+      class: Atournayre\PHPStan\ElegantObject\Rules\BeEitherFinalOrAbstractRule
+      arguments:
+        excludedPaths:
+          - %currentWorkingDirectory%/tests
+      tags:
+        - phpstan.rules.rule
+
+    -
+      class: Atournayre\PHPStan\ElegantObject\Rules\BeImmutableRule
+      tags:
+        - phpstan.rules.rule
+
+    -
+      class: Atournayre\PHPStan\ElegantObject\Rules\DontUseStaticMethodsRule
+      tags:
+        - phpstan.rules.rule
+
+    -
+      class: Atournayre\PHPStan\ElegantObject\Rules\KeepConstructorsCodeFreeRule
+      tags:
+        - phpstan.rules.rule
+
+    -
+      class: Atournayre\PHPStan\ElegantObject\Rules\NeverReturnNullRule
+      tags:
+        - phpstan.rules.rule
+
+    -
+      class: Atournayre\PHPStan\ElegantObject\Rules\NeverUseErNamesRule
+      tags:
+        - phpstan.rules.rule
+
+    -
+      class: Atournayre\PHPStan\ElegantObject\Rules\NeverUseGettersAndSettersRule
+      arguments:
+        excludedPaths:
+            - %currentWorkingDirectory%/tests
+      tags:
+        - phpstan.rules.rule
+
+    -
+      class: Atournayre\PHPStan\ElegantObject\Rules\NeverUsePublicConstantsRule
+      tags:
+        - phpstan.rules.rule
+
+    -
+      class: Atournayre\PHPStan\ElegantObject\Rules\KeepInterfacesShortRule
+      arguments:
+        maxMethods: 5
+      tags:
+        - phpstan.rules.rule
+
+    -
+      class: Atournayre\PHPStan\ElegantObject\Rules\ExposeFewPublicMethodsRule
+      arguments:
+        maxPublicMethods: 5
+        excludedPaths:
+          - %currentWorkingDirectory%/tests
+      tags:
+        - phpstan.rules.rule
+
+    -
+      class: Atournayre\PHPStan\ElegantObject\Rules\NeverAcceptNullArgumentsRule
+      tags:
+        - phpstan.rules.rule
+
+    -
+      class: Atournayre\PHPStan\ElegantObject\Rules\NoNewOutsideSecondaryConstructorsRule
+      arguments:
+        excludedPaths:
+          - %currentWorkingDirectory%/tests
+      tags:
+        - phpstan.rules.rule

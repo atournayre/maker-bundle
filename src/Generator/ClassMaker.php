@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Atournayre\Bundle\MakerBundle\Generator;
 
 use Symfony\Component\Console\Command\Command;
@@ -17,30 +19,21 @@ class ClassMaker extends AbstractMaker
     public function __construct(
         Environment $twig,
         string $namespacePrefix = 'App',
-        string $dirPrefix = 'src'
+        string $dirPrefix = 'src',
     ) {
         parent::__construct($twig, $namespacePrefix, $dirPrefix);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCommandName(): string
     {
         return 'make:elegant:class';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCommandDescription(): string
     {
         return 'Creates a new PHP class';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureCommand(Command $command): void
     {
         $command
@@ -52,9 +45,6 @@ class ClassMaker extends AbstractMaker
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doGenerate(InputInterface $input, SymfonyStyle $io): void
     {
         $className = $input->getArgument('name');
@@ -65,7 +55,7 @@ class ClassMaker extends AbstractMaker
         $description = $input->getOption('description');
 
         // Generate the class file
-        $classPath = $this->getPath(str_replace('\\', '/', $input->getOption('namespace'))) . '/' . $className . '.php';
+        $classPath = $this->getPath(str_replace('\\', '/', $input->getOption('namespace'))).'/'.$className.'.php';
 
         $this->generateFile($classPath, 'class/Class.twig', [
             'namespace' => $namespace,
@@ -82,7 +72,7 @@ class ClassMaker extends AbstractMaker
 
         $io->text([
             'Class successfully generated!',
-            'Path: ' . $classPath,
+            'Path: '.$classPath,
         ]);
     }
 }

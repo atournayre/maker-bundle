@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Atournayre\Bundle\MakerBundle;
 
 use Atournayre\Bundle\MakerBundle\DependencyInjection\CompilerPass\MakerCompilerPass;
