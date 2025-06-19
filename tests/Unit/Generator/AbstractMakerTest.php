@@ -43,6 +43,9 @@ class AbstractMakerTest extends TestCase
         };
     }
 
+    /**
+     * @covers \Atournayre\Bundle\MakerBundle\Generator\AbstractMaker::namespace
+     */
     public function testNamespace(): void
     {
         $method = new \ReflectionMethod(AbstractMaker::class, 'namespace');
@@ -53,6 +56,9 @@ class AbstractMakerTest extends TestCase
         self::assertEquals('TestApp\\Domain\\Model', $method->invoke($this->maker, 'Domain\\Model'));
     }
 
+    /**
+     * @covers \Atournayre\Bundle\MakerBundle\Generator\AbstractMaker::path
+     */
     public function testPath(): void
     {
         $method = new \ReflectionMethod(AbstractMaker::class, 'path');
@@ -63,6 +69,9 @@ class AbstractMakerTest extends TestCase
         self::assertEquals('test-src/Domain/Model', $method->invoke($this->maker, 'Domain/Model'));
     }
 
+    /**
+     * @covers \Atournayre\Bundle\MakerBundle\Generator\AbstractMaker::generateFile
+     */
     public function testGenerateFile(): void
     {
         $this->twig->expects(self::once())
@@ -103,15 +112,14 @@ class AbstractMakerTest extends TestCase
             }
         };
 
-        // Use vfsStream or similar to test file creation in a real test
-        // For this example, we'll just test that the method doesn't throw an exception
-        $this->expectNotToPerformAssertions();
-
         // We can't actually write to the filesystem in a unit test, so we'll just
-        // verify that the method doesn't throw an exception
+        // verify that the method doesn't throw an exception and that the Twig render method is called
         $testMaker->publicGenerateFile('test-path', 'test-template.twig', ['param' => 'value']);
     }
 
+    /**
+     * @covers \Atournayre\Bundle\MakerBundle\Generator\AbstractMaker::generate
+     */
     public function testGenerate(): void
     {
         $input = $this->createMock(InputInterface::class);
@@ -137,6 +145,9 @@ class AbstractMakerTest extends TestCase
         self::assertEquals(Command::SUCCESS, $result);
     }
 
+    /**
+     * @covers \Atournayre\Bundle\MakerBundle\Generator\AbstractMaker::generate
+     */
     public function testGenerateWithException(): void
     {
         $input = $this->createMock(InputInterface::class);

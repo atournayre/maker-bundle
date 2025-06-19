@@ -9,6 +9,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class ElegantMakerBundleTest extends TestCase
 {
+    /**
+     * @covers \Atournayre\Bundle\MakerBundle\ElegantMakerBundle::build
+     */
     public function testBundleBuild(): void
     {
         $bundle = new ElegantMakerBundle();
@@ -30,6 +33,9 @@ class ElegantMakerBundleTest extends TestCase
         self::assertTrue($passFound, 'MakerCompilerPass should be registered');
     }
 
+    /**
+     * @covers \Atournayre\Bundle\MakerBundle\ElegantMakerBundle::getPath
+     */
     public function testBundleGetPath(): void
     {
         $bundle = new ElegantMakerBundle();
@@ -42,6 +48,9 @@ class ElegantMakerBundleTest extends TestCase
     /**
      * This is a more complex integration test that would normally be run in a real Symfony application.
      * For simplicity, we're just testing that the services can be created and configured.
+     *
+     * @covers \Atournayre\Bundle\MakerBundle\ElegantMakerBundle::build
+     * @covers \Atournayre\Bundle\MakerBundle\DependencyInjection\CompilerPass\MakerCompilerPass
      */
     public function testServiceConfiguration(): void
     {

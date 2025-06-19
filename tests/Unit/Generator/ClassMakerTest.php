@@ -25,16 +25,25 @@ class ClassMakerTest extends TestCase
         $this->maker = new ClassMaker($this->twig, 'TestApp', 'test-src');
     }
 
+    /**
+     * @covers \Atournayre\Bundle\MakerBundle\Generator\ClassMaker::commandName
+     */
     public function testCommandName(): void
     {
         self::assertEquals('make:elegant:class', $this->maker->commandName());
     }
 
+    /**
+     * @covers \Atournayre\Bundle\MakerBundle\Generator\ClassMaker::commandDescription
+     */
     public function testCommandDescription(): void
     {
         self::assertNotEmpty($this->maker->commandDescription());
     }
 
+    /**
+     * @covers \Atournayre\Bundle\MakerBundle\Generator\ClassMaker::configureCommand
+     */
     public function testConfigureCommand(): void
     {
         $command = $this->createMock(Command::class);
@@ -92,6 +101,9 @@ class ClassMakerTest extends TestCase
         $this->maker->configureCommand($command);
     }
 
+    /**
+     * @covers \Atournayre\Bundle\MakerBundle\Generator\ClassMaker::doGenerate
+     */
     public function testDoGenerate(): void
     {
         $input = $this->createMock(InputInterface::class);
