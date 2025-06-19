@@ -15,7 +15,7 @@ use Twig\Environment;
 /**
  * Maker for generating a simple class.
  */
-class ClassMaker extends AbstractMaker implements MakerInterface
+final class ClassMaker extends AbstractMaker implements MakerInterface
 {
     public function __construct(
         Environment $twig,
