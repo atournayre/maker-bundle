@@ -12,6 +12,9 @@ use Twig\Environment;
 
 class AbstractMakerTest extends TestCase
 {
+    /**
+     * @var Environment&\PHPUnit\Framework\MockObject\MockObject
+     */
     private Environment $twig;
     private AbstractMaker $maker;
 
@@ -91,6 +94,8 @@ class AbstractMakerTest extends TestCase
             // Expose the protected method for testing
             /**
              * @param array<string, mixed> $parameters
+             *
+             * @api
              */
             public function publicGenerateFile(string $targetPath, string $template, array $parameters = []): void
             {

@@ -13,6 +13,9 @@ use Twig\Environment;
 
 class ClassMakerTest extends TestCase
 {
+    /**
+     * @var Environment&\PHPUnit\Framework\MockObject\MockObject
+     */
     private Environment $twig;
     private ClassMaker $maker;
 
