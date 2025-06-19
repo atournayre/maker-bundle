@@ -22,13 +22,13 @@ class MakerCommand extends Command
 {
     public function __construct(private readonly MakerInterface $maker)
     {
-        parent::__construct($this->maker->getCommandName());
+        parent::__construct($this->maker->commandName());
     }
 
     protected function configure(): void
     {
         $this
-            ->setDescription($this->maker->getCommandDescription())
+            ->setDescription($this->maker->commandDescription())
         ;
 
         $this->maker->configureCommand($this);

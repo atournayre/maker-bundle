@@ -16,12 +16,12 @@ interface MakerInterface
     /**
      * Return the command name (e.g. make:elegant:entity).
      */
-    public function getCommandName(): string;
+    public function commandName(): string;
 
     /**
      * Return the command description.
      */
-    public function getCommandDescription(): string;
+    public function commandDescription(): string;
 
     /**
      * Configure the command (add arguments, options, etc.).

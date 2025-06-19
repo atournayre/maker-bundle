@@ -25,12 +25,12 @@ final class ClassMaker extends AbstractMaker implements MakerInterface
         parent::__construct($twig, $namespacePrefix, $dirPrefix);
     }
 
-    public function getCommandName(): string
+    public function commandName(): string
     {
         return 'make:elegant:class';
     }
 
-    public function getCommandDescription(): string
+    public function commandDescription(): string
     {
         return 'Creates a new PHP class';
     }

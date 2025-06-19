@@ -20,12 +20,12 @@ class AbstractMakerTest extends TestCase
         $this->twig = $this->createMock(Environment::class);
         // Create a concrete implementation of the abstract class for testing
         $this->maker = new class($this->twig, 'TestApp', 'test-src') extends AbstractMaker {
-            public function getCommandName(): string
+            public function commandName(): string
             {
                 return 'test:command';
             }
 
-            public function getCommandDescription(): string
+            public function commandDescription(): string
             {
                 return 'Test command';
             }
@@ -70,12 +70,12 @@ class AbstractMakerTest extends TestCase
 
         // Create a test subclass that exposes the protected method
         $testMaker = new class($this->twig, 'TestApp', 'test-src') extends AbstractMaker {
-            public function getCommandName(): string
+            public function commandName(): string
             {
                 return 'test:command';
             }
 
-            public function getCommandDescription(): string
+            public function commandDescription(): string
             {
                 return 'Test command';
             }
@@ -115,7 +115,7 @@ class AbstractMakerTest extends TestCase
         // Create a test-specific subclass with a mock doGenerate method
         $testMaker = $this->getMockBuilder(AbstractMaker::class)
             ->setConstructorArgs([$this->twig, 'TestApp', 'test-src'])
-            ->onlyMethods(['doGenerate', 'getCommandName', 'getCommandDescription', 'configureCommand'])
+            ->onlyMethods(['doGenerate', 'commandName', 'commandDescription', 'configureCommand'])
             ->getMock()
         ;
 
@@ -124,8 +124,8 @@ class AbstractMakerTest extends TestCase
             ->with($input, self::isInstanceOf(SymfonyStyle::class))
         ;
 
-        $testMaker->method('getCommandName')->willReturn('test:command');
-        $testMaker->method('getCommandDescription')->willReturn('Test command');
+        $testMaker->method('commandName')->willReturn('test:command');
+        $testMaker->method('commandDescription')->willReturn('Test command');
 
         $result = $testMaker->generate($input, $output);
 
@@ -140,7 +140,7 @@ class AbstractMakerTest extends TestCase
         // Create a test-specific subclass with a mock doGenerate method that throws an exception
         $testMaker = $this->getMockBuilder(AbstractMaker::class)
             ->setConstructorArgs([$this->twig, 'TestApp', 'test-src'])
-            ->onlyMethods(['doGenerate', 'getCommandName', 'getCommandDescription', 'configureCommand'])
+            ->onlyMethods(['doGenerate', 'commandName', 'commandDescription', 'configureCommand'])
             ->getMock()
         ;
 
@@ -150,8 +150,8 @@ class AbstractMakerTest extends TestCase
             ->willThrowException(new \Exception('Test exception'))
         ;
 
-        $testMaker->method('getCommandName')->willReturn('test:command');
-        $testMaker->method('getCommandDescription')->willReturn('Test command');
+        $testMaker->method('commandName')->willReturn('test:command');
+        $testMaker->method('commandDescription')->willReturn('Test command');
 
         $result = $testMaker->generate($input, $output);
 

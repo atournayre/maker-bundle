@@ -22,14 +22,14 @@ class ClassMakerTest extends TestCase
         $this->maker = new ClassMaker($this->twig, 'TestApp', 'test-src');
     }
 
-    public function testGetCommandName(): void
+    public function testCommandName(): void
     {
-        self::assertEquals('make:elegant:class', $this->maker->getCommandName());
+        self::assertEquals('make:elegant:class', $this->maker->commandName());
     }
 
-    public function testGetCommandDescription(): void
+    public function testCommandDescription(): void
     {
-        self::assertNotEmpty($this->maker->getCommandDescription());
+        self::assertNotEmpty($this->maker->commandDescription());
     }
 
     public function testConfigureCommand(): void

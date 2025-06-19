@@ -33,12 +33,12 @@ class CustomMaker extends AbstractMaker
         parent::__construct($twig, $namespacePrefix, $dirPrefix);
     }
 
-    public function getCommandName(): string
+    public function commandName(): string
     {
         return 'make:elegant:custom';
     }
 
-    public function getCommandDescription(): string
+    public function commandDescription(): string
     {
         return 'Creates a custom component';
     }
