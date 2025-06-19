@@ -23,3 +23,7 @@ Thumbs.db
 /public/bundles/
 
 .php-cs-fixer.cache
+
+# Test files created during tests
+/test-path
+/test-src/

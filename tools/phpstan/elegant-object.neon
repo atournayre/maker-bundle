@@ -100,5 +100,9 @@ services:
       arguments:
         excludedPaths:
           - %currentWorkingDirectory%/tests
+          - %currentWorkingDirectory%/src/DependencyInjection/Configuration.php
+          - %currentWorkingDirectory%/src/DependencyInjection/ElegantMakerExtension.php
+          - %currentWorkingDirectory%/src/ElegantMakerBundle.php
+          - %currentWorkingDirectory%/src/Generator/AbstractMaker.php
       tags:
         - phpstan.rules.rule
