@@ -51,7 +51,6 @@ services:
       arguments:
           excludedSuffixes:
               - Maker
-              - TemplateRenderer
       tags:
         - phpstan.rules.rule
 

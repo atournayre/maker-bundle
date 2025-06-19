@@ -13,10 +13,6 @@ services:
         exclude: '../../Generator/{MakerInterface.php}'
         tags: ['elegant.maker']
 
-    # Register the template renderer
-    Atournayre\Bundle\MakerBundle\Template\TemplateRenderer:
-        arguments:
-            $twig: '@twig'
 
     # Register commands for all makers
     Atournayre\Bundle\MakerBundle\Command\MakerCommand:

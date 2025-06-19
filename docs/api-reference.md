@@ -148,34 +148,6 @@ class CommandFactory
 }
 ```
 
-## Template Classes
-
-### TemplateRenderer
-
-The `TemplateRenderer` class provides methods for rendering Twig templates.
-
-```php
-namespace Atournayre\Bundle\MakerBundle\Template;
-
-use Twig\Environment;
-
-class TemplateRenderer
-{
-    private Environment $twig;
-
-    public function __construct(Environment $twig);
-
-    /**
-     * Render a template with the given parameters.
-     */
-    public function render(string $template, array $parameters = []): string;
-
-    /**
-     * Generate a file from a template.
-     */
-    public function generateFile(string $targetPath, string $template, array $parameters = []): void;
-}
-```
 
 ## Bundle Configuration
 
