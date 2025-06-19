@@ -12,7 +12,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  * ElegantMakerBundle is a Symfony bundle that provides commands to generate code
  * based on the atournayre/framework library.
  */
-class ElegantMakerBundle extends Bundle
+final class ElegantMakerBundle extends Bundle
 {
     public function build(ContainerBuilder $container): void
     {

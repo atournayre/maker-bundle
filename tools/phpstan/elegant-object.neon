@@ -12,6 +12,9 @@ services:
       arguments:
           excludedPaths:
               - %currentWorkingDirectory%/tests
+              - %currentWorkingDirectory%/src/Command
+              - %currentWorkingDirectory%/src/DependencyInjection
+              - %currentWorkingDirectory%/src/ElegantMakerBundle.php
       tags:
         - phpstan.rules.rule
 
@@ -59,8 +62,10 @@ services:
       arguments:
         excludedPaths:
             - %currentWorkingDirectory%/tests
+            - %currentWorkingDirectory%/src/DependencyInjection/Configuration.php
         allowedInterfaces:
             - Atournayre\Bundle\MakerBundle\Generator\MakerInterface
+            - Symfony\Component\Config\Definition\ConfigurationInterface
       tags:
         - phpstan.rules.rule
 

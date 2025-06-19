@@ -49,14 +49,14 @@ final class ClassMaker extends AbstractMaker implements MakerInterface
     protected function doGenerate(InputInterface $input, SymfonyStyle $io): void
     {
         $className = $input->getArgument('name');
-        $namespace = $this->getNamespace($input->getOption('namespace'));
+        $namespace = $this->namespace($input->getOption('namespace'));
 
         $extends = $input->getOption('extends');
         $implements = $input->getOption('implements');
         $description = $input->getOption('description');
 
         // Generate the class file
-        $classPath = $this->getPath(StringType::of($input->getOption('namespace'))->replace('\\', '/')->toString()).'/'.$className.'.php';
+        $classPath = $this->path(StringType::of($input->getOption('namespace'))->replace('\\', '/')->toString()).'/'.$className.'.php';
 
         $this->generateFile($classPath, 'class/Class.twig', [
             'namespace' => $namespace,

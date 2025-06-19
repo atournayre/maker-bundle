@@ -12,7 +12,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 /**
  * This is the class that loads and manages the bundle configuration.
  */
-class ElegantMakerExtension extends Extension
+final class ElegantMakerExtension extends Extension
 {
     public function load(array $configs, ContainerBuilder $container): void
     {

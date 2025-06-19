@@ -40,9 +40,9 @@ class AbstractMakerTest extends TestCase
         };
     }
 
-    public function testGetNamespace(): void
+    public function testNamespace(): void
     {
-        $method = new \ReflectionMethod(AbstractMaker::class, 'getNamespace');
+        $method = new \ReflectionMethod(AbstractMaker::class, 'namespace');
         $method->setAccessible(true);
 
         self::assertEquals('TestApp', $method->invoke($this->maker));
@@ -50,9 +50,9 @@ class AbstractMakerTest extends TestCase
         self::assertEquals('TestApp\\Domain\\Model', $method->invoke($this->maker, 'Domain\\Model'));
     }
 
-    public function testGetPath(): void
+    public function testPath(): void
     {
-        $method = new \ReflectionMethod(AbstractMaker::class, 'getPath');
+        $method = new \ReflectionMethod(AbstractMaker::class, 'path');
         $method->setAccessible(true);
 
         self::assertEquals('test-src', $method->invoke($this->maker));

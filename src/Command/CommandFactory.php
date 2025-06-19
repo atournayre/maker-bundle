@@ -9,12 +9,12 @@ use Atournayre\Bundle\MakerBundle\Generator\MakerInterface;
 /**
  * Factory for creating command instances for each maker service.
  */
-class CommandFactory
+final readonly class CommandFactory
 {
     /**
      * @param iterable<MakerInterface> $makers
      */
-    public function __construct(private readonly iterable $makers)
+    public function __construct(private iterable $makers)
     {
     }
 

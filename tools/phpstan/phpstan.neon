@@ -10,6 +10,7 @@ parameters:
         - ../../tests/
     excludePaths:
         - ../../src/Resources/skeleton
+        - ../../src/Resources/skeleton/class.tpl.php
     unused_public:
         methods: true
         properties: true

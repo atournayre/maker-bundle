@@ -43,6 +43,8 @@ abstract class AbstractMaker implements MakerInterface
 
     /**
      * Generate a file from a Twig template.
+     *
+     * @param array<string, mixed> $parameters
      */
     protected function generateFile(string $targetPath, string $template, array $parameters = []): void
     {
@@ -57,17 +59,17 @@ abstract class AbstractMaker implements MakerInterface
     }
 
     /**
-     * Get the full namespace for a class.
+     * Return the full namespace for a class.
      */
-    protected function getNamespace(string $subNamespace = ''): string
+    protected function namespace(string $subNamespace = ''): string
     {
         return StringType::of($this->namespacePrefix.'\\'.$subNamespace)->trim('\\')->toString();
     }
 
     /**
-     * Get the full path for a file.
+     * Return the full path for a file.
      */
-    protected function getPath(string $subPath = ''): string
+    protected function path(string $subPath = ''): string
     {
         return StringType::of($this->dirPrefix.'/'.$subPath)->trim('/')->toString();
     }

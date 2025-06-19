@@ -48,7 +48,7 @@
     },
     "scripts": {
         "test": "phpunit",
-        "phpstan": "phpstan analyse src",
+        "phpstan": "phpstan analyse --configuration=tools/phpstan/phpstan.neon src",
         "rector": "rector process src",
         "qa": [
             "@phpstan",

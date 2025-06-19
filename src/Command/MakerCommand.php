@@ -18,7 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
     description: 'This is a placeholder command that will be replaced by concrete maker commands',
     hidden: true
 )]
-class MakerCommand extends Command
+final class MakerCommand extends Command
 {
     public function __construct(private readonly MakerInterface $maker)
     {
