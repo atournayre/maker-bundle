@@ -36,7 +36,7 @@ parameters:
                 - 'substr()'
                 - 'ucfirst()'
                 - 'ucwords()'
-            message: 'use Symfony\Component\String\u() instead, because it is more secure and toString() performs assertion'
+            message: 'use Atournayre\Primitives\StringType::of() instead, because it is more secure and toString() performs assertion'
             allowIn:
                 - tests/*
         -

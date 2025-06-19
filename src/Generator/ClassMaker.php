@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Generator;
 
+use Atournayre\Primitives\StringType;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -14,7 +15,7 @@ use Twig\Environment;
 /**
  * Maker for generating a simple class.
  */
-class ClassMaker extends AbstractMaker
+class ClassMaker extends AbstractMaker implements MakerInterface
 {
     public function __construct(
         Environment $twig,
@@ -55,7 +56,7 @@ class ClassMaker extends AbstractMaker
         $description = $input->getOption('description');
 
         // Generate the class file
-        $classPath = $this->getPath(str_replace('\\', '/', $input->getOption('namespace'))).'/'.$className.'.php';
+        $classPath = $this->getPath(StringType::of($input->getOption('namespace'))->replace('\\', '/')->toString()).'/'.$className.'.php';
 
         $this->generateFile($classPath, 'class/Class.twig', [
             'namespace' => $namespace,

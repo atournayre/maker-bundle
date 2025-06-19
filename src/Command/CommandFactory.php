@@ -22,6 +22,8 @@ class CommandFactory
      * Create a command for each maker service.
      *
      * @return array<MakerCommand>
+     *
+     * @api
      */
     public function createCommands(): array
     {
@@ -37,6 +39,8 @@ class CommandFactory
     /**
      * Create a command for a specific maker service.
      * This is used by the service container to create command instances.
+     *
+     * @api
      */
     public function createCommand(MakerInterface $maker): MakerCommand
     {

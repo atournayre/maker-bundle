@@ -13,8 +13,8 @@ use Twig\Environment;
 
 class ClassMakerTest extends TestCase
 {
-    private $twig;
-    private $maker;
+    private Environment $twig;
+    private ClassMaker $maker;
 
     protected function setUp(): void
     {
@@ -24,58 +24,65 @@ class ClassMakerTest extends TestCase
 
     public function testGetCommandName(): void
     {
-        $this->assertEquals('make:elegant:class', $this->maker->getCommandName());
+        self::assertEquals('make:elegant:class', $this->maker->getCommandName());
     }
 
     public function testGetCommandDescription(): void
     {
-        $this->assertNotEmpty($this->maker->getCommandDescription());
+        self::assertNotEmpty($this->maker->getCommandDescription());
     }
 
     public function testConfigureCommand(): void
     {
         $command = $this->createMock(Command::class);
 
-        $command->expects($this->once())
+        $command->expects(self::once())
             ->method('addArgument')
             ->with(
                 'name',
                 InputArgument::REQUIRED,
-                $this->isType('string')
+                self::isType('string')
             )
             ->willReturnSelf()
         ;
 
-        $command->expects($this->exactly(4))
+        $command->expects(self::exactly(4))
             ->method('addOption')
-            ->withConsecutive(
-                [
-                    'namespace',
-                    null,
-                    InputOption::VALUE_OPTIONAL,
-                    $this->isType('string'),
-                    '',
-                ],
-                [
-                    'extends',
-                    null,
-                    InputOption::VALUE_OPTIONAL,
-                    $this->isType('string'),
-                ],
-                [
-                    'implements',
-                    null,
-                    $this->isType('int'),
-                    $this->isType('string'),
-                    [],
-                ],
-                [
-                    'description',
-                    null,
-                    InputOption::VALUE_OPTIONAL,
-                    $this->isType('string'),
-                ]
-            )
+            ->willReturnCallback(function ($name, $shortcut, $mode, $description, $default = null) use ($command) {
+                static $callCount = 0;
+                ++$callCount;
+
+                switch ($callCount) {
+                    case 1:
+                        self::assertEquals('namespace', $name);
+                        self::assertNull($shortcut);
+                        self::assertEquals(InputOption::VALUE_OPTIONAL, $mode);
+                        self::assertIsString($description);
+                        self::assertEquals('', $default);
+                        break;
+                    case 2:
+                        self::assertEquals('extends', $name);
+                        self::assertNull($shortcut);
+                        self::assertEquals(InputOption::VALUE_OPTIONAL, $mode);
+                        self::assertIsString($description);
+                        break;
+                    case 3:
+                        self::assertEquals('implements', $name);
+                        self::assertNull($shortcut);
+                        self::assertEquals(InputOption::VALUE_OPTIONAL, $mode);
+                        self::assertIsString($description);
+                        self::assertEquals([], $default);
+                        break;
+                    case 4:
+                        self::assertEquals('description', $name);
+                        self::assertNull($shortcut);
+                        self::assertEquals(InputOption::VALUE_OPTIONAL, $mode);
+                        self::assertIsString($description);
+                        break;
+                }
+
+                return $command;
+            })
             ->willReturnSelf()
         ;
 
@@ -87,33 +94,40 @@ class ClassMakerTest extends TestCase
         $input = $this->createMock(InputInterface::class);
         $io = $this->createMock(SymfonyStyle::class);
 
-        $input->expects($this->once())
+        $input->expects(self::once())
             ->method('getArgument')
             ->with('name')
             ->willReturn('TestClass')
         ;
 
-        $input->expects($this->exactly(4))
+        $input->expects(self::exactly(5))
             ->method('getOption')
-            ->withConsecutive(
-                ['namespace'],
-                ['extends'],
-                ['implements'],
-                ['description']
-            )
-            ->willReturnOnConsecutiveCalls(
-                'Domain\\Model',
-                'BaseClass',
-                ['Interface1', 'Interface2'],
-                'Test description'
-            )
+            ->willReturnCallback(function ($option) {
+                static $callCount = 0;
+                static $namespaceCallCount = 0;
+                ++$callCount;
+
+                if ('namespace' === $option) {
+                    ++$namespaceCallCount;
+
+                    return 'Domain\\Model';
+                } elseif ('extends' === $option) {
+                    return 'BaseClass';
+                } elseif ('implements' === $option) {
+                    return ['Interface1', 'Interface2'];
+                } elseif ('description' === $option) {
+                    return 'Test description';
+                } else {
+                    self::fail('Unexpected option: '.$option);
+                }
+            })
         ;
 
-        $this->twig->expects($this->once())
+        $this->twig->expects(self::once())
             ->method('render')
             ->with(
                 'class/Class.twig',
-                $this->callback(function ($params) {
+                self::callback(function ($params) {
                     return 'TestApp\\Domain\\Model' === $params['namespace']
                            && 'TestClass' === $params['class_name']
                            && 'BaseClass' === $params['extends']
@@ -124,9 +138,9 @@ class ClassMakerTest extends TestCase
             ->willReturn('rendered class content')
         ;
 
-        $io->expects($this->once())
+        $io->expects(self::once())
             ->method('text')
-            ->with($this->isType('array'))
+            ->with(self::isType('array'))
         ;
 
         // Use reflection to call the protected method

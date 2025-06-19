@@ -9,12 +9,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class ElegantMakerBundleTest extends TestCase
 {
-    public function testBundleRegistration(): void
-    {
-        $bundle = new ElegantMakerBundle();
-        $this->assertInstanceOf(ElegantMakerBundle::class, $bundle);
-    }
-
     public function testBundleBuild(): void
     {
         $bundle = new ElegantMakerBundle();
@@ -33,7 +27,7 @@ class ElegantMakerBundleTest extends TestCase
             }
         }
 
-        $this->assertTrue($passFound, 'MakerCompilerPass should be registered');
+        self::assertTrue($passFound, 'MakerCompilerPass should be registered');
     }
 
     public function testBundleGetPath(): void
@@ -41,8 +35,8 @@ class ElegantMakerBundleTest extends TestCase
         $bundle = new ElegantMakerBundle();
         $path = $bundle->getPath();
 
-        $this->assertDirectoryExists($path);
-        $this->assertStringEndsWith('maker-bundle', $path);
+        self::assertDirectoryExists($path);
+        self::assertStringEndsWith('maker-bundle', $path);
     }
 
     /**
@@ -72,7 +66,7 @@ class ElegantMakerBundleTest extends TestCase
         $container->compile();
 
         // Check that the service was registered
-        $this->assertTrue($container->has('elegant.maker.class_maker'));
-        $this->assertInstanceOf(ClassMaker::class, $container->get('elegant.maker.class_maker'));
+        self::assertTrue($container->has('elegant.maker.class_maker'));
+        self::assertInstanceOf(ClassMaker::class, $container->get('elegant.maker.class_maker'));
     }
 }

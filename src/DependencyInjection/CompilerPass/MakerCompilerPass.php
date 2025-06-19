@@ -11,7 +11,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 /**
  * Compiler pass to register all maker services.
  */
-class MakerCompilerPass implements CompilerPassInterface
+final class MakerCompilerPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
@@ -25,7 +25,11 @@ class MakerCompilerPass implements CompilerPassInterface
             }
 
             $class = $definition->getClass();
-            if (!$class) {
+            if (null === $class) {
+                continue;
+            }
+
+            if ('' === $class) {
                 continue;
             }
 

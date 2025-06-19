@@ -12,16 +12,32 @@ use Twig\Environment;
 
 class AbstractMakerTest extends TestCase
 {
-    private $twig;
-    private $maker;
+    private Environment $twig;
+    private AbstractMaker $maker;
 
     protected function setUp(): void
     {
         $this->twig = $this->createMock(Environment::class);
-        $this->maker = $this->getMockForAbstractClass(
-            AbstractMaker::class,
-            [$this->twig, 'TestApp', 'test-src']
-        );
+        // Create a concrete implementation of the abstract class for testing
+        $this->maker = new class($this->twig, 'TestApp', 'test-src') extends AbstractMaker {
+            public function getCommandName(): string
+            {
+                return 'test:command';
+            }
+
+            public function getCommandDescription(): string
+            {
+                return 'Test command';
+            }
+
+            public function configureCommand(Command $command): void
+            {
+            }
+
+            protected function doGenerate(InputInterface $input, SymfonyStyle $io): void
+            {
+            }
+        };
     }
 
     public function testGetNamespace(): void
@@ -29,9 +45,9 @@ class AbstractMakerTest extends TestCase
         $method = new \ReflectionMethod(AbstractMaker::class, 'getNamespace');
         $method->setAccessible(true);
 
-        $this->assertEquals('TestApp', $method->invoke($this->maker));
-        $this->assertEquals('TestApp\\Domain', $method->invoke($this->maker, 'Domain'));
-        $this->assertEquals('TestApp\\Domain\\Model', $method->invoke($this->maker, 'Domain\\Model'));
+        self::assertEquals('TestApp', $method->invoke($this->maker));
+        self::assertEquals('TestApp\\Domain', $method->invoke($this->maker, 'Domain'));
+        self::assertEquals('TestApp\\Domain\\Model', $method->invoke($this->maker, 'Domain\\Model'));
     }
 
     public function testGetPath(): void
@@ -39,14 +55,14 @@ class AbstractMakerTest extends TestCase
         $method = new \ReflectionMethod(AbstractMaker::class, 'getPath');
         $method->setAccessible(true);
 
-        $this->assertEquals('test-src', $method->invoke($this->maker));
-        $this->assertEquals('test-src/Domain', $method->invoke($this->maker, 'Domain'));
-        $this->assertEquals('test-src/Domain/Model', $method->invoke($this->maker, 'Domain/Model'));
+        self::assertEquals('test-src', $method->invoke($this->maker));
+        self::assertEquals('test-src/Domain', $method->invoke($this->maker, 'Domain'));
+        self::assertEquals('test-src/Domain/Model', $method->invoke($this->maker, 'Domain/Model'));
     }
 
     public function testGenerateFile(): void
     {
-        $this->twig->expects($this->once())
+        $this->twig->expects(self::once())
             ->method('render')
             ->with('test-template.twig', ['param' => 'value'])
             ->willReturn('rendered content')
@@ -73,6 +89,9 @@ class AbstractMakerTest extends TestCase
             }
 
             // Expose the protected method for testing
+            /**
+             * @param array<string, mixed> $parameters
+             */
             public function publicGenerateFile(string $targetPath, string $template, array $parameters = []): void
             {
                 $this->generateFile($targetPath, $template, $parameters);
@@ -93,24 +112,24 @@ class AbstractMakerTest extends TestCase
         $input = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
 
-        $this->maker = $this->getMockForAbstractClass(
-            AbstractMaker::class,
-            [$this->twig, 'TestApp', 'test-src'],
-            '',
-            true,
-            true,
-            true,
-            ['doGenerate']
-        );
-
-        $this->maker->expects($this->once())
-            ->method('doGenerate')
-            ->with($input, $this->isInstanceOf(SymfonyStyle::class))
+        // Create a test-specific subclass with a mock doGenerate method
+        $testMaker = $this->getMockBuilder(AbstractMaker::class)
+            ->setConstructorArgs([$this->twig, 'TestApp', 'test-src'])
+            ->onlyMethods(['doGenerate', 'getCommandName', 'getCommandDescription', 'configureCommand'])
+            ->getMock()
         ;
 
-        $result = $this->maker->generate($input, $output);
+        $testMaker->expects(self::once())
+            ->method('doGenerate')
+            ->with($input, self::isInstanceOf(SymfonyStyle::class))
+        ;
 
-        $this->assertEquals(Command::SUCCESS, $result);
+        $testMaker->method('getCommandName')->willReturn('test:command');
+        $testMaker->method('getCommandDescription')->willReturn('Test command');
+
+        $result = $testMaker->generate($input, $output);
+
+        self::assertEquals(Command::SUCCESS, $result);
     }
 
     public function testGenerateWithException(): void
@@ -118,24 +137,24 @@ class AbstractMakerTest extends TestCase
         $input = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
 
-        $this->maker = $this->getMockForAbstractClass(
-            AbstractMaker::class,
-            [$this->twig, 'TestApp', 'test-src'],
-            '',
-            true,
-            true,
-            true,
-            ['doGenerate']
-        );
+        // Create a test-specific subclass with a mock doGenerate method that throws an exception
+        $testMaker = $this->getMockBuilder(AbstractMaker::class)
+            ->setConstructorArgs([$this->twig, 'TestApp', 'test-src'])
+            ->onlyMethods(['doGenerate', 'getCommandName', 'getCommandDescription', 'configureCommand'])
+            ->getMock()
+        ;
 
-        $this->maker->expects($this->once())
+        $testMaker->expects(self::once())
             ->method('doGenerate')
-            ->with($input, $this->isInstanceOf(SymfonyStyle::class))
+            ->with($input, self::isInstanceOf(SymfonyStyle::class))
             ->willThrowException(new \Exception('Test exception'))
         ;
 
-        $result = $this->maker->generate($input, $output);
+        $testMaker->method('getCommandName')->willReturn('test:command');
+        $testMaker->method('getCommandDescription')->willReturn('Test command');
 
-        $this->assertEquals(Command::FAILURE, $result);
+        $result = $testMaker->generate($input, $output);
+
+        self::assertEquals(Command::FAILURE, $result);
     }
 }

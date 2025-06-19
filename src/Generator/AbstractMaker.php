@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Generator;
 
+use Atournayre\Primitives\StringType;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -60,7 +61,7 @@ abstract class AbstractMaker implements MakerInterface
      */
     protected function getNamespace(string $subNamespace = ''): string
     {
-        return trim($this->namespacePrefix.'\\'.$subNamespace, '\\');
+        return StringType::of($this->namespacePrefix.'\\'.$subNamespace)->trim('\\')->toString();
     }
 
     /**
@@ -68,6 +69,6 @@ abstract class AbstractMaker implements MakerInterface
      */
     protected function getPath(string $subPath = ''): string
     {
-        return trim($this->dirPrefix.'/'.$subPath, '/');
+        return StringType::of($this->dirPrefix.'/'.$subPath)->trim('/')->toString();
     }
 }

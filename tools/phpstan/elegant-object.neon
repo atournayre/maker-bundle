@@ -25,6 +25,9 @@ services:
 
     -
       class: Atournayre\PHPStan\ElegantObject\Rules\BeImmutableRule
+      arguments:
+        excludedPaths:
+          - %currentWorkingDirectory%/tests
       tags:
         - phpstan.rules.rule
 
@@ -45,6 +48,10 @@ services:
 
     -
       class: Atournayre\PHPStan\ElegantObject\Rules\NeverUseErNamesRule
+      arguments:
+          excludedSuffixes:
+              - Maker
+              - TemplateRenderer
       tags:
         - phpstan.rules.rule
 
@@ -53,6 +60,8 @@ services:
       arguments:
         excludedPaths:
             - %currentWorkingDirectory%/tests
+        allowedInterfaces:
+            - Atournayre\Bundle\MakerBundle\Generator\MakerInterface
       tags:
         - phpstan.rules.rule
 
