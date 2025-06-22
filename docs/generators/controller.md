@@ -95,6 +95,7 @@ You can specify a custom template to use for generating the controller:
 php bin/console make:elegant:controller Payment --template="my_custom_controller.tpl.php"
 ```
 
+```php
  Summary
 +----------------------------+------------------------------------------+
 | Property                   | Value                                    |
@@ -134,7 +135,7 @@ use Atournayre\Contracts\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 
-final class PaymentController
+final readonly class PaymentController
 {
     public function __construct(
         private readonly LoggerInterface $logger,
@@ -170,7 +171,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-final class PaymentController extends AbstractController
+final readonly class PaymentController extends AbstractController
 {
     // ...
 }
@@ -194,7 +195,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use App\Contracts\Controller\ControllerInterface;
 use App\Contracts\Controller\ApiControllerInterface;
 
-final class PaymentController implements ControllerInterface, ApiControllerInterface
+final readonly class PaymentController implements ControllerInterface, ApiControllerInterface
 {
     // ...
 }

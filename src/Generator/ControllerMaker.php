@@ -277,7 +277,7 @@ final class ControllerMaker extends AbstractMaker implements MakerInterface
             $content = substr_replace($content, "\n".$useStatements, $lastUseEndPos, 0);
 
             // Add implements clause after the class declaration
-            $classPos = strpos($content, 'final class '.$controllerName.'Controller');
+            $classPos = strpos($content, 'final readonly class '.$controllerName.'Controller');
             $extendsPos = strpos($content, ' extends ', $classPos);
             $implementsPos = false !== $extendsPos ? $extendsPos + StringType::of(' extends AbstractController')->length()->value() : strpos($content, "\n", $classPos);
             $content = substr_replace($content, $implementsClause, $implementsPos, 0);
