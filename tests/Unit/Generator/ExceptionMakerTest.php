@@ -7,7 +7,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Twig\Environment;
 
 class ExceptionMakerTest extends TestCase
@@ -57,12 +56,14 @@ class ExceptionMakerTest extends TestCase
         $command->expects(self::once())
             ->method('addArgument')
             ->with('name', self::anything(), self::anything())
-            ->willReturnSelf();
+            ->willReturnSelf()
+        ;
 
         $command->expects(self::once())
             ->method('addOption')
             ->with('namespace', null, self::anything(), self::anything())
-            ->willReturnSelf();
+            ->willReturnSelf()
+        ;
 
         $this->maker->configureCommand($command);
     }
@@ -83,8 +84,8 @@ class ExceptionMakerTest extends TestCase
     }
 
     /**
-     * Test the integration with AbstractMaker
-     * 
+     * Test the integration with AbstractMaker.
+     *
      * @covers \Atournayre\Bundle\MakerBundle\Generator\ExceptionMaker::generate
      */
     public function testGenerateIntegration(): void

@@ -8,9 +8,9 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Question\ChoiceQuestion;
+use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Finder\Finder;
 use Twig\Environment;
 
@@ -20,6 +20,7 @@ use Twig\Environment;
 final class ExceptionMaker extends AbstractMaker implements MakerInterface
 {
     private const DEFAULT_EXCEPTION_NAMESPACE = 'Exception';
+
     private const DEFAULT_EXCEPTION_DIRECTORY = 'Exception';
 
     private const PHP_CORE_EXCEPTIONS = [
@@ -72,8 +73,8 @@ final class ExceptionMaker extends AbstractMaker implements MakerInterface
         $exceptionName = $input->getArgument('name');
         if (empty($exceptionName)) {
             $exceptionName = $this->askForExceptionName($io);
-        } elseif (str_ends_with($exceptionName, 'Exception')) {
-            $exceptionName = substr($exceptionName, 0, -9); // Remove 'Exception' suffix
+        } elseif (str_ends_with((string) $exceptionName, 'Exception')) {
+            $exceptionName = substr((string) $exceptionName, 0, -9); // Remove 'Exception' suffix
         }
 
         // 2. Get available exceptions (PHP core + project exceptions)
@@ -84,9 +85,9 @@ final class ExceptionMaker extends AbstractMaker implements MakerInterface
 
         // 4. Determine namespace and directory
         $customNamespace = $input->getOption('namespace');
-        $namespace = !empty($customNamespace) 
-            ? $this->namespace($customNamespace) 
-            : $this->getExceptionNamespace();
+        $namespace = empty($customNamespace)
+            ? $this->getExceptionNamespace()
+            : $this->namespace($customNamespace);
         $directory = $this->getExceptionDirectory();
 
         // 5. Confirm namespace and directory
@@ -94,16 +95,17 @@ final class ExceptionMaker extends AbstractMaker implements MakerInterface
         $io->table(
             ['Property', 'Value'],
             [
-                ['Exception name', $exceptionName . 'Exception'],
+                ['Exception name', $exceptionName.'Exception'],
                 ['Parent exception', $parentException],
                 ['Namespace', $namespace],
                 ['Directory', $directory],
-                ['File path', $directory . '/' . $exceptionName . 'Exception.php'],
+                ['File path', $directory.'/'.$exceptionName.'Exception.php'],
             ]
         );
 
         if (!$io->confirm('Do you want to generate this exception class?', true)) {
             $io->warning('Exception generation cancelled.');
+
             return;
         }
 
@@ -117,7 +119,7 @@ final class ExceptionMaker extends AbstractMaker implements MakerInterface
 
         $io->success([
             'Exception class generated successfully!',
-            'Path: ' . $directory . '/' . $exceptionName . 'Exception.php',
+            'Path: '.$directory.'/'.$exceptionName.'Exception.php',
         ]);
     }
 
@@ -147,8 +149,8 @@ final class ExceptionMaker extends AbstractMaker implements MakerInterface
         $projectExceptions = $this->findProjectExceptions();
 
         // Add project exceptions with a label to distinguish them
-        foreach ($projectExceptions as $exceptionClass => $namespace) {
-            $exceptions[] = $exceptionClass . ' (from project)';
+        foreach (array_keys($projectExceptions) as $exceptionClass) {
+            $exceptions[] = $exceptionClass.' (from project)';
         }
 
         return $exceptions;
@@ -173,7 +175,8 @@ final class ExceptionMaker extends AbstractMaker implements MakerInterface
         $finder = new Finder();
         $finder->files()
             ->in($exceptionDirectory)
-            ->name('*Exception.php');
+            ->name('*Exception.php')
+        ;
 
         foreach ($finder as $file) {
             $className = $file->getBasename('.php');
@@ -194,8 +197,8 @@ final class ExceptionMaker extends AbstractMaker implements MakerInterface
         $choice = $io->askQuestion($question);
 
         // If it's a project exception, extract the class name
-        if (str_contains($choice, ' (from project)')) {
-            $choice = str_replace(' (from project)', '', $choice);
+        if (str_contains((string) $choice, ' (from project)')) {
+            return str_replace(' (from project)', '', $choice);
         }
 
         return $choice;
@@ -211,15 +214,14 @@ final class ExceptionMaker extends AbstractMaker implements MakerInterface
         return $this->path($this->exceptionDirectory ?? self::DEFAULT_EXCEPTION_DIRECTORY);
     }
 
-
     private function generateExceptionClass(
         string $exceptionName,
         string $parentException,
         string $namespace,
-        string $directory
+        string $directory,
     ): void {
-        $className = $exceptionName . 'Exception';
-        $filePath = $directory . '/' . $className . '.php';
+        $className = $exceptionName.'Exception';
+        $filePath = $directory.'/'.$className.'.php';
 
         $this->generateFile($filePath, 'exception.tpl.php', [
             'namespace' => $namespace,

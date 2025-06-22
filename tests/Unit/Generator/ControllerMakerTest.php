@@ -7,7 +7,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Twig\Environment;
 
 class ControllerMakerTest extends TestCase
@@ -59,15 +58,18 @@ class ControllerMakerTest extends TestCase
         $command->expects(self::once())
             ->method('addArgument')
             ->with('name', self::anything(), self::anything())
-            ->willReturnSelf();
+            ->willReturnSelf()
+        ;
 
         // Create a mock that will track the calls to addOption
         $optionCalls = [];
         $command->method('addOption')
             ->willReturnCallback(function ($name, $shortcut, $mode, $description) use (&$optionCalls, $command) {
                 $optionCalls[] = $name;
+
                 return $command;
-            });
+            })
+        ;
 
         $this->maker->configureCommand($command);
 
@@ -94,8 +96,8 @@ class ControllerMakerTest extends TestCase
     }
 
     /**
-     * Test the integration with AbstractMaker
-     * 
+     * Test the integration with AbstractMaker.
+     *
      * @covers \Atournayre\Bundle\MakerBundle\Generator\ControllerMaker::generate
      */
     public function testGenerateIntegration(): void
