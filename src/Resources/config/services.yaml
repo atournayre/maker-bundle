@@ -6,6 +6,8 @@ services:
         bind:
             $namespacePrefix: '%elegant_maker.namespace_prefix%'
             $dirPrefix: '%elegant_maker.dir_prefix%'
+            $exceptionNamespace: '%elegant_maker.exception.root_namespace%'
+            $exceptionDirectory: '%elegant_maker.exception.target_directory%'
 
     # Register all services in the Generator namespace
     Atournayre\Bundle\MakerBundle\Generator\:

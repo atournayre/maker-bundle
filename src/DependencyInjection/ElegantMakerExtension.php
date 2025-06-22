@@ -22,6 +22,10 @@ final class ElegantMakerExtension extends Extension
         $container->setParameter('elegant_maker.namespace_prefix', $config['namespace_prefix']);
         $container->setParameter('elegant_maker.dir_prefix', $config['dir_prefix']);
 
+        // Exception maker configuration
+        $container->setParameter('elegant_maker.exception.root_namespace', $config['exception']['root_namespace']);
+        $container->setParameter('elegant_maker.exception.target_directory', $config['exception']['target_directory']);
+
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yaml');
     }
