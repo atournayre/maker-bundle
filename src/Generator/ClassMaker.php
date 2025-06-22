@@ -58,7 +58,7 @@ final class ClassMaker extends AbstractMaker implements MakerInterface
         // Generate the class file
         $classPath = $this->path(StringType::of($input->getOption('namespace'))->replace('\\', '/')->toString()).'/'.$className.'.php';
 
-        $this->generateFile($classPath, 'class/Class.twig', [
+        $this->generateFile($classPath, 'class.tpl.php', [
             'namespace' => $namespace,
             'class_name' => $className,
             'extends' => $extends,

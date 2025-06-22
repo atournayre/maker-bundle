@@ -9,8 +9,7 @@ parameters:
         - ../../src/
         - ../../tests/
     excludePaths:
-        - ../../src/Resources/skeleton
-        - ../../src/Resources/skeleton/class.tpl.php
+        - ../../templates
     unused_public:
         methods: true
         properties: true

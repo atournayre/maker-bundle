@@ -2,7 +2,6 @@
 
 $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__.'/../../{src,tests}')
-    ->exclude('Resources/skeleton')
 ;
 
 $config = new PhpCsFixer\Config();

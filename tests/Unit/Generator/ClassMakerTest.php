@@ -141,7 +141,7 @@ class ClassMakerTest extends TestCase
         $this->twig->expects(self::once())
             ->method('render')
             ->with(
-                'class/Class.twig',
+                'class.tpl.php',
                 self::callback(function ($params) {
                     return 'TestApp\\Domain\\Model' === $params['namespace']
                            && 'TestClass' === $params['class_name']

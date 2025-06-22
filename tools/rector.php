@@ -10,7 +10,7 @@ return RectorConfig::configure()
         __DIR__.'/../src',
         __DIR__.'/../tests',
     ])
-    ->withSkipPath(__DIR__ . '/../src/Resources/skeleton')
+    ->withSkipPath(__DIR__ . '/../templates')
     ->withPhpSets(
         php82: \true,
     )
