@@ -10,6 +10,7 @@ nav:
   - Home: index.md
   - Installation: installation.md
   - Usage: usage.md
+  - Configuration: configuration.md
   - Generators:
     - Overview: generators/index.md
     - Class Generator: generators/class.md
