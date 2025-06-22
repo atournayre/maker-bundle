@@ -61,11 +61,21 @@ class ControllerMakerTest extends TestCase
             ->with('name', self::anything(), self::anything())
             ->willReturnSelf();
 
-        $command->expects(self::exactly(3))
-            ->method('addOption')
-            ->willReturnSelf();
+        // Create a mock that will track the calls to addOption
+        $optionCalls = [];
+        $command->method('addOption')
+            ->willReturnCallback(function ($name, $shortcut, $mode, $description) use (&$optionCalls, $command) {
+                $optionCalls[] = $name;
+                return $command;
+            });
 
         $this->maker->configureCommand($command);
+
+        // Verify that the expected options were added
+        self::assertCount(3, $optionCalls);
+        self::assertContains('namespace', $optionCalls);
+        self::assertContains('extends-abstract-controller', $optionCalls);
+        self::assertContains('template', $optionCalls);
     }
 
     /**

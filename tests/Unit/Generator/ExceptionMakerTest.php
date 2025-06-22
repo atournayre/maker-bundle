@@ -53,13 +53,16 @@ class ExceptionMakerTest extends TestCase
     {
         $command = $this->createMock(Command::class);
 
-        // The configureCommand method doesn't add any arguments or options
-        // as everything is collected interactively, so we just verify it's called
-        $command->expects(self::never())
-            ->method('addArgument');
+        // Verify that the command is configured with the expected arguments and options
+        $command->expects(self::once())
+            ->method('addArgument')
+            ->with('name', self::anything(), self::anything())
+            ->willReturnSelf();
 
-        $command->expects(self::never())
-            ->method('addOption');
+        $command->expects(self::once())
+            ->method('addOption')
+            ->with('namespace', null, self::anything(), self::anything())
+            ->willReturnSelf();
 
         $this->maker->configureCommand($command);
     }
