@@ -42,19 +42,31 @@ abstract class AbstractMaker implements MakerInterface
     abstract protected function doGenerate(InputInterface $input, SymfonyStyle $io): void;
 
     /**
-     * Generate a file from a Twig template.
+     * Generate a file from a PHP template.
      *
      * @param array<string, mixed> $parameters
      */
     protected function generateFile(string $targetPath, string $template, array $parameters = []): void
     {
-        $content = $this->twig->render($template, $parameters);
+        // Extract parameters to make them available in the template
+        extract($parameters); // @phpstan-ignore-line
 
+        // Start output buffering to capture the template output
+        ob_start();
+
+        // Include the template file
+        include __DIR__.'/../../templates/'.$template;
+
+        // Get the content from the output buffer
+        $content = ob_get_clean();
+
+        // Create the directory if it doesn't exist
         $directory = dirname($targetPath);
         if (!is_dir($directory)) {
             mkdir($directory, 0777, true);
         }
 
+        // Write the content to the target file
         file_put_contents($targetPath, $content);
     }
 

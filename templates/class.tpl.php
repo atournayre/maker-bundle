@@ -1,51 +1,55 @@
 <?php
+// Template for generating a class
+?>
+<?= "<?php\n" ?>
 
-namespace {{ namespace }};
+namespace <?= $namespace ?>;
 
-{% if uses %}
-{% for use in uses %}
-use {{ use }};
-{% endfor %}
-{% endif %}
+<?php if (!empty($uses)): ?>
+<?php foreach ($uses as $use): ?>
+use <?= $use ?>;
+<?php endforeach ?>
+<?php endif ?>
 
 /**
- * {{ class_name }} class.
-{% if description %}
- * {{ description }}
-{% endif %}
+ * <?= $class_name ?> class.
+<?php if (!empty($description)): ?>
+ * <?= $description ?>
+<?php endif ?>
  */
-{% if attributes %}
-{% for attribute in attributes %}
-#[{{ attribute }}]
-{% endfor %}
-{% endif %}
-class {{ class_name }}{% if extends %} extends {{ extends }}{% endif %}{% if implements %} implements {{ implements|join(', ') }}{% endif %}
+<?php if (!empty($attributes)): ?>
+<?php foreach ($attributes as $attribute): ?>
+#[<?= $attribute ?>]
+<?php endforeach ?>
+<?php endif ?>
+class <?= $class_name ?><?php if (!empty($extends)): ?> extends <?= $extends ?><?php endif ?><?php if (!empty($implements)): ?> implements <?= implode(', ', $implements) ?><?php endif ?>
+
 {
-{% if properties %}
-{% for property in properties %}
-    {{ property.visibility }} {{ property.type }} ${{ property.name }}{% if property.default is defined %} = {{ property.default }}{% endif %};
-{% endfor %}
-{% endif %}
+<?php if (!empty($properties)): ?>
+<?php foreach ($properties as $property): ?>
+    <?= $property['visibility'] ?> <?= $property['type'] ?> $<?= $property['name'] ?><?php if (isset($property['default'])): ?> = <?= $property['default'] ?><?php endif ?>;
+<?php endforeach ?>
+<?php endif ?>
 
-{% if constructor %}
+<?php if (!empty($constructor)): ?>
     public function __construct(
-{% for param in constructor.params %}
-        {{ param.type }} ${{ param.name }}{% if not loop.last %},{% endif %}
+<?php foreach ($constructor['params'] as $index => $param): ?>
+        <?= $param['type'] ?> $<?= $param['name'] ?><?php if ($index < count($constructor['params']) - 1): ?>,<?php endif ?>
 
-{% endfor %}
+<?php endforeach ?>
     ) {
-{% for param in constructor.params %}
-        $this->{{ param.name }} = ${{ param.name }};
-{% endfor %}
+<?php foreach ($constructor['params'] as $param): ?>
+        $this-><?= $param['name'] ?> = $<?= $param['name'] ?>;
+<?php endforeach ?>
     }
-{% endif %}
+<?php endif ?>
 
-{% if methods %}
-{% for method in methods %}
-    {{ method.visibility }} function {{ method.name }}({% for param in method.params %}{{ param.type }} ${{ param.name }}{% if not loop.last %}, {% endif %}{% endfor %}): {{ method.return_type }}
+<?php if (!empty($methods)): ?>
+<?php foreach ($methods as $method): ?>
+    <?= $method['visibility'] ?> function <?= $method['name'] ?>(<?php foreach ($method['params'] as $index => $param): ?><?= $param['type'] ?> $<?= $param['name'] ?><?php if ($index < count($method['params']) - 1): ?>, <?php endif ?><?php endforeach ?>): <?= $method['return_type'] ?>
     {
-        {{ method.body|raw }}
+        <?= $method['body'] ?>
     }
-{% endfor %}
-{% endif %}
+<?php endforeach ?>
+<?php endif ?>
 }
