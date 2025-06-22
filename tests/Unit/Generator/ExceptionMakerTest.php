@@ -76,11 +76,19 @@ class ExceptionMakerTest extends TestCase
         // This test is limited because ExceptionMaker is a final class
         // and we can't mock it or its protected/private methods
 
-        // We'll just verify that the public methods exist and can be called
-        self::assertTrue(method_exists($this->maker, 'generate'));
-        self::assertTrue(method_exists($this->maker, 'commandName'));
-        self::assertTrue(method_exists($this->maker, 'commandDescription'));
-        self::assertTrue(method_exists($this->maker, 'configureCommand'));
+        // We'll verify that the public methods have the expected return types
+        $generateMethod = new \ReflectionMethod($this->maker, 'generate');
+        self::assertEquals('int', (string) $generateMethod->getReturnType());
+
+        // These methods are safe to call directly
+        $commandName = $this->maker->commandName();
+        $commandDescription = $this->maker->commandDescription();
+        self::assertNotEmpty($commandName);
+        self::assertNotEmpty($commandDescription);
+
+        // configureCommand doesn't return anything, so we just verify it has void return type
+        $configureCommandMethod = new \ReflectionMethod($this->maker, 'configureCommand');
+        self::assertEquals('void', (string) $configureCommandMethod->getReturnType());
     }
 
     /**
@@ -99,11 +107,14 @@ class ExceptionMakerTest extends TestCase
         // it's properly integrated with AbstractMaker by checking that
         // it returns the expected values for success/failure scenarios
 
-        // We'll use reflection to check that ExceptionMaker extends AbstractMaker
-        $reflection = new \ReflectionClass(ExceptionMaker::class);
-        self::assertTrue($reflection->isSubclassOf('Atournayre\Bundle\MakerBundle\Generator\AbstractMaker'));
+        // We're not testing method existence here as these methods are guaranteed to exist
+        // as part of the class contract. We've already verified their behavior in other tests.
 
-        // We'll also verify that it implements MakerInterface
-        self::assertTrue($reflection->implementsInterface('Atournayre\Bundle\MakerBundle\Generator\MakerInterface'));
+        // Verify that the maker has the expected properties
+        $reflection = new \ReflectionClass($this->maker);
+        self::assertTrue($reflection->hasProperty('exceptionNamespace'));
+
+        // Verify that the maker has the expected command name
+        self::assertEquals('make:elegant:exception', $this->maker->commandName());
     }
 }

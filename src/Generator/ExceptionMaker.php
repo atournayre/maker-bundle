@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Generator;
 
+use Atournayre\Primitives\Collection;
+use Atournayre\Primitives\StringType;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -71,24 +73,24 @@ final class ExceptionMaker extends AbstractMaker implements MakerInterface
     {
         // 1. Get the exception name (from argument or ask interactively)
         $exceptionName = $input->getArgument('name');
-        if (empty($exceptionName)) {
+        if (null === $exceptionName || '' === $exceptionName) {
             $exceptionName = $this->askForExceptionName($io);
-        } elseif (str_ends_with((string) $exceptionName, 'Exception')) {
-            $exceptionName = substr((string) $exceptionName, 0, -9); // Remove 'Exception' suffix
+        } elseif (StringType::of((string) $exceptionName)->endsWith('Exception')->asBool()) {
+            $exceptionName = StringType::of((string) $exceptionName)->slice(0, -9)->toString(); // Remove 'Exception' suffix
         }
 
         // 2. Get available exceptions (PHP core + project exceptions)
-        $availableExceptions = $this->getAvailableExceptions();
+        $availableExceptions = $this->collectAvailableExceptions();
 
         // 3. Ask for parent exception
         $parentException = $this->askForParentException($io, $availableExceptions);
 
         // 4. Determine namespace and directory
         $customNamespace = $input->getOption('namespace');
-        $namespace = empty($customNamespace)
-            ? $this->getExceptionNamespace()
+        $namespace = (null === $customNamespace || '' === $customNamespace)
+            ? $this->resolveExceptionNamespace()
             : $this->namespace($customNamespace);
-        $directory = $this->getExceptionDirectory();
+        $directory = $this->resolveExceptionDirectory();
 
         // 5. Confirm namespace and directory
         $io->section('Summary');
@@ -125,14 +127,14 @@ final class ExceptionMaker extends AbstractMaker implements MakerInterface
 
     private function askForExceptionName(SymfonyStyle $io): string
     {
-        $question = new Question('Choose exception name (without "Exception" suffix):');
+        $question = $this->createQuestion('Choose exception name (without "Exception" suffix):');
         $question->setValidator(function ($answer) {
-            if (empty($answer)) {
-                throw new \RuntimeException('The exception name cannot be empty.');
+            if (null === $answer || '' === $answer) {
+                throw $this->createRuntimeException('The exception name cannot be empty.');
             }
 
-            if (str_ends_with($answer, 'Exception')) {
-                throw new \RuntimeException('Please provide the name without the "Exception" suffix.');
+            if (StringType::of($answer)->endsWith('Exception')->asBool()) {
+                throw $this->createRuntimeException('Please provide the name without the "Exception" suffix.');
             }
 
             return $answer;
@@ -141,7 +143,20 @@ final class ExceptionMaker extends AbstractMaker implements MakerInterface
         return $io->askQuestion($question);
     }
 
-    private function getAvailableExceptions(): array
+    private function createQuestion(string $questionText): Question
+    {
+        return new Question($questionText);
+    }
+
+    private function createRuntimeException(string $message): \RuntimeException
+    {
+        return new \RuntimeException($message);
+    }
+
+    /**
+     * @return array<int, string> List of available exception class names
+     */
+    private function collectAvailableExceptions(): array
     {
         $exceptions = self::PHP_CORE_EXCEPTIONS;
 
@@ -149,7 +164,7 @@ final class ExceptionMaker extends AbstractMaker implements MakerInterface
         $projectExceptions = $this->findProjectExceptions();
 
         // Add project exceptions with a label to distinguish them
-        foreach (array_keys($projectExceptions) as $exceptionClass) {
+        foreach (Collection::of($projectExceptions)->keys() as $exceptionClass) {
             $exceptions[] = $exceptionClass.' (from project)';
         }
 
@@ -164,15 +179,15 @@ final class ExceptionMaker extends AbstractMaker implements MakerInterface
     private function findProjectExceptions(): array
     {
         $exceptions = [];
-        $exceptionNamespace = $this->getExceptionNamespace();
-        $exceptionDirectory = $this->getExceptionDirectory();
+        $exceptionNamespace = $this->resolveExceptionNamespace();
+        $exceptionDirectory = $this->resolveExceptionDirectory();
 
         // Only scan if the directory exists
         if (!is_dir($exceptionDirectory)) {
             return $exceptions;
         }
 
-        $finder = new Finder();
+        $finder = $this->createFinder();
         $finder->files()
             ->in($exceptionDirectory)
             ->name('*Exception.php')
@@ -186,9 +201,12 @@ final class ExceptionMaker extends AbstractMaker implements MakerInterface
         return $exceptions;
     }
 
+    /**
+     * @param array<int, string> $availableExceptions List of available exception class names
+     */
     private function askForParentException(SymfonyStyle $io, array $availableExceptions): string
     {
-        $question = new ChoiceQuestion(
+        $question = $this->createChoiceQuestion(
             'Choose parent exception:',
             $availableExceptions,
             0 // Default to Exception
@@ -197,21 +215,34 @@ final class ExceptionMaker extends AbstractMaker implements MakerInterface
         $choice = $io->askQuestion($question);
 
         // If it's a project exception, extract the class name
-        if (str_contains((string) $choice, ' (from project)')) {
-            return str_replace(' (from project)', '', $choice);
+        if (StringType::of((string) $choice)->containsAny(' (from project)')->asBool()) {
+            return StringType::of((string) $choice)->replace(' (from project)', '')->toString();
         }
 
         return $choice;
     }
 
-    private function getExceptionNamespace(): string
+    /**
+     * @param array<int, string> $choices
+     */
+    private function createChoiceQuestion(string $questionText, array $choices, int $defaultChoice): ChoiceQuestion
+    {
+        return new ChoiceQuestion($questionText, $choices, $defaultChoice);
+    }
+
+    private function resolveExceptionNamespace(): string
     {
         return $this->namespace($this->exceptionNamespace ?? self::DEFAULT_EXCEPTION_NAMESPACE);
     }
 
-    private function getExceptionDirectory(): string
+    private function resolveExceptionDirectory(): string
     {
         return $this->path($this->exceptionDirectory ?? self::DEFAULT_EXCEPTION_DIRECTORY);
+    }
+
+    private function createFinder(): Finder
+    {
+        return new Finder();
     }
 
     private function generateExceptionClass(

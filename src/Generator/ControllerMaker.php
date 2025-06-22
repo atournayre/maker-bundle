@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Atournayre\Bundle\MakerBundle\Generator;
 
+use Atournayre\Primitives\Collection;
+use Atournayre\Primitives\StringType;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -22,6 +24,9 @@ final class ControllerMaker extends AbstractMaker implements MakerInterface
 
     private const DEFAULT_CONTROLLER_DIRECTORY = 'src/Controller';
 
+    /**
+     * @param array<int, string> $controllerInterfaces List of interface class names to be implemented by generated controllers
+     */
     public function __construct(
         Environment $twig,
         string $namespacePrefix = 'App',
@@ -58,29 +63,29 @@ final class ControllerMaker extends AbstractMaker implements MakerInterface
     {
         // 1. Get the controller name (from argument or ask interactively)
         $controllerName = $input->getArgument('name');
-        if (empty($controllerName)) {
+        if (null === $controllerName || '' === $controllerName) {
             $controllerName = $this->askForControllerName($io);
-        } elseif (str_ends_with((string) $controllerName, 'Controller')) {
-            $controllerName = substr((string) $controllerName, 0, -10); // Remove 'Controller' suffix
+        } elseif (StringType::of($controllerName)->endsWith('Controller')->asBool()) {
+            $controllerName = StringType::of($controllerName)->slice(0, -10)->toString(); // Remove 'Controller' suffix
         }
 
         // 2. Ask if the controller should extend AbstractController
-        $extendsAbstractController = $input->getOption('extends-abstract-controller');
-        if (!$input->getOption('extends-abstract-controller') && !$input->isInteractive()) {
+        $extendsAbstractController = (bool) $input->getOption('extends-abstract-controller');
+        if (false === $extendsAbstractController && !$input->isInteractive()) {
             $extendsAbstractController = false;
-        } elseif (!$input->getOption('extends-abstract-controller')) {
+        } elseif (false === $extendsAbstractController) {
             $extendsAbstractController = $this->askForExtendsAbstractController($io);
         }
 
         // 3. Determine namespace and directory
         $customNamespace = $input->getOption('namespace');
-        $namespace = empty($customNamespace)
-            ? $this->getControllerNamespace()
+        $namespace = (null === $customNamespace || '' === $customNamespace)
+            ? $this->resolveControllerNamespace()
             : $this->namespace($customNamespace);
-        $directory = $this->getControllerDirectory();
+        $directory = $this->resolveControllerDirectory();
 
         // 4. Get template path from option or configuration
-        $templatePath = $this->getControllerTemplatePath($input->getOption('template'));
+        $templatePath = $this->resolveControllerTemplatePath((string) $input->getOption('template'));
 
         // 5. Generate route pattern and name
         $routePattern = $this->generateRoutePattern($controllerName);
@@ -101,7 +106,7 @@ final class ControllerMaker extends AbstractMaker implements MakerInterface
                 ['Route name', $routeName],
                 ['View template path', $viewTemplatePath],
                 ['Controller template', $templatePath],
-                ['Interfaces', $this->controllerInterfaces === [] ? 'None' : implode(', ', $this->controllerInterfaces)],
+                ['Interfaces', [] === $this->controllerInterfaces ? 'None' : implode(', ', $this->controllerInterfaces)],
             ]
         );
 
@@ -131,14 +136,14 @@ final class ControllerMaker extends AbstractMaker implements MakerInterface
 
     private function askForControllerName(SymfonyStyle $io): string
     {
-        $question = new Question('Choose controller name (without "Controller" suffix):');
+        $question = $this->createQuestion('Choose controller name (without "Controller" suffix):');
         $question->setValidator(function ($answer) {
-            if (empty($answer)) {
-                throw new \RuntimeException('The controller name cannot be empty.');
+            if (null === $answer || '' === $answer) {
+                throw $this->createRuntimeException('The controller name cannot be empty.');
             }
 
-            if (str_ends_with($answer, 'Controller')) {
-                throw new \RuntimeException('Please provide the name without the "Controller" suffix.');
+            if (StringType::of($answer)->endsWith('Controller')->asBool()) {
+                throw $this->createRuntimeException('Please provide the name without the "Controller" suffix.');
             }
 
             return $answer;
@@ -147,9 +152,19 @@ final class ControllerMaker extends AbstractMaker implements MakerInterface
         return $io->askQuestion($question);
     }
 
+    private function createQuestion(string $questionText): Question
+    {
+        return new Question($questionText);
+    }
+
+    private function createRuntimeException(string $message): \RuntimeException
+    {
+        return new \RuntimeException($message);
+    }
+
     private function askForExtendsAbstractController(SymfonyStyle $io): bool
     {
-        $question = new ConfirmationQuestion(
+        $question = $this->createConfirmationQuestion(
             'Should the controller extend Symfony\Bundle\FrameworkBundle\Controller\AbstractController?',
             false
         );
@@ -157,25 +172,30 @@ final class ControllerMaker extends AbstractMaker implements MakerInterface
         return $io->askQuestion($question);
     }
 
-    private function getControllerNamespace(): string
+    private function createConfirmationQuestion(string $questionText, bool $defaultAnswer): ConfirmationQuestion
+    {
+        return new ConfirmationQuestion($questionText, $defaultAnswer);
+    }
+
+    private function resolveControllerNamespace(): string
     {
         return $this->namespace($this->controllerNamespace ?? self::DEFAULT_CONTROLLER_NAMESPACE);
     }
 
-    private function getControllerDirectory(): string
+    private function resolveControllerDirectory(): string
     {
         return $this->controllerDirectory ?? self::DEFAULT_CONTROLLER_DIRECTORY;
     }
 
-    private function getControllerTemplatePath(?string $optionTemplatePath = null): string
+    private function resolveControllerTemplatePath(string $optionTemplatePath = ''): string
     {
         // First check if a template path was provided as an option
-        if ($optionTemplatePath !== null && $optionTemplatePath !== '' && $optionTemplatePath !== '0') {
+        if ('' !== $optionTemplatePath && '0' !== $optionTemplatePath) {
             return $optionTemplatePath;
         }
 
         // Then check if a template path was configured
-        if ($this->controllerTemplatePath !== null && $this->controllerTemplatePath !== '' && $this->controllerTemplatePath !== '0') {
+        if (null !== $this->controllerTemplatePath && '' !== $this->controllerTemplatePath && '0' !== $this->controllerTemplatePath) {
             return $this->controllerTemplatePath;
         }
 
@@ -186,21 +206,21 @@ final class ControllerMaker extends AbstractMaker implements MakerInterface
     private function generateRoutePattern(string $controllerName): string
     {
         // Convert camel case to kebab case
-        $pattern = strtolower((string) preg_replace('/(?<!^)[A-Z]/', '-$0', $controllerName));
+        $pattern = StringType::of(preg_replace('/(?<!^)[A-Z]/', '-$0', $controllerName))->lower()->toString();
 
-        return '/'.strtolower($pattern);
+        return '/'.StringType::of($pattern)->lower()->toString();
     }
 
     private function generateRouteName(string $controllerName): string
     {
         // Convert camel case to snake case
-        return strtolower((string) preg_replace('/(?<!^)[A-Z]/', '_$0', $controllerName));
+        return StringType::of(preg_replace('/(?<!^)[A-Z]/', '_$0', $controllerName))->lower()->toString();
     }
 
     private function generateTemplatePath(string $controllerName): string
     {
         // Convert camel case to snake case for the template path
-        $templateName = strtolower((string) preg_replace('/(?<!^)[A-Z]/', '_$0', $controllerName));
+        $templateName = StringType::of(preg_replace('/(?<!^)[A-Z]/', '_$0', $controllerName))->lower()->toString();
 
         return $templateName.'/index.html.twig';
     }
@@ -229,7 +249,7 @@ final class ControllerMaker extends AbstractMaker implements MakerInterface
         ]);
 
         // If there are interfaces, modify the generated file to add them
-        if ($this->controllerInterfaces !== []) {
+        if ([] !== $this->controllerInterfaces) {
             $content = file_get_contents($filePath);
 
             // Generate use statements for interfaces
@@ -239,11 +259,15 @@ final class ControllerMaker extends AbstractMaker implements MakerInterface
             }
 
             // Generate implements clause
-            $interfaceShortNames = array_map(function ($interface) {
-                $parts = explode('\\', (string) $interface);
+            $interfaceShortNames = Collection::of($this->controllerInterfaces)
+                ->map(function ($interface) {
+                    $parts = StringType::of($interface)->split('\\');
+                    $collection = Collection::of($parts);
 
-                return end($parts);
-            }, $this->controllerInterfaces);
+                    return $collection->last();
+                })
+                ->toArray()
+            ;
 
             $implementsClause = ' implements '.implode(', ', $interfaceShortNames);
 
@@ -255,7 +279,7 @@ final class ControllerMaker extends AbstractMaker implements MakerInterface
             // Add implements clause after the class declaration
             $classPos = strpos($content, 'final class '.$controllerName.'Controller');
             $extendsPos = strpos($content, ' extends ', $classPos);
-            $implementsPos = false !== $extendsPos ? $extendsPos + strlen(' extends AbstractController') : strpos($content, "\n", $classPos);
+            $implementsPos = false !== $extendsPos ? $extendsPos + StringType::of(' extends AbstractController')->length()->value() : strpos($content, "\n", $classPos);
             $content = substr_replace($content, $implementsClause, $implementsPos, 0);
 
             // Write the modified content back to the file
