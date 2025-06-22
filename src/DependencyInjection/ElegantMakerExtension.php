@@ -32,6 +32,11 @@ final class ElegantMakerExtension extends Extension
         $container->setParameter('elegant_maker.controller.template_path', $config['controller']['template_path']);
         $container->setParameter('elegant_maker.controller.interfaces', $config['controller']['interfaces'] ?? []);
 
+        // Collection maker configuration
+        $container->setParameter('elegant_maker.collection.root_namespace', $config['collection']['root_namespace']);
+        $container->setParameter('elegant_maker.collection.target_directory', $config['collection']['target_directory']);
+        $container->setParameter('elegant_maker.collection.allowed_namespaces', $config['collection']['allowed_namespaces'] ?? []);
+
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yaml');
     }

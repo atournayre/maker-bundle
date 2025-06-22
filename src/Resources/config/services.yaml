@@ -12,6 +12,9 @@ services:
             $controllerDirectory: '%elegant_maker.controller.target_directory%'
             $controllerTemplatePath: '%elegant_maker.controller.template_path%'
             $controllerInterfaces: '%elegant_maker.controller.interfaces%'
+            $collectionNamespace: '%elegant_maker.collection.root_namespace%'
+            $collectionDirectory: '%elegant_maker.collection.target_directory%'
+            $allowedNamespaces: '%elegant_maker.collection.allowed_namespaces%'
 
     # Register all services in the Generator namespace
     Atournayre\Bundle\MakerBundle\Generator\:
