@@ -7,7 +7,7 @@
     "minimum-stability": "stable",
     "require": {
         "php": ">=8.2",
-        "atournayre/framework": "^1.0",
+        "atournayre/framework": "^2",
         "symfony/console": "^6.4 || ^7.0",
         "symfony/framework-bundle": "^6.4 || ^7.0",
         "twig/twig": "^3.0"
