@@ -14,6 +14,9 @@ nav:
   - Generators:
     - Overview: generators/index.md
     - Class Generator: generators/class.md
+    - Collection Generator: generators/collection.md
+    - Controller Generator: generators/controller.md
+    - Exception Generator: generators/exception.md
   - Extending:
     - Custom Generators: extending/custom-generators.md
   - API Reference: api-reference.md
