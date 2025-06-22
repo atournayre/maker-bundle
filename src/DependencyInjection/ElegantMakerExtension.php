@@ -29,6 +29,8 @@ final class ElegantMakerExtension extends Extension
         // Controller maker configuration
         $container->setParameter('elegant_maker.controller.root_namespace', $config['controller']['root_namespace']);
         $container->setParameter('elegant_maker.controller.target_directory', $config['controller']['target_directory']);
+        $container->setParameter('elegant_maker.controller.template_path', $config['controller']['template_path']);
+        $container->setParameter('elegant_maker.controller.interfaces', $config['controller']['interfaces'] ?? []);
 
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yaml');

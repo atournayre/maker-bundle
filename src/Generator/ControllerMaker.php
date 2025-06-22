@@ -27,6 +27,8 @@ final class ControllerMaker extends AbstractMaker implements MakerInterface
         string $dirPrefix = 'src',
         private readonly ?string $controllerNamespace = null,
         private readonly ?string $controllerDirectory = null,
+        private readonly ?string $controllerTemplatePath = null,
+        private readonly array $controllerInterfaces = [],
     ) {
         parent::__construct($twig, $namespacePrefix, $dirPrefix);
     }
@@ -47,6 +49,7 @@ final class ControllerMaker extends AbstractMaker implements MakerInterface
             ->addArgument('name', InputArgument::OPTIONAL, 'The name of the controller (without "Controller" suffix)')
             ->addOption('namespace', null, InputOption::VALUE_OPTIONAL, 'The namespace of the controller')
             ->addOption('extends-abstract-controller', null, InputOption::VALUE_NONE, 'Whether the controller should extend AbstractController')
+            ->addOption('template', null, InputOption::VALUE_OPTIONAL, 'The template to use for generating the controller')
         ;
     }
 
@@ -75,12 +78,15 @@ final class ControllerMaker extends AbstractMaker implements MakerInterface
             : $this->getControllerNamespace();
         $directory = $this->getControllerDirectory();
 
-        // 4. Generate route pattern and name
+        // 4. Get template path from option or configuration
+        $templatePath = $this->getControllerTemplatePath($input->getOption('template'));
+
+        // 5. Generate route pattern and name
         $routePattern = $this->generateRoutePattern($controllerName);
         $routeName = $this->generateRouteName($controllerName);
-        $templatePath = $this->generateTemplatePath($controllerName);
+        $viewTemplatePath = $this->generateTemplatePath($controllerName);
 
-        // 5. Confirm namespace and directory
+        // 6. Confirm namespace and directory
         $io->section('Summary');
         $io->table(
             ['Property', 'Value'],
@@ -92,7 +98,9 @@ final class ControllerMaker extends AbstractMaker implements MakerInterface
                 ['File path', $directory . '/' . $controllerName . 'Controller.php'],
                 ['Route pattern', $routePattern],
                 ['Route name', $routeName],
-                ['Template path', $templatePath],
+                ['View template path', $viewTemplatePath],
+                ['Controller template', $templatePath],
+                ['Interfaces', !empty($this->controllerInterfaces) ? implode(', ', $this->controllerInterfaces) : 'None'],
             ]
         );
 
@@ -101,7 +109,7 @@ final class ControllerMaker extends AbstractMaker implements MakerInterface
             return;
         }
 
-        // 6. Generate the controller class
+        // 7. Generate the controller class
         $this->generateControllerClass(
             $controllerName,
             $extendsAbstractController,
@@ -109,6 +117,7 @@ final class ControllerMaker extends AbstractMaker implements MakerInterface
             $directory,
             $routePattern,
             $routeName,
+            $viewTemplatePath,
             $templatePath
         );
 
@@ -156,6 +165,22 @@ final class ControllerMaker extends AbstractMaker implements MakerInterface
         return $this->controllerDirectory ?? self::DEFAULT_CONTROLLER_DIRECTORY;
     }
 
+    private function getControllerTemplatePath(?string $optionTemplatePath = null): string
+    {
+        // First check if a template path was provided as an option
+        if (!empty($optionTemplatePath)) {
+            return $optionTemplatePath;
+        }
+
+        // Then check if a template path was configured
+        if (!empty($this->controllerTemplatePath)) {
+            return $this->controllerTemplatePath;
+        }
+
+        // Finally, fall back to the default template
+        return 'controller.tpl.php';
+    }
+
     private function generateRoutePattern(string $controllerName): string
     {
         // Convert camel case to kebab case
@@ -183,18 +208,53 @@ final class ControllerMaker extends AbstractMaker implements MakerInterface
         string $directory,
         string $routePattern,
         string $routeName,
-        string $templatePath
+        string $viewTemplatePath,
+        string $controllerTemplatePath
     ): void {
         $className = $controllerName . 'Controller';
         $filePath = $directory . '/' . $className . '.php';
 
-        $this->generateFile($filePath, 'controller.tpl.php', [
+        // Generate the controller file using the template
+        $this->generateFile($filePath, $controllerTemplatePath, [
             'namespace' => $namespace,
             'class_name' => $controllerName,
             'extends_abstract_controller' => $extendsAbstractController,
             'route_pattern' => $routePattern,
             'route_name' => $routeName,
-            'template_path' => $templatePath,
+            'template_path' => $viewTemplatePath,
         ]);
+
+        // If there are interfaces, modify the generated file to add them
+        if (!empty($this->controllerInterfaces)) {
+            $content = file_get_contents($filePath);
+
+            // Generate use statements for interfaces
+            $useStatements = '';
+            foreach ($this->controllerInterfaces as $interface) {
+                $useStatements .= "use $interface;\n";
+            }
+
+            // Generate implements clause
+            $interfaceShortNames = array_map(function($interface) {
+                $parts = explode('\\', $interface);
+                return end($parts);
+            }, $this->controllerInterfaces);
+
+            $implementsClause = ' implements ' . implode(', ', $interfaceShortNames);
+
+            // Add use statements after the last use statement
+            $lastUsePos = strrpos($content, "use ");
+            $lastUseEndPos = strpos($content, "\n", $lastUsePos);
+            $content = substr_replace($content, "\n" . $useStatements, $lastUseEndPos, 0);
+
+            // Add implements clause after the class declaration
+            $classPos = strpos($content, "final class " . $controllerName . "Controller");
+            $extendsPos = strpos($content, " extends ", $classPos);
+            $implementsPos = $extendsPos !== false ? $extendsPos + strlen(" extends AbstractController") : strpos($content, "\n", $classPos);
+            $content = substr_replace($content, $implementsClause, $implementsPos, 0);
+
+            // Write the modified content back to the file
+            file_put_contents($filePath, $content);
+        }
     }
 }

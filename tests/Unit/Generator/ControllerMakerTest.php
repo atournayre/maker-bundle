@@ -26,7 +26,9 @@ class ControllerMakerTest extends TestCase
             'TestApp',
             'test-src',
             'TestApp\\Controller',
-            'test-src/Controller'
+            'test-src/Controller',
+            'controller.tpl.php',
+            ['TestApp\\Contracts\\Controller\\ControllerInterface']
         );
     }
 
@@ -59,7 +61,7 @@ class ControllerMakerTest extends TestCase
             ->with('name', self::anything(), self::anything())
             ->willReturnSelf();
 
-        $command->expects(self::exactly(2))
+        $command->expects(self::exactly(3))
             ->method('addOption')
             ->willReturnSelf();
 

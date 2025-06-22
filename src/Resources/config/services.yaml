@@ -10,6 +10,8 @@ services:
             $exceptionDirectory: '%elegant_maker.exception.target_directory%'
             $controllerNamespace: '%elegant_maker.controller.root_namespace%'
             $controllerDirectory: '%elegant_maker.controller.target_directory%'
+            $controllerTemplatePath: '%elegant_maker.controller.template_path%'
+            $controllerInterfaces: '%elegant_maker.controller.interfaces%'
 
     # Register all services in the Generator namespace
     Atournayre\Bundle\MakerBundle\Generator\:

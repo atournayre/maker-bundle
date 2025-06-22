@@ -20,6 +20,7 @@ php bin/console make:elegant:controller [name] [options]
 |--------|-------------|---------|
 | `--namespace` | The namespace of the controller | Value from configuration |
 | `--extends-abstract-controller` | Whether the controller should extend AbstractController | false |
+| `--template` | The template to use for generating the controller | Value from configuration |
 
 ## Interactive Prompts
 
@@ -39,6 +40,8 @@ The Controller Generator is fully interactive and will prompt you for the follow
 - Generates a template path based on the controller name (converted to snake_case)
 - Configurable namespace and directory through bundle configuration
 - Option to extend Symfony's AbstractController
+- Customizable controller template through configuration or command option
+- Support for implementing interfaces specified in configuration
 
 ## Example Usage
 
@@ -64,7 +67,9 @@ php bin/console make:elegant:controller
 | File path                  | src/Controller/PaymentController.php     |
 | Route pattern              | /payment                                 |
 | Route name                 | payment                                  |
-| Template path              | payment/index.html.twig                  |
+| View template path         | payment/index.html.twig                  |
+| Controller template        | controller.tpl.php                       |
+| Interfaces                 | None                                     |
 +----------------------------+------------------------------------------+
 
  Do you want to generate this controller class? (yes/no) [yes]:
@@ -80,19 +85,30 @@ You can also specify the controller name and options directly on the command lin
 
 ```bash
 php bin/console make:elegant:controller Payment --namespace="App\Controller\Payment" --extends-abstract-controller
+```
+
+### Using a Custom Template
+
+You can specify a custom template to use for generating the controller:
+
+```bash
+php bin/console make:elegant:controller Payment --template="my_custom_controller.tpl.php"
+```
 
  Summary
 +----------------------------+------------------------------------------+
 | Property                   | Value                                    |
 +----------------------------+------------------------------------------+
 | Controller name            | PaymentController                        |
-| Extends AbstractController | Yes                           |
+| Extends AbstractController | Yes                                      |
 | Namespace                  | App\Controller\Payment                   |
 | Directory                  | src/Controller                           |
 | File path                  | src/Controller/PaymentController.php     |
 | Route pattern              | /payment                                 |
 | Route name                 | payment                                  |
-| Template path              | payment/index.html.twig                  |
+| View template path         | payment/index.html.twig                  |
+| Controller template        | controller.tpl.php                       |
+| Interfaces                 | None                                     |
 +----------------------------+------------------------------------------+
 
  Do you want to generate this controller class? (yes/no) [yes]:
@@ -125,13 +141,13 @@ final class PaymentController
     )
     {
     }
-    
+
     #[Route(path: '/payment', name: 'payment', methods: ['GET', 'POST'])]
     #[Template(template: 'payment/index.html.twig')]
     public function __invoke(Request $request, ContextInterface $context)
     {
         return TryCatch::with(function () use ($request) {
-        
+
         }, $this->logger)
         // implements catch if needed
         ->execute();
@@ -160,9 +176,33 @@ final class PaymentController extends AbstractController
 }
 ```
 
+### Controller with Interfaces
+
+When interfaces are specified in the configuration, the generated controller will implement those interfaces:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Controller;
+
+use Atournayre\Contracts\Context\ContextInterface;
+use Atournayre\Contracts\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Attribute\Route;
+use App\Contracts\Controller\ControllerInterface;
+use App\Contracts\Controller\ApiControllerInterface;
+
+final class PaymentController implements ControllerInterface, ApiControllerInterface
+{
+    // ...
+}
+```
+
 ## Configuration
 
-You can customize the namespace and directory for generated controllers in your configuration:
+You can customize the namespace, directory, template path, and interfaces for generated controllers in your configuration:
 
 ```yaml
 # config/packages/elegant_maker.yaml
@@ -170,4 +210,21 @@ elegant_maker:
     controller:
         root_namespace: 'App\Controller'
         target_directory: 'src/Controller'
+        template_path: 'controller.tpl.php'  # Custom template path
+        interfaces:     # List of interfaces to implement
+            - 'App\Contracts\Controller\ControllerInterface'
+            - 'App\Contracts\Controller\ApiControllerInterface'
 ```
+
+### Custom Template
+
+You can create a custom template for your controllers by copying the default template and modifying it to suit your needs. The template is a PHP file with Twig-like syntax that's processed by the Twig engine.
+
+### Implementing Interfaces
+
+When you specify interfaces in the configuration, the generator will automatically:
+1. Add use statements for the interfaces
+2. Add the interfaces to the class declaration
+3. Show the interfaces in the summary before generation
+
+This allows you to ensure that all generated controllers implement the required interfaces for your application.
