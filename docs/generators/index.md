@@ -11,6 +11,7 @@ Each generator is designed to create a specific type of code structure following
 | Generator | Command | Description |
 |-----------|---------|-------------|
 | [Class Generator](class.md) | `make:elegant:class` | Creates a simple PHP class |
+| [Controller Generator](controller.md) | `make:elegant:controller` | Creates a new controller class |
 | [Exception Generator](exception.md) | `make:elegant:exception` | Creates a new exception class |
 | More generators coming soon... | | |
 

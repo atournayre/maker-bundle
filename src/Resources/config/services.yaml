@@ -8,6 +8,8 @@ services:
             $dirPrefix: '%elegant_maker.dir_prefix%'
             $exceptionNamespace: '%elegant_maker.exception.root_namespace%'
             $exceptionDirectory: '%elegant_maker.exception.target_directory%'
+            $controllerNamespace: '%elegant_maker.controller.root_namespace%'
+            $controllerDirectory: '%elegant_maker.controller.target_directory%'
 
     # Register all services in the Generator namespace
     Atournayre\Bundle\MakerBundle\Generator\:
